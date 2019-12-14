@@ -2,7 +2,7 @@ package validator
 
 import (
 	"github.com/pepeunlimited/microservice-kit/validator"
-	rpc2 "github.com/pepeunlimited/users/rpc"
+	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
 )
 
@@ -13,7 +13,7 @@ func NewUserServerValidator() UserServerValidator {
 	return UserServerValidator{}
 }
 
-func (UserServerValidator) CreateUser(params *rpc2.CreateUserParams) error {
+func (UserServerValidator) CreateUser(params *rpc.CreateUserParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}
@@ -26,6 +26,16 @@ func (UserServerValidator) CreateUser(params *rpc2.CreateUserParams) error {
 	return nil
 }
 
-func (UserServerValidator) GetUser(params *rpc2.GetUserParams) error {
+func (UserServerValidator) GetUser(params *rpc.GetUserParams) error {
+	return nil
+}
+
+func (UserServerValidator) SignIn(params *rpc.SignInParams) error {
+	if validator.IsEmpty(params.Username) {
+		return twirp.RequiredArgumentError("username")
+	}
+ 	if validator.IsEmpty(params.Password) {
+ 		return twirp.RequiredArgumentError("password")
+	}
 	return nil
 }

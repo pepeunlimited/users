@@ -62,3 +62,46 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestUserServer_SignInOk(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient())
+	server.users.DeleteAll(ctx)
+
+	email := "simo@gmail.com"
+	username := email
+	password := "p4sw0rd"
+
+	server.CreateUser(ctx, &rpc2.CreateUserParams{
+		Username: username,
+		Password: password,
+		Email:    email,
+	})
+	user, err := server.SignIn(ctx, &rpc2.SignInParams{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if user == nil {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_SignInFail(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient())
+	server.users.DeleteAll(ctx)
+	_, err := server.SignIn(ctx, &rpc2.SignInParams{
+		Username: "simo",
+		Password: "p4sw0rd",
+	})
+	if err == nil {
+		t.FailNow()
+	}
+	if err.(twirp.Error).Meta(rpcz.NotFound) != "user" {
+		t.FailNow()
+	}
+}

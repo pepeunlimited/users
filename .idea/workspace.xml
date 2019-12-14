@@ -118,7 +118,7 @@
       <recent name="$PROJECT_DIR$/build/package/app1" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
+  <component name="RunManager" selected="Go Test.TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$" />
@@ -126,28 +126,6 @@
       <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
       <package value="github.com/pepeunlimited/users" />
       <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserServer_CreateUser in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_CreateUser$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_CreateUserFail$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -159,6 +137,28 @@
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
       <pattern value="^TestUserServer_GetUserNotFound$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServer_SignInFail$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServer_SignInOk$" />
       <method v="2" />
     </configuration>
     <configuration name="user_service_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -173,11 +173,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server" />
+        <item itemvalue="Go Test.TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.user_service_test.go" />
         <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_CreateUser in github.com/pepeunlimited/users/internal/app/app1/server" />
       </list>
     </recent_temporary>
   </component>
@@ -245,26 +245,26 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576244697297" />
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1576342920502">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1576359502586">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576342920501" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576351525322">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576359677220">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576351525322" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576351525318">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576359677220" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576359677217">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576351525318" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576351525316">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576359677217" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576359677215">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576351525316" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576351525320">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576359677215" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576359677219">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576351525320" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576359677219" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576328735605">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

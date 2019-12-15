@@ -19,7 +19,7 @@ spec:
             - name: MYSQL_DATABASE
               value: users
             - name: MYSQL_HOST
-              value: mysql
+              value: docker-mysql.default.svc
             - name: MYSQL_PORT
               value: "3306"
             - name: MYSQL_ROOT_PASSWORD
@@ -30,7 +30,7 @@ spec:
               value: nats
             - name: NATS_PORT
               value: "4222"
-          image: pepeunlimited/users:1.0
+          image: pepeunlimited/users:0.1
           name: users
           ports:
             - containerPort: 8080

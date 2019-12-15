@@ -32,8 +32,8 @@ service UserService {
 }
 
 message VerifySignInParams {
-    string username = 1;
-    string password = 2;
+    string username = 1;//required
+    string password = 2;//required
 }
 
 // CreateUser:CreateUserParams
@@ -59,20 +59,20 @@ message ForgotPasswordParams {
 
 message User {
     int64 id = 1;
-    string username = 2; // required
+    string username = 2;
     string email = 3;
     string role = 4;
 }
 
 message ResetPasswordParams {
-    string token = 1;
-    string password = 2;
+    string token = 1;//required
+    string password = 2;//required
 }
 
 message ResetPasswordResponse {}
 
 message VerifyPasswordParams {
-    string token = 1;
+    string token = 1;//required
 }
 
 message VerifyPasswordResponse {}

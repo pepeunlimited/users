@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/production/app-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/production/app-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/production/app-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-service.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/staging/app-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/staging/app-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/staging/app-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.proto" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +62,7 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.dep.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/deployments/dev" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -75,11 +71,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/deployments/dev" />
+      <recent name="$PROJECT_DIR$/deployments" />
       <recent name="$PROJECT_DIR$/deployments/staging" />
       <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
-      <recent name="$PROJECT_DIR$/deployments" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/configs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/internal/app/app1" />
@@ -221,22 +217,22 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576408322933">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576434398254">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322933" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576408322930">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398254" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576434398251">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322930" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576408322927">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398251" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576434398249">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322927" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576408322931">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398249" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576434398252">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322931" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398252" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576406153589">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

@@ -11,14 +11,14 @@ import (
 
 type Role string
 const (
-	User Role = "User"
-	Admin 	  = "Admin"
+	User Role = "user"
+	Admin 	  = "admin"
 )
 
 var (
 	ErrUserBanned 		= errors.New("users: user is banned")
 	ErrUserLocked 		= errors.New("users: user is locked")
-	ErrUserDeleted    	= errors.New("users: user is deleted")
+	ErrUserNotExist 	= errors.New("users: user not exist")
 	ErrUsernameExist    = errors.New("users: username already exist")
 	ErrEmailExist 		= errors.New("users: email already exist")
 )
@@ -52,11 +52,13 @@ type userMySQL struct {
 }
 
 func (repo userMySQL) GetUserByUsername(ctx context.Context, username string) (*ent.User, error) {
-	return repo.client.User.Query().Where(user.Username(username)).Only(ctx)
+	user, err := repo.client.User.Query().Where(user.IsDeleted(false), user.Username(username)).Only(ctx)
+	return repo.isUserError(user, err)
 }
 
 func (repo userMySQL) GetUserByEmail(ctx context.Context, email string) (*ent.User, error) {
-	return repo.client.User.Query().Where(user.Email(email)).Only(ctx)
+	user, err := repo.client.User.Query().Where(user.IsDeleted(false), user.Email(email)).Only(ctx)
+	return repo.isUserError(user, err)
 }
 
 func (repo userMySQL) UnbanUser(ctx context.Context, userId int) (*ent.User, error) {
@@ -166,9 +168,12 @@ func (repo userMySQL) CreateUser(ctx context.Context, username string, email str
 	return save, nil
 }
 
-func (repo userMySQL) GetUserById(ctx context.Context, id int) (*ent.User, error) {
-	user, err := repo.client.User.Get(ctx, id)
+func (repo userMySQL) isUserError(user *ent.User, err error) (*ent.User, error) {
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, ErrUserNotExist
+		}
+		// unknown
 		return nil, err
 	}
 	if user.IsBanned {
@@ -177,10 +182,12 @@ func (repo userMySQL) GetUserById(ctx context.Context, id int) (*ent.User, error
 	if user.IsLocked {
 		return nil, ErrUserLocked
 	}
-	if user.IsDeleted {
-		return nil, ErrUserDeleted
-	}
 	return user, nil
+}
+
+func (repo userMySQL) GetUserById(ctx context.Context, id int) (*ent.User, error) {
+	user, err := repo.client.User.Query().Where(user.IsDeleted(false), user.ID(id)).Only(ctx)
+	return repo.isUserError(user, err)
 }
 
 func (repo userMySQL) GetUsers(ctx context.Context, offset int, limit int) ([]*ent.User, error) {

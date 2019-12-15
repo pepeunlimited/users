@@ -3,28 +3,37 @@ package server
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
 	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServer struct {
 	tickets repository.TicketRepository
 	users repository.UserRepository
+	crypto  cryptoz.Crypto
 	validator validator.UserServerValidator
 }
 
-func (server UserServer) SignIn(ctx context.Context, params *rpc.SignInParams) (*rpc.User, error) {
+func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySignInParams) (*rpc.User, error) {
 	err := server.validator.SignIn(params)
 	if err != nil {
 		return nil, err
 	}
 	user, err := server.users.GetUserByUsername(ctx, params.Username)
 	if err != nil {
-		return nil, server.getUserError(err)
+		return nil, server.isUserError(err)
+	}
+	if err := server.crypto.Check(user.Password, params.Password); err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return nil, twirp.NewError(twirp.Unauthenticated, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
+		}
+		return nil, twirp.InternalError("unknown error during sign-in err: "+err.Error())
 	}
 	return &rpc.User{
 		Id:       int64(user.ID),
@@ -58,9 +67,9 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 	if err  != nil {
 		switch err {
 		case repository.ErrUsernameExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Unique, "username")
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpc.UsernameExist)
 		case repository.ErrEmailExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Unique, "email")
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpc.EmailExist)
 		}
 		return nil, twirp.NewError(twirp.Aborted, err.Error())
 	}
@@ -72,11 +81,18 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 	}, nil
 }
 
-func (server UserServer) getUserError(err error) error {
-	if ent.IsNotFound(err) {
-		return twirp.NotFoundError("user not exist").WithMeta(rpcz.NotFound, "user")
+func (server UserServer) isUserError(err error) error {
+	if err == repository.ErrUserNotExist {
+		return twirp.NotFoundError("user not exist").WithMeta(rpcz.Reason, rpc.UserNotFound)
 	}
-	return err
+	if err == repository.ErrUserLocked {
+		return twirp.NewError(twirp.PermissionDenied ,"user is locked").WithMeta(rpcz.Reason, rpc.UserIsLocked)
+	}
+	if err == repository.ErrUserBanned {
+		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpc.UserIsBanned)
+	}
+	// unknown
+	return twirp.NewError(twirp.Internal ,"unknown error: "+err.Error())
 }
 
 func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {
@@ -86,7 +102,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	}
 	user, err := server.users.GetUserById(ctx, int(userId))
 	if err != nil {
-		return nil, server.getUserError(err)
+		return nil, server.isUserError(err)
 	}
 	return &rpc.User{
 		Id:       int64(user.ID),
@@ -101,8 +117,9 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 
 func NewUserServer(client *ent.Client) UserServer {
 	return UserServer{
-		users: repository.NewUserRepository(client),
-		tickets: repository.NewTicketRepository(client),
-		validator: validator.NewUserServerValidator(),
+		users: 		repository.NewUserRepository(client),
+		tickets: 	repository.NewTicketRepository(client),
+		crypto:		cryptoz.NewCrypto(),
+		validator: 	validator.NewUserServerValidator(),
 	}
 }

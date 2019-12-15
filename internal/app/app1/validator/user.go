@@ -30,7 +30,7 @@ func (UserServerValidator) GetUser(params *rpc.GetUserParams) error {
 	return nil
 }
 
-func (UserServerValidator) SignIn(params *rpc.SignInParams) error {
+func (UserServerValidator) SignIn(params *rpc.VerifySignInParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}

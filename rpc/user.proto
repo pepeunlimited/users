@@ -27,10 +27,11 @@ service UserService {
     // Get the current user:Restricted
     rpc GetUser(GetUserParams) returns (User);
 
-    rpc SignIn(SignInParams) returns (User);
+    // verify the sign-in with real credentials
+    rpc VerifySignIn(VerifySignInParams) returns (User);
 }
 
-message SignInParams {
+message VerifySignInParams {
     string username = 1;
     string password = 2;
 }

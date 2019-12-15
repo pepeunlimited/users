@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
-	rpc2 "github.com/pepeunlimited/users/rpc"
+	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
 	"testing"
 )
@@ -13,7 +13,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.CreateUser(ctx, &rpc2.CreateUserParams{
+	_, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
@@ -28,7 +28,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.CreateUser(ctx, &rpc2.CreateUserParams{
+	_, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
@@ -37,7 +37,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.CreateUser(ctx, &rpc2.CreateUserParams{
+	_, err = server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo2@gmail.com",
@@ -45,7 +45,8 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if err.(twirp.Error).Meta(rpcz.Unique) != "username" {
+	if !rpc.IsReason(err.(twirp.Error), rpc.UsernameExist) {
+		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
 }
@@ -54,11 +55,12 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.GetUser(ctx, &rpc2.GetUserParams{})
+	_, err := server.GetUser(ctx, &rpc.GetUserParams{})
 	if err == nil {
 		t.FailNow()
 	}
-	if err.(twirp.Error).Meta(rpcz.NotFound) != "user" {
+	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
+		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
 }
@@ -72,12 +74,12 @@ func TestUserServer_SignInOk(t *testing.T) {
 	username := email
 	password := "p4sw0rd"
 
-	server.CreateUser(ctx, &rpc2.CreateUserParams{
+	server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: username,
 		Password: password,
 		Email:    email,
 	})
-	user, err := server.SignIn(ctx, &rpc2.SignInParams{
+	user, err := server.SignIn(ctx, &rpc.SignInParams{
 		Username: username,
 		Password: password,
 	})
@@ -94,14 +96,35 @@ func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.SignIn(ctx, &rpc2.SignInParams{
+	_, err := server.SignIn(ctx, &rpc.SignInParams{
 		Username: "simo",
 		Password: "p4sw0rd",
 	})
 	if err == nil {
 		t.FailNow()
 	}
-	if err.(twirp.Error).Meta(rpcz.NotFound) != "user" {
+	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
+		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
+
+}
+
+
+func TestUserServer_SignInFailCred(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient())
+	server.users.DeleteAll(ctx)
+	_, err := server.SignIn(ctx, &rpc.SignInParams{
+		Username: "simo",
+		Password: "p4sw0rd",
+	})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
+		t.Log(err.(twirp.Error).Error())
+		t.FailNow()
+	}
+
 }

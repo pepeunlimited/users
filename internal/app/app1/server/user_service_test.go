@@ -79,7 +79,7 @@ func TestUserServer_SignInOk(t *testing.T) {
 		Password: password,
 		Email:    email,
 	})
-	user, err := server.SignIn(ctx, &rpc.SignInParams{
+	user, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: username,
 		Password: password,
 	})
@@ -96,7 +96,7 @@ func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.SignIn(ctx, &rpc.SignInParams{
+	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",
 		Password: "p4sw0rd",
 	})
@@ -115,7 +115,7 @@ func TestUserServer_SignInFailCred(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(repository.NewEntClient())
 	server.users.DeleteAll(ctx)
-	_, err := server.SignIn(ctx, &rpc.SignInParams{
+	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",
 		Password: "p4sw0rd",
 	})

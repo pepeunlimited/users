@@ -3,12 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/app-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/app-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/app-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/app-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/app-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/app-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-service.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,25 +89,14 @@
       <recent name="$PROJECT_DIR$/build/package/app1" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server">
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build github.com/pepeunlimited/users/cmd/app1">
+    <configuration name="go build github.com/pepeunlimited/users/cmd/app1" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
-      <package value="github.com/pepeunlimited/users" />
-      <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserMySQL_BanUserUnLock in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
-      <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/repository" />
+      <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
+      <package value="github.com/pepeunlimited/users/cmd/app1" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserMySQL_BanUserUnLock$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -143,13 +132,24 @@
       <pattern value="^TestUserServer_SignInFail$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServer_SignInOk$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build github.com/pepeunlimited/users/cmd/app1" />
+        <item itemvalue="Go Test.TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserMySQL_BanUserUnLock in github.com/pepeunlimited/users/internal/app/app1/repository" />
-        <item itemvalue="Go Build.go build main.go" />
       </list>
     </recent_temporary>
   </component>
@@ -221,22 +221,22 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="363" key="GridCell.Tab.0.bottom" timestamp="1576406153584">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576408322933">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153584" />
-    <state width="1638" height="363" key="GridCell.Tab.0.center" timestamp="1576406153581">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322933" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576408322930">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153581" />
-    <state width="1638" height="363" key="GridCell.Tab.0.left" timestamp="1576406153580">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322930" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576408322927">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153580" />
-    <state width="1638" height="363" key="GridCell.Tab.0.right" timestamp="1576406153583">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322927" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576408322931">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153583" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576408322931" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576406153589">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -257,10 +257,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="349" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1576317305084" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1576405865284">
+    <state width="500" height="445" key="SwitcherDM" timestamp="1576409097882">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576405865284" />
+    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576409097882" />
     <state x="602" y="140" key="refactoring.ChangeSignatureDialog" timestamp="1576252230617">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

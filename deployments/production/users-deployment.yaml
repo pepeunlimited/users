@@ -1,7 +1,7 @@
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
-  namespace: ingress-nginx
+  namespace: default
   name: app
   labels:
     app: app
@@ -18,7 +18,7 @@ spec:
       containers:
         - env:
             - name: MYSQL_DATABASE
-              value: shopping_list
+              value: users
             - name: MYSQL_HOST
               value: mysql
             - name: MYSQL_PORT
@@ -31,8 +31,6 @@ spec:
               value: nats
             - name: NATS_PORT
               value: "4222"
-            - name: WAIT_HOSTS
-              value: mysql:3306
           image: pepeunlimited/app1-k8:latest
           name: app
           ports:

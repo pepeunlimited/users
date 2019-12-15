@@ -82,16 +82,15 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 }
 
 func (server UserServer) isUserError(err error) error {
-	if err == repository.ErrUserNotExist {
+	switch err {
+	case repository.ErrUserNotExist:
 		return twirp.NotFoundError("user not exist").WithMeta(rpcz.Reason, rpc.UserNotFound)
-	}
-	if err == repository.ErrUserLocked {
+	case repository.ErrUserLocked:
 		return twirp.NewError(twirp.PermissionDenied ,"user is locked").WithMeta(rpcz.Reason, rpc.UserIsLocked)
-	}
-	if err == repository.ErrUserBanned {
+	case repository.ErrUserBanned:
 		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpc.UserIsBanned)
 	}
-	// unknown
+	//unknown
 	return twirp.NewError(twirp.Internal ,"unknown error: "+err.Error())
 }
 
@@ -111,9 +110,6 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 		Role:     user.Role,
 	}, nil
 }
-
-
-
 
 func NewUserServer(client *ent.Client) UserServer {
 	return UserServer{

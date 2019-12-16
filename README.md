@@ -9,7 +9,7 @@ A starting point project to create `users`-service
 ### `/cmd`
 
 ### `/deployments`
-Deployments folder contains files for the `k8s` environment; `service`, `deployment` and `ingress`. Dev have additional `external-mysql-service.yaml` which allow access from local cluster to external MySQL database.  
+Deployments folder contains files for the `k8s` environment; `service`, `deployment` and `ingress`. Dev have an additional `external-mysql-service.yaml` which allow access from local cluster to external MySQL database.  
 
 ### `/init`
 

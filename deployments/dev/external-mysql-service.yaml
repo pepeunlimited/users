@@ -1,8 +1,8 @@
 kind: Service
 apiVersion: v1
 metadata:
-  # MYSQL_HOST=docker-mysql.default.svc
-  name: docker-mysql
+  # MYSQL_HOST=external-mysql.default.svc
+  name: external-mysql
 spec:
   type: ExternalName
   externalName: 10.0.2.2

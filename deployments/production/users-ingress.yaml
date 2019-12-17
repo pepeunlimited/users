@@ -15,7 +15,7 @@ spec:
           - backend:
               serviceName: users
               servicePort: 80
-            path: /twirp/pepeunlimited.users.UseService/*
+            path: /twirp/pepeunlimited.users.UserService/*
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -31,8 +31,8 @@ spec:
           - backend:
               serviceName: users
               servicePort: 80
-            path: /twirp/pepeunlimited.users.UseService/VerifySignIn
+            path: /twirp/pepeunlimited.users.UserService/VerifySignIn
           - backend:
               serviceName: users
               servicePort: 80
-            path: /twirp/pepeunlimited.users.UseService/CreateUser
+            path: /twirp/pepeunlimited.users.UserService/CreateUser

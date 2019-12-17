@@ -20,3 +20,9 @@ $ curl -H "Content-Type: application/json" \
 -X POST "localhost:8080/twirp/pepeunlimited.users.UserService/GetUser" \
 -d '{}'
 ```
+### `VerifySignIn`
+```
+$ curl -H "Content-Type: application/json" \
+-X POST "localhost:8080/twirp/pepeunlimited.users.UserService/VeriySignIn" \
+-d '{"username": "ssimoo", "email": "simo@gmail.com", "password": "p4sw0rd"}'
+```

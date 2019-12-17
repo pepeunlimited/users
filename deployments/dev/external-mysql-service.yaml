@@ -1,8 +1,25 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  # MYSQL_HOST=external-mysql.default.svc
   name: external-mysql
 spec:
-  type: ExternalName
-  externalName: 10.0.2.2
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-mysql
+subsets:
+  - addresses:
+      # READ MORE:
+      # $ minikube ssh "route -n | grep ^0.0.0.0 | awk '{ print \$2 }'"
+      # ${LOCAL_HOST}:3306
+      # MYSQL_HOST=external-mysql
+      - ip: 192.168.64.1
+    ports:
+      - name: mysql
+        port: 3306

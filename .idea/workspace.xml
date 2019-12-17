@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API.md" beforeDir="false" afterPath="$PROJECT_DIR$/API.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/external-mysql-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/external-mysql-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-ingress.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-service.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +35,11 @@
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
+  </component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
   </component>
   <component name="ProjectConfigurationFiles">
     <option name="files">
@@ -65,7 +80,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="go.vgo" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -83,7 +98,7 @@
       <recent name="$PROJECT_DIR$/build/package/app1" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/pepeunlimited/users/cmd/app1">
+  <component name="RunManager" selected="Go Test.user_service_test.go">
     <configuration name="go build github.com/pepeunlimited/users/cmd/app1" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$" />
@@ -115,17 +130,6 @@
       <pattern value="^TestUserServer_GetUserNotFound$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_SignInFail$" />
-      <method v="2" />
-    </configuration>
     <configuration name="TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
@@ -137,13 +141,23 @@
       <pattern value="^TestUserServer_SignInOk$" />
       <method v="2" />
     </configuration>
+    <configuration name="user_service_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <package value="github.com/pepeunlimited/users" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.user_service_test.go" />
         <item itemvalue="Go Build.go build github.com/pepeunlimited/users/cmd/app1" />
         <item itemvalue="Go Test.TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_SignInFail in github.com/pepeunlimited/users/internal/app/app1/server" />
       </list>
     </recent_temporary>
   </component>
@@ -215,46 +229,54 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576434398254">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576580714350">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398254" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576434398251">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576580714350" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576580714348">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398251" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576434398249">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576580714348" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576580714346">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398249" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576434398252">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576580714346" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576580714349">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576434398252" />
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576406153589">
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576580714349" />
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576575609933">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153589" />
-    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1576406153587">
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609933" />
+    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1576575609930">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153587" />
-    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1576406153586">
+    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609930" />
+    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1576575609929">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153586" />
-    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1576406153588">
+    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609929" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1576575609931">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576406153588" />
-    <state x="349" y="164" key="SettingsEditor" timestamp="1576317305084">
+    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609931" />
+    <state x="349" y="164" key="SettingsEditor" timestamp="1576576019170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="349" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1576317305084" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1576409097882">
+    <state x="349" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1576576019170" />
+    <state width="500" height="445" key="SwitcherDM" timestamp="1576578754435">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576409097882" />
+    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576578754435" />
+    <state x="200" y="0" width="1480" height="1034" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1576581191522">
+      <screen x="0" y="23" width="1680" height="984" />
+    </state>
+    <state x="200" y="0" width="1480" height="1034" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.23.1680.984@0.23.1680.984" timestamp="1576581191522" />
+    <state x="715" y="400" width="250" height="278" key="jetbrains.javascript.buildTools.run-task-popup" timestamp="1576579049863">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="715" y="400" width="250" height="278" key="jetbrains.javascript.buildTools.run-task-popup/0.0.1680.1050@0.0.1680.1050" timestamp="1576579049863" />
     <state x="602" y="140" key="refactoring.ChangeSignatureDialog" timestamp="1576252230617">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

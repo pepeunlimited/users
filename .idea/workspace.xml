@@ -3,16 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API.md" beforeDir="false" afterPath="$PROJECT_DIR$/API.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/dev/external-mysql-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/external-mysql-service.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/dev/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/dev/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-service.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/production/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-service.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/staging/users-service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-service.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,10 +214,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="440" y="190" key="#GOROOT/0.0.1680.1050@0.0.1680.1050" timestamp="1575917125364" />
-    <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1576244697297">
+    <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1576614983234">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576244697297" />
+    <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576614983234" />
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1576359502586">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

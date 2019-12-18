@@ -21,7 +21,7 @@ func main() {
 	us := rpc.NewUserServiceServer(server.NewUserServer(client), nil)
 
 	mux := http.NewServeMux()
-	mux.Handle(us.PathPrefix(), middleware.Adapt(us, headers.Username(), headers.UserId(), headers.Email()))
+	mux.Handle(us.PathPrefix(), middleware.Adapt(us, headers.Username(), headers.Roles(), headers.UserId(), headers.Email()))
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Panic(err)

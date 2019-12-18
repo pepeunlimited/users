@@ -58,6 +58,8 @@ github.com/pepeunlimited/microservice-kit v0.0.0-20191214204646-fce6ca084918 h1:
 github.com/pepeunlimited/microservice-kit v0.0.0-20191214204646-fce6ca084918/go.mod h1:J1oUwmuM7TbNNB1RKRGRQIv/LVSjz9br8D4FMGlb4zo=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191215093117-ed624b980ad9 h1:w1NLULHlTQBYXHu9+t7niZGnQlX8qyT8qloq+/VTlic=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191215093117-ed624b980ad9/go.mod h1:J1oUwmuM7TbNNB1RKRGRQIv/LVSjz9br8D4FMGlb4zo=
+github.com/pepeunlimited/microservice-kit v0.0.0-20191218200034-08dd8ebc45a6 h1:DdBf60/3zTDJHRtR22XfK1mqkrjcCfxd5eTYKrSRqQ8=
+github.com/pepeunlimited/microservice-kit v0.0.0-20191218200034-08dd8ebc45a6/go.mod h1:J1oUwmuM7TbNNB1RKRGRQIv/LVSjz9br8D4FMGlb4zo=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=

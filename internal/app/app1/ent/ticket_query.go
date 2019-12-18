@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // TicketQuery is the builder for querying Ticket entities.
@@ -21,13 +21,13 @@ type TicketQuery struct {
 	offset     *int
 	order      []Order
 	unique     []string
-	predicates []predicate2.Ticket
+	predicates []predicate.Ticket
 	// intermediate queries.
 	sql *sql.Selector
 }
 
 // Where adds a new predicate for the builder.
-func (tq *TicketQuery) Where(ps ...predicate2.Ticket) *TicketQuery {
+func (tq *TicketQuery) Where(ps ...predicate.Ticket) *TicketQuery {
 	tq.predicates = append(tq.predicates, ps...)
 	return tq
 }
@@ -54,9 +54,9 @@ func (tq *TicketQuery) Order(o ...Order) *TicketQuery {
 func (tq *TicketQuery) QueryUsers() *UserQuery {
 	query := &UserQuery{config: tq.config}
 	step := sql.NewStep(
-		sql.From(ticket2.Table, ticket2.FieldID, tq.sqlQuery()),
-		sql.To(user2.Table, user2.FieldID),
-		sql.Edge(sql.M2O, true, ticket2.UsersTable, ticket2.UsersColumn),
+		sql.From(ticket.Table, ticket.FieldID, tq.sqlQuery()),
+		sql.To(user.Table, user.FieldID),
+		sql.Edge(sql.M2O, true, ticket.UsersTable, ticket.UsersColumn),
 	)
 	query.sql = sql.SetNeighbors(tq.driver.Dialect(), step)
 	return query
@@ -69,7 +69,7 @@ func (tq *TicketQuery) First(ctx context.Context) (*Ticket, error) {
 		return nil, err
 	}
 	if len(ts) == 0 {
-		return nil, &ErrNotFound{ticket2.Label}
+		return nil, &ErrNotFound{ticket.Label}
 	}
 	return ts[0], nil
 }
@@ -90,7 +90,7 @@ func (tq *TicketQuery) FirstID(ctx context.Context) (id int, err error) {
 		return
 	}
 	if len(ids) == 0 {
-		err = &ErrNotFound{ticket2.Label}
+		err = &ErrNotFound{ticket.Label}
 		return
 	}
 	return ids[0], nil
@@ -115,9 +115,9 @@ func (tq *TicketQuery) Only(ctx context.Context) (*Ticket, error) {
 	case 1:
 		return ts[0], nil
 	case 0:
-		return nil, &ErrNotFound{ticket2.Label}
+		return nil, &ErrNotFound{ticket.Label}
 	default:
-		return nil, &ErrNotSingular{ticket2.Label}
+		return nil, &ErrNotSingular{ticket.Label}
 	}
 }
 
@@ -140,9 +140,9 @@ func (tq *TicketQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &ErrNotFound{ticket2.Label}
+		err = &ErrNotFound{ticket.Label}
 	default:
-		err = &ErrNotSingular{ticket2.Label}
+		err = &ErrNotSingular{ticket.Label}
 	}
 	return
 }
@@ -173,7 +173,7 @@ func (tq *TicketQuery) AllX(ctx context.Context) []*Ticket {
 // IDs executes the query and returns a list of Ticket ids.
 func (tq *TicketQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
-	if err := tq.Select(ticket2.FieldID).Scan(ctx, &ids); err != nil {
+	if err := tq.Select(ticket.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -225,7 +225,7 @@ func (tq *TicketQuery) Clone() *TicketQuery {
 		offset:     tq.offset,
 		order:      append([]Order{}, tq.order...),
 		unique:     append([]string{}, tq.unique...),
-		predicates: append([]predicate2.Ticket{}, tq.predicates...),
+		predicates: append([]predicate.Ticket{}, tq.predicates...),
 		// clone intermediate queries.
 		sql: tq.sql.Clone(),
 	}
@@ -294,7 +294,7 @@ func (tq *TicketQuery) sqlAll(ctx context.Context) ([]*Ticket, error) {
 func (tq *TicketQuery) sqlCount(ctx context.Context) (int, error) {
 	rows := &sql.Rows{}
 	selector := tq.sqlQuery()
-	unique := []string{ticket2.FieldID}
+	unique := []string{ticket.FieldID}
 	if len(tq.unique) > 0 {
 		unique = tq.unique
 	}
@@ -324,11 +324,11 @@ func (tq *TicketQuery) sqlExist(ctx context.Context) (bool, error) {
 
 func (tq *TicketQuery) sqlQuery() *sql.Selector {
 	builder := sql.Dialect(tq.driver.Dialect())
-	t1 := builder.Table(ticket2.Table)
-	selector := builder.Select(t1.Columns(ticket2.Columns...)...).From(t1)
+	t1 := builder.Table(ticket.Table)
+	selector := builder.Select(t1.Columns(ticket.Columns...)...).From(t1)
 	if tq.sql != nil {
 		selector = tq.sql
-		selector.Select(selector.Columns(ticket2.Columns...)...)
+		selector.Select(selector.Columns(ticket.Columns...)...)
 	}
 	for _, p := range tq.predicates {
 		p(selector)

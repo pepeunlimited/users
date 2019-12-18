@@ -5,10 +5,13 @@ package ent
 import (
 	"context"
 	"fmt"
-	migrate2 "github.com/pepeunlimited/users/internal/app/app1/ent/migrate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"log"
+
+	"github.com/pepeunlimited/users/internal/app/app1/ent/migrate"
+
+	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 
 	"github.com/facebookincubator/ent/dialect"
 	"github.com/facebookincubator/ent/dialect/sql"
@@ -18,7 +21,9 @@ import (
 type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
-	Schema *migrate2.Schema
+	Schema *migrate.Schema
+	// Role is the client for interacting with the Role builders.
+	Role *RoleClient
 	// Ticket is the client for interacting with the Ticket builders.
 	Ticket *TicketClient
 	// User is the client for interacting with the User builders.
@@ -31,7 +36,8 @@ func NewClient(opts ...Option) *Client {
 	c.options(opts...)
 	return &Client{
 		config: c,
-		Schema: migrate2.NewSchema(c.driver),
+		Schema: migrate.NewSchema(c.driver),
+		Role:   NewRoleClient(c),
 		Ticket: NewTicketClient(c),
 		User:   NewUserClient(c),
 	}
@@ -66,6 +72,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := config{driver: tx, log: c.log, debug: c.debug}
 	return &Tx{
 		config: cfg,
+		Role:   NewRoleClient(cfg),
 		Ticket: NewTicketClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
@@ -74,7 +81,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Ticket.
+//		Role.
 //		Query().
 //		Count(ctx)
 //
@@ -85,7 +92,8 @@ func (c *Client) Debug() *Client {
 	cfg := config{driver: dialect.Debug(c.driver, c.log), log: c.log, debug: true}
 	return &Client{
 		config: cfg,
-		Schema: migrate2.NewSchema(cfg.driver),
+		Schema: migrate.NewSchema(cfg.driver),
+		Role:   NewRoleClient(cfg),
 		Ticket: NewTicketClient(cfg),
 		User:   NewUserClient(cfg),
 	}
@@ -94,6 +102,84 @@ func (c *Client) Debug() *Client {
 // Close closes the database connection and prevents new queries from starting.
 func (c *Client) Close() error {
 	return c.driver.Close()
+}
+
+// RoleClient is a client for the Role schema.
+type RoleClient struct {
+	config
+}
+
+// NewRoleClient returns a client for the Role from the given config.
+func NewRoleClient(c config) *RoleClient {
+	return &RoleClient{config: c}
+}
+
+// Create returns a create builder for Role.
+func (c *RoleClient) Create() *RoleCreate {
+	return &RoleCreate{config: c.config}
+}
+
+// Update returns an update builder for Role.
+func (c *RoleClient) Update() *RoleUpdate {
+	return &RoleUpdate{config: c.config}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RoleClient) UpdateOne(r *Role) *RoleUpdateOne {
+	return c.UpdateOneID(r.ID)
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RoleClient) UpdateOneID(id int) *RoleUpdateOne {
+	return &RoleUpdateOne{config: c.config, id: id}
+}
+
+// Delete returns a delete builder for Role.
+func (c *RoleClient) Delete() *RoleDelete {
+	return &RoleDelete{config: c.config}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *RoleClient) DeleteOne(r *Role) *RoleDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *RoleClient) DeleteOneID(id int) *RoleDeleteOne {
+	return &RoleDeleteOne{c.Delete().Where(role.ID(id))}
+}
+
+// Create returns a query builder for Role.
+func (c *RoleClient) Query() *RoleQuery {
+	return &RoleQuery{config: c.config}
+}
+
+// Get returns a Role entity by its id.
+func (c *RoleClient) Get(ctx context.Context, id int) (*Role, error) {
+	return c.Query().Where(role.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RoleClient) GetX(ctx context.Context, id int) *Role {
+	r, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return r
+}
+
+// QueryUsers queries the users edge of a Role.
+func (c *RoleClient) QueryUsers(r *Role) *UserQuery {
+	query := &UserQuery{config: c.config}
+	id := r.ID
+	step := sql.NewStep(
+		sql.From(role.Table, role.FieldID, id),
+		sql.To(user.Table, user.FieldID),
+		sql.Edge(sql.M2O, true, role.UsersTable, role.UsersColumn),
+	)
+	query.sql = sql.Neighbors(r.driver.Dialect(), step)
+
+	return query
 }
 
 // TicketClient is a client for the Ticket schema.
@@ -138,7 +224,7 @@ func (c *TicketClient) DeleteOne(t *Ticket) *TicketDeleteOne {
 
 // DeleteOneID returns a delete builder for the given id.
 func (c *TicketClient) DeleteOneID(id int) *TicketDeleteOne {
-	return &TicketDeleteOne{c.Delete().Where(ticket2.ID(id))}
+	return &TicketDeleteOne{c.Delete().Where(ticket.ID(id))}
 }
 
 // Create returns a query builder for Ticket.
@@ -148,7 +234,7 @@ func (c *TicketClient) Query() *TicketQuery {
 
 // Get returns a Ticket entity by its id.
 func (c *TicketClient) Get(ctx context.Context, id int) (*Ticket, error) {
-	return c.Query().Where(ticket2.ID(id)).Only(ctx)
+	return c.Query().Where(ticket.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -165,9 +251,9 @@ func (c *TicketClient) QueryUsers(t *Ticket) *UserQuery {
 	query := &UserQuery{config: c.config}
 	id := t.ID
 	step := sql.NewStep(
-		sql.From(ticket2.Table, ticket2.FieldID, id),
-		sql.To(user2.Table, user2.FieldID),
-		sql.Edge(sql.M2O, true, ticket2.UsersTable, ticket2.UsersColumn),
+		sql.From(ticket.Table, ticket.FieldID, id),
+		sql.To(user.Table, user.FieldID),
+		sql.Edge(sql.M2O, true, ticket.UsersTable, ticket.UsersColumn),
 	)
 	query.sql = sql.Neighbors(t.driver.Dialect(), step)
 
@@ -216,7 +302,7 @@ func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
 
 // DeleteOneID returns a delete builder for the given id.
 func (c *UserClient) DeleteOneID(id int) *UserDeleteOne {
-	return &UserDeleteOne{c.Delete().Where(user2.ID(id))}
+	return &UserDeleteOne{c.Delete().Where(user.ID(id))}
 }
 
 // Create returns a query builder for User.
@@ -226,7 +312,7 @@ func (c *UserClient) Query() *UserQuery {
 
 // Get returns a User entity by its id.
 func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
-	return c.Query().Where(user2.ID(id)).Only(ctx)
+	return c.Query().Where(user.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -243,9 +329,23 @@ func (c *UserClient) QueryTickets(u *User) *TicketQuery {
 	query := &TicketQuery{config: c.config}
 	id := u.ID
 	step := sql.NewStep(
-		sql.From(user2.Table, user2.FieldID, id),
-		sql.To(ticket2.Table, ticket2.FieldID),
-		sql.Edge(sql.O2M, false, user2.TicketsTable, user2.TicketsColumn),
+		sql.From(user.Table, user.FieldID, id),
+		sql.To(ticket.Table, ticket.FieldID),
+		sql.Edge(sql.O2M, false, user.TicketsTable, user.TicketsColumn),
+	)
+	query.sql = sql.Neighbors(u.driver.Dialect(), step)
+
+	return query
+}
+
+// QueryRoles queries the roles edge of a User.
+func (c *UserClient) QueryRoles(u *User) *RoleQuery {
+	query := &RoleQuery{config: c.config}
+	id := u.ID
+	step := sql.NewStep(
+		sql.From(user.Table, user.FieldID, id),
+		sql.To(role.Table, role.FieldID),
+		sql.Edge(sql.O2M, false, user.RolesTable, user.RolesColumn),
 	)
 	query.sql = sql.Neighbors(u.driver.Dialect(), step)
 

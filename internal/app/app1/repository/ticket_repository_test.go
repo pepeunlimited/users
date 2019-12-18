@@ -15,10 +15,9 @@ func TestTicketMySQL_CreateTicket(t *testing.T) {
 	users := NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 
-	tickets.DeleteTickets(ctx)
-	users.DeleteUsers(ctx)
+	users.DeleteAll(ctx)
 
-	user, err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd", Admin)
+	user,_, err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd")
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -52,10 +51,8 @@ func TestTicketMySQL_GetTicketUserByTokenExpired(t *testing.T) {
 	users := NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 
-	tickets.DeleteTickets(ctx)
-	users.DeleteUsers(ctx)
-
-	user, err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd", Admin)
+	users.DeleteAll(ctx)
+	user,_, err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd")
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -91,7 +88,7 @@ func TestTicketMySQL_UseTicket(t *testing.T) {
 	users := NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 	users.DeleteAll(ctx)
-	user, err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd", Admin)
+	user,_,err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd")
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

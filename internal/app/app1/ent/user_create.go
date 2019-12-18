@@ -6,17 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.
 type UserCreate struct {
 	config
-	role          *string
 	username      *string
 	email         *string
 	password      *string
@@ -25,20 +25,7 @@ type UserCreate struct {
 	is_locked     *bool
 	last_modified *time.Time
 	tickets       map[int]struct{}
-}
-
-// SetRole sets the role field.
-func (uc *UserCreate) SetRole(s string) *UserCreate {
-	uc.role = &s
-	return uc
-}
-
-// SetNillableRole sets the role field if the given value is not nil.
-func (uc *UserCreate) SetNillableRole(s *string) *UserCreate {
-	if s != nil {
-		uc.SetRole(*s)
-	}
-	return uc
+	roles         map[int]struct{}
 }
 
 // SetUsername sets the username field.
@@ -127,40 +114,56 @@ func (uc *UserCreate) AddTickets(t ...*Ticket) *UserCreate {
 	return uc.AddTicketIDs(ids...)
 }
 
+// AddRoleIDs adds the roles edge to Role by ids.
+func (uc *UserCreate) AddRoleIDs(ids ...int) *UserCreate {
+	if uc.roles == nil {
+		uc.roles = make(map[int]struct{})
+	}
+	for i := range ids {
+		uc.roles[ids[i]] = struct{}{}
+	}
+	return uc
+}
+
+// AddRoles adds the roles edges to Role.
+func (uc *UserCreate) AddRoles(r ...*Role) *UserCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uc.AddRoleIDs(ids...)
+}
+
 // Save creates the User in the database.
 func (uc *UserCreate) Save(ctx context.Context) (*User, error) {
-	if uc.role == nil {
-		v := user2.DefaultRole
-		uc.role = &v
-	}
 	if uc.username == nil {
 		return nil, errors.New("ent: missing required field \"username\"")
 	}
-	if err := user2.UsernameValidator(*uc.username); err != nil {
+	if err := user.UsernameValidator(*uc.username); err != nil {
 		return nil, fmt.Errorf("ent: validator failed for field \"username\": %v", err)
 	}
 	if uc.email == nil {
 		return nil, errors.New("ent: missing required field \"email\"")
 	}
-	if err := user2.EmailValidator(*uc.email); err != nil {
+	if err := user.EmailValidator(*uc.email); err != nil {
 		return nil, fmt.Errorf("ent: validator failed for field \"email\": %v", err)
 	}
 	if uc.password == nil {
 		return nil, errors.New("ent: missing required field \"password\"")
 	}
-	if err := user2.PasswordValidator(*uc.password); err != nil {
+	if err := user.PasswordValidator(*uc.password); err != nil {
 		return nil, fmt.Errorf("ent: validator failed for field \"password\": %v", err)
 	}
 	if uc.is_deleted == nil {
-		v := user2.DefaultIsDeleted
+		v := user.DefaultIsDeleted
 		uc.is_deleted = &v
 	}
 	if uc.is_banned == nil {
-		v := user2.DefaultIsBanned
+		v := user.DefaultIsBanned
 		uc.is_banned = &v
 	}
 	if uc.is_locked == nil {
-		v := user2.DefaultIsLocked
+		v := user.DefaultIsLocked
 		uc.is_locked = &v
 	}
 	if uc.last_modified == nil {
@@ -188,41 +191,37 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	insert := builder.Insert(user2.Table).Default()
-	if value := uc.role; value != nil {
-		insert.Set(user2.FieldRole, *value)
-		u.Role = *value
-	}
+	insert := builder.Insert(user.Table).Default()
 	if value := uc.username; value != nil {
-		insert.Set(user2.FieldUsername, *value)
+		insert.Set(user.FieldUsername, *value)
 		u.Username = *value
 	}
 	if value := uc.email; value != nil {
-		insert.Set(user2.FieldEmail, *value)
+		insert.Set(user.FieldEmail, *value)
 		u.Email = *value
 	}
 	if value := uc.password; value != nil {
-		insert.Set(user2.FieldPassword, *value)
+		insert.Set(user.FieldPassword, *value)
 		u.Password = *value
 	}
 	if value := uc.is_deleted; value != nil {
-		insert.Set(user2.FieldIsDeleted, *value)
+		insert.Set(user.FieldIsDeleted, *value)
 		u.IsDeleted = *value
 	}
 	if value := uc.is_banned; value != nil {
-		insert.Set(user2.FieldIsBanned, *value)
+		insert.Set(user.FieldIsBanned, *value)
 		u.IsBanned = *value
 	}
 	if value := uc.is_locked; value != nil {
-		insert.Set(user2.FieldIsLocked, *value)
+		insert.Set(user.FieldIsLocked, *value)
 		u.IsLocked = *value
 	}
 	if value := uc.last_modified; value != nil {
-		insert.Set(user2.FieldLastModified, *value)
+		insert.Set(user.FieldLastModified, *value)
 		u.LastModified = *value
 	}
 
-	id, err := insertLastID(ctx, tx, insert.Returning(user2.FieldID))
+	id, err := insertLastID(ctx, tx, insert.Returning(user.FieldID))
 	if err != nil {
 		return nil, rollback(tx, err)
 	}
@@ -230,11 +229,11 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	if len(uc.tickets) > 0 {
 		p := sql.P()
 		for eid := range uc.tickets {
-			p.Or().EQ(ticket2.FieldID, eid)
+			p.Or().EQ(ticket.FieldID, eid)
 		}
-		query, args := builder.Update(user2.TicketsTable).
-			Set(user2.TicketsColumn, id).
-			Where(sql.And(p, sql.IsNull(user2.TicketsColumn))).
+		query, args := builder.Update(user.TicketsTable).
+			Set(user.TicketsColumn, id).
+			Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
 			Query()
 		if err := tx.Exec(ctx, query, args, &res); err != nil {
 			return nil, rollback(tx, err)
@@ -245,6 +244,26 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		}
 		if int(affected) < len(uc.tickets) {
 			return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"tickets\" %v already connected to a different \"User\"", keys(uc.tickets))})
+		}
+	}
+	if len(uc.roles) > 0 {
+		p := sql.P()
+		for eid := range uc.roles {
+			p.Or().EQ(role.FieldID, eid)
+		}
+		query, args := builder.Update(user.RolesTable).
+			Set(user.RolesColumn, id).
+			Where(sql.And(p, sql.IsNull(user.RolesColumn))).
+			Query()
+		if err := tx.Exec(ctx, query, args, &res); err != nil {
+			return nil, rollback(tx, err)
+		}
+		affected, err := res.RowsAffected()
+		if err != nil {
+			return nil, rollback(tx, err)
+		}
+		if int(affected) < len(uc.roles) {
+			return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uc.roles))})
 		}
 	}
 	if err := tx.Commit(); err != nil {

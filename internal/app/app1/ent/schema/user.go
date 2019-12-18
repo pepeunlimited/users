@@ -31,7 +31,6 @@ func (User) Config() ent.Config {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("role").Default("USER"),
 		field.String("username").MaxLen(320).NotEmpty().Unique(),
 		field.String("email").MaxLen(320).NotEmpty().Unique().Validate(func(s string) error {
 			regex := regexp.MustCompile(EmailRegExp)
@@ -51,6 +50,7 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tickets", Ticket.Type),
+		edge.To("tickets", Ticket.Type), // one-to-many
+		edge.To("roles", Role.Type), 		// one-to-many
 	}
 }

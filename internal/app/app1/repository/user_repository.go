@@ -9,12 +9,6 @@ import (
 	"time"
 )
 
-type Role string
-const (
-	User Role = "user"
-	Admin 	  = "admin"
-)
-
 var (
 	ErrUserBanned 		= errors.New("users: user is banned")
 	ErrUserLocked 		= errors.New("users: user is locked")
@@ -25,8 +19,9 @@ var (
 
 // Access the `users` table
 // 	- one-to-many to `tickets`
+//  - one-to-many to `roles`
 type UserRepository interface {
-	CreateUser(ctx context.Context, username string, email string, password string, role Role) (*ent.User, error)
+	CreateUser(ctx context.Context, username string, email string, password string) (*ent.User, *ent.Role, error)
 	GetUserById(ctx context.Context, id int) (*ent.User, error)
 	GetUserByUsername(ctx context.Context, username string) (*ent.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*ent.User, error)
@@ -37,8 +32,12 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, userId int) error
 	BanUser(ctx context.Context, userId int) error
 	LockUser(ctx context.Context, userId int) error
+
 	GetUserTicketsByUserId(ctx context.Context, userId int) (*ent.User, []*ent.Ticket, error)
-	// wipes `users` and `tickets` database tables
+	GetUserRolesByUserId(ctx context.Context, userId int) (*ent.User, []*ent.Role, error)
+	GetUserRolesByUsername(ctx context.Context, username string) (*ent.User, []*ent.Role, error)
+
+	// wipes `users`, `roles`, and `tickets` database tables
 	DeleteAll(ctx context.Context)
 
 	UnbanUser(ctx context.Context, userId int) (*ent.User, error)
@@ -51,7 +50,31 @@ type userMySQL struct {
 	crypto cryptoz.Crypto
 }
 
-func (repo userMySQL) GetUserByUsername(ctx context.Context, username string) (*ent.User, error) {
+func (repo userMySQL) GetUserRolesByUsername(ctx context.Context, username string) (*ent.User, []*ent.Role, error) {
+	user, err := repo.GetUserByUsername(ctx, username)
+	if err != nil {
+		return nil, nil, err
+	}
+	roles, err := user.QueryRoles().All(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return user, roles, nil
+}
+
+func (repo userMySQL) GetUserRolesByUserId(ctx context.Context, userId int) (*ent.User, []*ent.Role, error) {
+	user, err := repo.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, nil, err
+	}
+	roles, err := user.QueryRoles().All(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return user, roles, nil
+}
+
+func (repo userMySQL) GetUserByUsername(ctx context.Context, username string) (*ent.User,  error) {
 	user, err := repo.client.User.Query().Where(user.IsDeleted(false), user.Username(username)).Only(ctx)
 	return repo.isUserError(user, err)
 }
@@ -126,12 +149,13 @@ func (repo userMySQL) DeleteUser(ctx context.Context, userId int) error {
 }
 
 func (repo userMySQL) DeleteAll(ctx context.Context) {
+	repo.client.Role.Delete().ExecX(ctx)
 	repo.client.Ticket.Delete().ExecX(ctx)
 	repo.client.User.Delete().ExecX(ctx)
 }
 
 func (repo userMySQL) GetUserTicketsByUserId(ctx context.Context, userId int) (*ent.User, []*ent.Ticket, error) {
-	user, err := repo.client.User.Get(ctx, userId)
+	user, err := repo.GetUserById(ctx, userId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -142,18 +166,23 @@ func (repo userMySQL) GetUserTicketsByUserId(ctx context.Context, userId int) (*
 	return user, tickets, nil
 }
 
-func (repo userMySQL) CreateUser(ctx context.Context, username string, email string, password string, role Role) (*ent.User, error) {
+
+
+func (repo userMySQL) CreateUser(ctx context.Context, username string, email string, password string) (*ent.User, *ent.Role, error) {
 	if _, err := repo.GetUserByUsername(ctx, username); err == nil {
-		return nil, ErrUsernameExist
+		return nil, nil, ErrUsernameExist
 	}
 	if _, err := repo.GetUserByEmail(ctx, email); err == nil {
-		return nil, ErrEmailExist
+		return nil, nil, ErrEmailExist
 	}
-	password, err := repo.crypto.Hash(password)
-	save, err := repo.client.
+	tx, err := repo.client.Tx(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	password, err = repo.crypto.Hash(password)
+	user, err := tx.
 		User.
 		Create().
-		SetRole(string(role)).
 		SetUsername(username).
 		SetEmail(email).
 		SetPassword(password).
@@ -163,9 +192,18 @@ func (repo userMySQL) CreateUser(ctx context.Context, username string, email str
 		SetIsLocked(false).
 		Save(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return save, nil
+	role, err := tx.Role.Create().SetUsersID(user.ID).SetRole(string(User)).Save(ctx)// add default role
+	if err != nil {
+		tx.Rollback()
+		return nil, nil, err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return nil, nil, err
+	}
+	return user, role, nil
 }
 
 func (repo userMySQL) isUserError(user *ent.User, err error) (*ent.User, error) {

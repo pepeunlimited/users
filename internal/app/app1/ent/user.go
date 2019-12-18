@@ -15,8 +15,6 @@ type User struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Role holds the value of the "role" field.
-	Role string `json:"role,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
 	// Email holds the value of the "email" field.
@@ -37,7 +35,6 @@ type User struct {
 func (u *User) FromRows(rows *sql.Rows) error {
 	var scanu struct {
 		ID           int
-		Role         sql.NullString
 		Username     sql.NullString
 		Email        sql.NullString
 		Password     sql.NullString
@@ -49,7 +46,6 @@ func (u *User) FromRows(rows *sql.Rows) error {
 	// the order here should be the same as in the `user.Columns`.
 	if err := rows.Scan(
 		&scanu.ID,
-		&scanu.Role,
 		&scanu.Username,
 		&scanu.Email,
 		&scanu.Password,
@@ -61,7 +57,6 @@ func (u *User) FromRows(rows *sql.Rows) error {
 		return err
 	}
 	u.ID = scanu.ID
-	u.Role = scanu.Role.String
 	u.Username = scanu.Username.String
 	u.Email = scanu.Email.String
 	u.Password = scanu.Password.String
@@ -75,6 +70,11 @@ func (u *User) FromRows(rows *sql.Rows) error {
 // QueryTickets queries the tickets edge of the User.
 func (u *User) QueryTickets() *TicketQuery {
 	return (&UserClient{u.config}).QueryTickets(u)
+}
+
+// QueryRoles queries the roles edge of the User.
+func (u *User) QueryRoles() *RoleQuery {
+	return (&UserClient{u.config}).QueryRoles(u)
 }
 
 // Update returns a builder for updating this User.
@@ -100,8 +100,6 @@ func (u *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
-	builder.WriteString(", role=")
-	builder.WriteString(u.Role)
 	builder.WriteString(", username=")
 	builder.WriteString(u.Username)
 	builder.WriteString(", email=")

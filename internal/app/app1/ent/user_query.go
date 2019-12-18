@@ -6,12 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // UserQuery is the builder for querying User entities.
@@ -21,13 +22,13 @@ type UserQuery struct {
 	offset     *int
 	order      []Order
 	unique     []string
-	predicates []predicate2.User
+	predicates []predicate.User
 	// intermediate queries.
 	sql *sql.Selector
 }
 
 // Where adds a new predicate for the builder.
-func (uq *UserQuery) Where(ps ...predicate2.User) *UserQuery {
+func (uq *UserQuery) Where(ps ...predicate.User) *UserQuery {
 	uq.predicates = append(uq.predicates, ps...)
 	return uq
 }
@@ -54,9 +55,21 @@ func (uq *UserQuery) Order(o ...Order) *UserQuery {
 func (uq *UserQuery) QueryTickets() *TicketQuery {
 	query := &TicketQuery{config: uq.config}
 	step := sql.NewStep(
-		sql.From(user2.Table, user2.FieldID, uq.sqlQuery()),
-		sql.To(ticket2.Table, ticket2.FieldID),
-		sql.Edge(sql.O2M, false, user2.TicketsTable, user2.TicketsColumn),
+		sql.From(user.Table, user.FieldID, uq.sqlQuery()),
+		sql.To(ticket.Table, ticket.FieldID),
+		sql.Edge(sql.O2M, false, user.TicketsTable, user.TicketsColumn),
+	)
+	query.sql = sql.SetNeighbors(uq.driver.Dialect(), step)
+	return query
+}
+
+// QueryRoles chains the current query on the roles edge.
+func (uq *UserQuery) QueryRoles() *RoleQuery {
+	query := &RoleQuery{config: uq.config}
+	step := sql.NewStep(
+		sql.From(user.Table, user.FieldID, uq.sqlQuery()),
+		sql.To(role.Table, role.FieldID),
+		sql.Edge(sql.O2M, false, user.RolesTable, user.RolesColumn),
 	)
 	query.sql = sql.SetNeighbors(uq.driver.Dialect(), step)
 	return query
@@ -69,7 +82,7 @@ func (uq *UserQuery) First(ctx context.Context) (*User, error) {
 		return nil, err
 	}
 	if len(us) == 0 {
-		return nil, &ErrNotFound{user2.Label}
+		return nil, &ErrNotFound{user.Label}
 	}
 	return us[0], nil
 }
@@ -90,7 +103,7 @@ func (uq *UserQuery) FirstID(ctx context.Context) (id int, err error) {
 		return
 	}
 	if len(ids) == 0 {
-		err = &ErrNotFound{user2.Label}
+		err = &ErrNotFound{user.Label}
 		return
 	}
 	return ids[0], nil
@@ -115,9 +128,9 @@ func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
 	case 1:
 		return us[0], nil
 	case 0:
-		return nil, &ErrNotFound{user2.Label}
+		return nil, &ErrNotFound{user.Label}
 	default:
-		return nil, &ErrNotSingular{user2.Label}
+		return nil, &ErrNotSingular{user.Label}
 	}
 }
 
@@ -140,9 +153,9 @@ func (uq *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &ErrNotFound{user2.Label}
+		err = &ErrNotFound{user.Label}
 	default:
-		err = &ErrNotSingular{user2.Label}
+		err = &ErrNotSingular{user.Label}
 	}
 	return
 }
@@ -173,7 +186,7 @@ func (uq *UserQuery) AllX(ctx context.Context) []*User {
 // IDs executes the query and returns a list of User ids.
 func (uq *UserQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
-	if err := uq.Select(user2.FieldID).Scan(ctx, &ids); err != nil {
+	if err := uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -225,7 +238,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		offset:     uq.offset,
 		order:      append([]Order{}, uq.order...),
 		unique:     append([]string{}, uq.unique...),
-		predicates: append([]predicate2.User{}, uq.predicates...),
+		predicates: append([]predicate.User{}, uq.predicates...),
 		// clone intermediate queries.
 		sql: uq.sql.Clone(),
 	}
@@ -237,12 +250,12 @@ func (uq *UserQuery) Clone() *UserQuery {
 // Example:
 //
 //	var v []struct {
-//		Role string `json:"role,omitempty"`
+//		Username string `json:"username,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		GroupBy(user.FieldRole).
+//		GroupBy(user.FieldUsername).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -258,11 +271,11 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Role string `json:"role,omitempty"`
+//		Username string `json:"username,omitempty"`
 //	}
 //
 //	client.User.Query().
-//		Select(user.FieldRole).
+//		Select(user.FieldUsername).
 //		Scan(ctx, &v)
 //
 func (uq *UserQuery) Select(field string, fields ...string) *UserSelect {
@@ -294,7 +307,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	rows := &sql.Rows{}
 	selector := uq.sqlQuery()
-	unique := []string{user2.FieldID}
+	unique := []string{user.FieldID}
 	if len(uq.unique) > 0 {
 		unique = uq.unique
 	}
@@ -324,11 +337,11 @@ func (uq *UserQuery) sqlExist(ctx context.Context) (bool, error) {
 
 func (uq *UserQuery) sqlQuery() *sql.Selector {
 	builder := sql.Dialect(uq.driver.Dialect())
-	t1 := builder.Table(user2.Table)
-	selector := builder.Select(t1.Columns(user2.Columns...)...).From(t1)
+	t1 := builder.Table(user.Table)
+	selector := builder.Select(t1.Columns(user.Columns...)...).From(t1)
 	if uq.sql != nil {
 		selector = uq.sql
-		selector.Select(selector.Columns(user2.Columns...)...)
+		selector.Select(selector.Columns(user.Columns...)...)
 	}
 	for _, p := range uq.predicates {
 		p(selector)

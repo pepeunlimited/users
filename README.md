@@ -33,3 +33,6 @@ Speed up implementing the database access using [`ent`](https://github.com/faceb
 
 #### `misc`
 ```$ brew install jq > curl ... | jq```
+##### display's MySQL logs
+```$ SET global general_log = 1;```  
+```$ SHOW VARIABLES LIKE "general_log%";```

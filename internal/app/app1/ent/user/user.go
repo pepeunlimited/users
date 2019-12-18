@@ -3,7 +3,7 @@
 package user
 
 import (
-	schema2 "github.com/pepeunlimited/users/internal/app/app1/ent/schema"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/schema"
 )
 
 const (
@@ -11,8 +11,6 @@ const (
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldRole holds the string denoting the role vertex property in the database.
-	FieldRole = "role"
 	// FieldUsername holds the string denoting the username vertex property in the database.
 	FieldUsername = "username"
 	// FieldEmail holds the string denoting the email vertex property in the database.
@@ -37,12 +35,18 @@ const (
 	TicketsInverseTable = "tickets"
 	// TicketsColumn is the table column denoting the tickets relation/edge.
 	TicketsColumn = "users_id"
+	// RolesTable is the table the holds the roles relation/edge.
+	RolesTable = "roles"
+	// RolesInverseTable is the table name for the Role entity.
+	// It exists in this package in order to avoid circular dependency with the "role" package.
+	RolesInverseTable = "roles"
+	// RolesColumn is the table column denoting the roles relation/edge.
+	RolesColumn = "users_id"
 )
 
 // Columns holds all SQL columns are user fields.
 var Columns = []string{
 	FieldID,
-	FieldRole,
 	FieldUsername,
 	FieldEmail,
 	FieldPassword,
@@ -53,15 +57,10 @@ var Columns = []string{
 }
 
 var (
-	fields = schema2.User{}.Fields()
-
-	// descRole is the schema descriptor for role field.
-	descRole = fields[0].Descriptor()
-	// DefaultRole holds the default value on creation for the role field.
-	DefaultRole = descRole.Default.(string)
+	fields = schema.User{}.Fields()
 
 	// descUsername is the schema descriptor for username field.
-	descUsername = fields[1].Descriptor()
+	descUsername = fields[0].Descriptor()
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator = func() func(string) error {
 		validators := descUsername.Validators
@@ -80,7 +79,7 @@ var (
 	}()
 
 	// descEmail is the schema descriptor for email field.
-	descEmail = fields[2].Descriptor()
+	descEmail = fields[1].Descriptor()
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator = func() func(string) error {
 		validators := descEmail.Validators
@@ -100,7 +99,7 @@ var (
 	}()
 
 	// descPassword is the schema descriptor for password field.
-	descPassword = fields[3].Descriptor()
+	descPassword = fields[2].Descriptor()
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator = func() func(string) error {
 		validators := descPassword.Validators
@@ -119,17 +118,17 @@ var (
 	}()
 
 	// descIsDeleted is the schema descriptor for is_deleted field.
-	descIsDeleted = fields[4].Descriptor()
+	descIsDeleted = fields[3].Descriptor()
 	// DefaultIsDeleted holds the default value on creation for the is_deleted field.
 	DefaultIsDeleted = descIsDeleted.Default.(bool)
 
 	// descIsBanned is the schema descriptor for is_banned field.
-	descIsBanned = fields[5].Descriptor()
+	descIsBanned = fields[4].Descriptor()
 	// DefaultIsBanned holds the default value on creation for the is_banned field.
 	DefaultIsBanned = descIsBanned.Default.(bool)
 
 	// descIsLocked is the schema descriptor for is_locked field.
-	descIsLocked = fields[6].Descriptor()
+	descIsLocked = fields[5].Descriptor()
 	// DefaultIsLocked holds the default value on creation for the is_locked field.
 	DefaultIsLocked = descIsLocked.Default.(bool)
 )

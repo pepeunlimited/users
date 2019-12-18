@@ -5,18 +5,18 @@ package ent
 import (
 	"context"
 	"fmt"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // UserUpdate is the builder for updating User entities.
 type UserUpdate struct {
 	config
-	role           *string
 	username       *string
 	email          *string
 	password       *string
@@ -25,27 +25,15 @@ type UserUpdate struct {
 	is_locked      *bool
 	last_modified  *time.Time
 	tickets        map[int]struct{}
+	roles          map[int]struct{}
 	removedTickets map[int]struct{}
-	predicates     []predicate2.User
+	removedRoles   map[int]struct{}
+	predicates     []predicate.User
 }
 
 // Where adds a new predicate for the builder.
-func (uu *UserUpdate) Where(ps ...predicate2.User) *UserUpdate {
+func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
 	uu.predicates = append(uu.predicates, ps...)
-	return uu
-}
-
-// SetRole sets the role field.
-func (uu *UserUpdate) SetRole(s string) *UserUpdate {
-	uu.role = &s
-	return uu
-}
-
-// SetNillableRole sets the role field if the given value is not nil.
-func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetRole(*s)
-	}
 	return uu
 }
 
@@ -135,6 +123,26 @@ func (uu *UserUpdate) AddTickets(t ...*Ticket) *UserUpdate {
 	return uu.AddTicketIDs(ids...)
 }
 
+// AddRoleIDs adds the roles edge to Role by ids.
+func (uu *UserUpdate) AddRoleIDs(ids ...int) *UserUpdate {
+	if uu.roles == nil {
+		uu.roles = make(map[int]struct{})
+	}
+	for i := range ids {
+		uu.roles[ids[i]] = struct{}{}
+	}
+	return uu
+}
+
+// AddRoles adds the roles edges to Role.
+func (uu *UserUpdate) AddRoles(r ...*Role) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.AddRoleIDs(ids...)
+}
+
 // RemoveTicketIDs removes the tickets edge to Ticket by ids.
 func (uu *UserUpdate) RemoveTicketIDs(ids ...int) *UserUpdate {
 	if uu.removedTickets == nil {
@@ -155,20 +163,40 @@ func (uu *UserUpdate) RemoveTickets(t ...*Ticket) *UserUpdate {
 	return uu.RemoveTicketIDs(ids...)
 }
 
+// RemoveRoleIDs removes the roles edge to Role by ids.
+func (uu *UserUpdate) RemoveRoleIDs(ids ...int) *UserUpdate {
+	if uu.removedRoles == nil {
+		uu.removedRoles = make(map[int]struct{})
+	}
+	for i := range ids {
+		uu.removedRoles[ids[i]] = struct{}{}
+	}
+	return uu
+}
+
+// RemoveRoles removes roles edges to Role.
+func (uu *UserUpdate) RemoveRoles(r ...*Role) *UserUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uu.RemoveRoleIDs(ids...)
+}
+
 // Save executes the query and returns the number of rows/vertices matched by this operation.
 func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
 	if uu.username != nil {
-		if err := user2.UsernameValidator(*uu.username); err != nil {
+		if err := user.UsernameValidator(*uu.username); err != nil {
 			return 0, fmt.Errorf("ent: validator failed for field \"username\": %v", err)
 		}
 	}
 	if uu.email != nil {
-		if err := user2.EmailValidator(*uu.email); err != nil {
+		if err := user.EmailValidator(*uu.email); err != nil {
 			return 0, fmt.Errorf("ent: validator failed for field \"email\": %v", err)
 		}
 	}
 	if uu.password != nil {
-		if err := user2.PasswordValidator(*uu.password); err != nil {
+		if err := user.PasswordValidator(*uu.password); err != nil {
 			return 0, fmt.Errorf("ent: validator failed for field \"password\": %v", err)
 		}
 	}
@@ -200,7 +228,7 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	var (
 		builder  = sql.Dialect(uu.driver.Dialect())
-		selector = builder.Select(user2.FieldID).From(builder.Table(user2.Table))
+		selector = builder.Select(user.FieldID).From(builder.Table(user.Table))
 	)
 	for _, p := range uu.predicates {
 		p(selector)
@@ -230,32 +258,29 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	var (
 		res     sql.Result
-		updater = builder.Update(user2.Table)
+		updater = builder.Update(user.Table)
 	)
-	updater = updater.Where(sql.InInts(user2.FieldID, ids...))
-	if value := uu.role; value != nil {
-		updater.Set(user2.FieldRole, *value)
-	}
+	updater = updater.Where(sql.InInts(user.FieldID, ids...))
 	if value := uu.username; value != nil {
-		updater.Set(user2.FieldUsername, *value)
+		updater.Set(user.FieldUsername, *value)
 	}
 	if value := uu.email; value != nil {
-		updater.Set(user2.FieldEmail, *value)
+		updater.Set(user.FieldEmail, *value)
 	}
 	if value := uu.password; value != nil {
-		updater.Set(user2.FieldPassword, *value)
+		updater.Set(user.FieldPassword, *value)
 	}
 	if value := uu.is_deleted; value != nil {
-		updater.Set(user2.FieldIsDeleted, *value)
+		updater.Set(user.FieldIsDeleted, *value)
 	}
 	if value := uu.is_banned; value != nil {
-		updater.Set(user2.FieldIsBanned, *value)
+		updater.Set(user.FieldIsBanned, *value)
 	}
 	if value := uu.is_locked; value != nil {
-		updater.Set(user2.FieldIsLocked, *value)
+		updater.Set(user.FieldIsLocked, *value)
 	}
 	if value := uu.last_modified; value != nil {
-		updater.Set(user2.FieldLastModified, *value)
+		updater.Set(user.FieldLastModified, *value)
 	}
 	if !updater.Empty() {
 		query, args := updater.Query()
@@ -268,10 +293,10 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for eid := range uu.removedTickets {
 			eids = append(eids, eid)
 		}
-		query, args := builder.Update(user2.TicketsTable).
-			SetNull(user2.TicketsColumn).
-			Where(sql.InInts(user2.TicketsColumn, ids...)).
-			Where(sql.InInts(ticket2.FieldID, eids...)).
+		query, args := builder.Update(user.TicketsTable).
+			SetNull(user.TicketsColumn).
+			Where(sql.InInts(user.TicketsColumn, ids...)).
+			Where(sql.InInts(ticket.FieldID, eids...)).
 			Query()
 		if err := tx.Exec(ctx, query, args, &res); err != nil {
 			return 0, rollback(tx, err)
@@ -281,11 +306,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, id := range ids {
 			p := sql.P()
 			for eid := range uu.tickets {
-				p.Or().EQ(ticket2.FieldID, eid)
+				p.Or().EQ(ticket.FieldID, eid)
 			}
-			query, args := builder.Update(user2.TicketsTable).
-				Set(user2.TicketsColumn, id).
-				Where(sql.And(p, sql.IsNull(user2.TicketsColumn))).
+			query, args := builder.Update(user.TicketsTable).
+				Set(user.TicketsColumn, id).
+				Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
 				Query()
 			if err := tx.Exec(ctx, query, args, &res); err != nil {
 				return 0, rollback(tx, err)
@@ -299,6 +324,42 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if len(uu.removedRoles) > 0 {
+		eids := make([]int, len(uu.removedRoles))
+		for eid := range uu.removedRoles {
+			eids = append(eids, eid)
+		}
+		query, args := builder.Update(user.RolesTable).
+			SetNull(user.RolesColumn).
+			Where(sql.InInts(user.RolesColumn, ids...)).
+			Where(sql.InInts(role.FieldID, eids...)).
+			Query()
+		if err := tx.Exec(ctx, query, args, &res); err != nil {
+			return 0, rollback(tx, err)
+		}
+	}
+	if len(uu.roles) > 0 {
+		for _, id := range ids {
+			p := sql.P()
+			for eid := range uu.roles {
+				p.Or().EQ(role.FieldID, eid)
+			}
+			query, args := builder.Update(user.RolesTable).
+				Set(user.RolesColumn, id).
+				Where(sql.And(p, sql.IsNull(user.RolesColumn))).
+				Query()
+			if err := tx.Exec(ctx, query, args, &res); err != nil {
+				return 0, rollback(tx, err)
+			}
+			affected, err := res.RowsAffected()
+			if err != nil {
+				return 0, rollback(tx, err)
+			}
+			if int(affected) < len(uu.roles) {
+				return 0, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uu.roles))})
+			}
+		}
+	}
 	if err = tx.Commit(); err != nil {
 		return 0, err
 	}
@@ -309,7 +370,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 type UserUpdateOne struct {
 	config
 	id             int
-	role           *string
 	username       *string
 	email          *string
 	password       *string
@@ -318,21 +378,9 @@ type UserUpdateOne struct {
 	is_locked      *bool
 	last_modified  *time.Time
 	tickets        map[int]struct{}
+	roles          map[int]struct{}
 	removedTickets map[int]struct{}
-}
-
-// SetRole sets the role field.
-func (uuo *UserUpdateOne) SetRole(s string) *UserUpdateOne {
-	uuo.role = &s
-	return uuo
-}
-
-// SetNillableRole sets the role field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetRole(*s)
-	}
-	return uuo
+	removedRoles   map[int]struct{}
 }
 
 // SetUsername sets the username field.
@@ -421,6 +469,26 @@ func (uuo *UserUpdateOne) AddTickets(t ...*Ticket) *UserUpdateOne {
 	return uuo.AddTicketIDs(ids...)
 }
 
+// AddRoleIDs adds the roles edge to Role by ids.
+func (uuo *UserUpdateOne) AddRoleIDs(ids ...int) *UserUpdateOne {
+	if uuo.roles == nil {
+		uuo.roles = make(map[int]struct{})
+	}
+	for i := range ids {
+		uuo.roles[ids[i]] = struct{}{}
+	}
+	return uuo
+}
+
+// AddRoles adds the roles edges to Role.
+func (uuo *UserUpdateOne) AddRoles(r ...*Role) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.AddRoleIDs(ids...)
+}
+
 // RemoveTicketIDs removes the tickets edge to Ticket by ids.
 func (uuo *UserUpdateOne) RemoveTicketIDs(ids ...int) *UserUpdateOne {
 	if uuo.removedTickets == nil {
@@ -441,20 +509,40 @@ func (uuo *UserUpdateOne) RemoveTickets(t ...*Ticket) *UserUpdateOne {
 	return uuo.RemoveTicketIDs(ids...)
 }
 
+// RemoveRoleIDs removes the roles edge to Role by ids.
+func (uuo *UserUpdateOne) RemoveRoleIDs(ids ...int) *UserUpdateOne {
+	if uuo.removedRoles == nil {
+		uuo.removedRoles = make(map[int]struct{})
+	}
+	for i := range ids {
+		uuo.removedRoles[ids[i]] = struct{}{}
+	}
+	return uuo
+}
+
+// RemoveRoles removes roles edges to Role.
+func (uuo *UserUpdateOne) RemoveRoles(r ...*Role) *UserUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return uuo.RemoveRoleIDs(ids...)
+}
+
 // Save executes the query and returns the updated entity.
 func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
 	if uuo.username != nil {
-		if err := user2.UsernameValidator(*uuo.username); err != nil {
+		if err := user.UsernameValidator(*uuo.username); err != nil {
 			return nil, fmt.Errorf("ent: validator failed for field \"username\": %v", err)
 		}
 	}
 	if uuo.email != nil {
-		if err := user2.EmailValidator(*uuo.email); err != nil {
+		if err := user.EmailValidator(*uuo.email); err != nil {
 			return nil, fmt.Errorf("ent: validator failed for field \"email\": %v", err)
 		}
 	}
 	if uuo.password != nil {
-		if err := user2.PasswordValidator(*uuo.password); err != nil {
+		if err := user.PasswordValidator(*uuo.password); err != nil {
 			return nil, fmt.Errorf("ent: validator failed for field \"password\": %v", err)
 		}
 	}
@@ -486,9 +574,9 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 	var (
 		builder  = sql.Dialect(uuo.driver.Dialect())
-		selector = builder.Select(user2.Columns...).From(builder.Table(user2.Table))
+		selector = builder.Select(user.Columns...).From(builder.Table(user.Table))
 	)
-	user2.ID(uuo.id)(selector)
+	user.ID(uuo.id)(selector)
 	rows := &sql.Rows{}
 	query, args := selector.Query()
 	if err = uuo.driver.Query(ctx, query, args, rows); err != nil {
@@ -519,39 +607,35 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 	}
 	var (
 		res     sql.Result
-		updater = builder.Update(user2.Table)
+		updater = builder.Update(user.Table)
 	)
-	updater = updater.Where(sql.InInts(user2.FieldID, ids...))
-	if value := uuo.role; value != nil {
-		updater.Set(user2.FieldRole, *value)
-		u.Role = *value
-	}
+	updater = updater.Where(sql.InInts(user.FieldID, ids...))
 	if value := uuo.username; value != nil {
-		updater.Set(user2.FieldUsername, *value)
+		updater.Set(user.FieldUsername, *value)
 		u.Username = *value
 	}
 	if value := uuo.email; value != nil {
-		updater.Set(user2.FieldEmail, *value)
+		updater.Set(user.FieldEmail, *value)
 		u.Email = *value
 	}
 	if value := uuo.password; value != nil {
-		updater.Set(user2.FieldPassword, *value)
+		updater.Set(user.FieldPassword, *value)
 		u.Password = *value
 	}
 	if value := uuo.is_deleted; value != nil {
-		updater.Set(user2.FieldIsDeleted, *value)
+		updater.Set(user.FieldIsDeleted, *value)
 		u.IsDeleted = *value
 	}
 	if value := uuo.is_banned; value != nil {
-		updater.Set(user2.FieldIsBanned, *value)
+		updater.Set(user.FieldIsBanned, *value)
 		u.IsBanned = *value
 	}
 	if value := uuo.is_locked; value != nil {
-		updater.Set(user2.FieldIsLocked, *value)
+		updater.Set(user.FieldIsLocked, *value)
 		u.IsLocked = *value
 	}
 	if value := uuo.last_modified; value != nil {
-		updater.Set(user2.FieldLastModified, *value)
+		updater.Set(user.FieldLastModified, *value)
 		u.LastModified = *value
 	}
 	if !updater.Empty() {
@@ -565,10 +649,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 		for eid := range uuo.removedTickets {
 			eids = append(eids, eid)
 		}
-		query, args := builder.Update(user2.TicketsTable).
-			SetNull(user2.TicketsColumn).
-			Where(sql.InInts(user2.TicketsColumn, ids...)).
-			Where(sql.InInts(ticket2.FieldID, eids...)).
+		query, args := builder.Update(user.TicketsTable).
+			SetNull(user.TicketsColumn).
+			Where(sql.InInts(user.TicketsColumn, ids...)).
+			Where(sql.InInts(ticket.FieldID, eids...)).
 			Query()
 		if err := tx.Exec(ctx, query, args, &res); err != nil {
 			return nil, rollback(tx, err)
@@ -578,11 +662,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 		for _, id := range ids {
 			p := sql.P()
 			for eid := range uuo.tickets {
-				p.Or().EQ(ticket2.FieldID, eid)
+				p.Or().EQ(ticket.FieldID, eid)
 			}
-			query, args := builder.Update(user2.TicketsTable).
-				Set(user2.TicketsColumn, id).
-				Where(sql.And(p, sql.IsNull(user2.TicketsColumn))).
+			query, args := builder.Update(user.TicketsTable).
+				Set(user.TicketsColumn, id).
+				Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
 				Query()
 			if err := tx.Exec(ctx, query, args, &res); err != nil {
 				return nil, rollback(tx, err)
@@ -593,6 +677,42 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
 			}
 			if int(affected) < len(uuo.tickets) {
 				return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"tickets\" %v already connected to a different \"User\"", keys(uuo.tickets))})
+			}
+		}
+	}
+	if len(uuo.removedRoles) > 0 {
+		eids := make([]int, len(uuo.removedRoles))
+		for eid := range uuo.removedRoles {
+			eids = append(eids, eid)
+		}
+		query, args := builder.Update(user.RolesTable).
+			SetNull(user.RolesColumn).
+			Where(sql.InInts(user.RolesColumn, ids...)).
+			Where(sql.InInts(role.FieldID, eids...)).
+			Query()
+		if err := tx.Exec(ctx, query, args, &res); err != nil {
+			return nil, rollback(tx, err)
+		}
+	}
+	if len(uuo.roles) > 0 {
+		for _, id := range ids {
+			p := sql.P()
+			for eid := range uuo.roles {
+				p.Or().EQ(role.FieldID, eid)
+			}
+			query, args := builder.Update(user.RolesTable).
+				Set(user.RolesColumn, id).
+				Where(sql.And(p, sql.IsNull(user.RolesColumn))).
+				Query()
+			if err := tx.Exec(ctx, query, args, &res); err != nil {
+				return nil, rollback(tx, err)
+			}
+			affected, err := res.RowsAffected()
+			if err != nil {
+				return nil, rollback(tx, err)
+			}
+			if int(affected) < len(uuo.roles) {
+				return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uuo.roles))})
 			}
 		}
 	}

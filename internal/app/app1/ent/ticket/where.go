@@ -3,15 +3,15 @@
 package ticket
 
 import (
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 )
 
 // ID filters vertices based on their identifier.
-func ID(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func ID(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldID), id))
 		},
@@ -19,8 +19,8 @@ func ID(id int) predicate2.Ticket {
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDEQ(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldID), id))
 		},
@@ -28,8 +28,8 @@ func IDEQ(id int) predicate2.Ticket {
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDNEQ(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.NEQ(s.C(FieldID), id))
 		},
@@ -37,8 +37,8 @@ func IDNEQ(id int) predicate2.Ticket {
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDIn(ids ...int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -56,8 +56,8 @@ func IDIn(ids ...int) predicate2.Ticket {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDNotIn(ids ...int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -75,8 +75,8 @@ func IDNotIn(ids ...int) predicate2.Ticket {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDGT(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GT(s.C(FieldID), id))
 		},
@@ -84,8 +84,8 @@ func IDGT(id int) predicate2.Ticket {
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDGTE(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GTE(s.C(FieldID), id))
 		},
@@ -93,8 +93,8 @@ func IDGTE(id int) predicate2.Ticket {
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDLT(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LT(s.C(FieldID), id))
 		},
@@ -102,8 +102,8 @@ func IDLT(id int) predicate2.Ticket {
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate2.Ticket {
-	return predicate2.Ticket(
+func IDLTE(id int) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LTE(s.C(FieldID), id))
 		},
@@ -111,8 +111,8 @@ func IDLTE(id int) predicate2.Ticket {
 }
 
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
-func Token(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func Token(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldToken), v))
 		},
@@ -120,8 +120,8 @@ func Token(v string) predicate2.Ticket {
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAt(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldCreatedAt), v))
 		},
@@ -129,8 +129,8 @@ func CreatedAt(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
-func ExpiresAt(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAt(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldExpiresAt), v))
 		},
@@ -138,8 +138,8 @@ func ExpiresAt(v time.Time) predicate2.Ticket {
 }
 
 // TokenEQ applies the EQ predicate on the "token" field.
-func TokenEQ(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenEQ(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldToken), v))
 		},
@@ -147,8 +147,8 @@ func TokenEQ(v string) predicate2.Ticket {
 }
 
 // TokenNEQ applies the NEQ predicate on the "token" field.
-func TokenNEQ(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenNEQ(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.NEQ(s.C(FieldToken), v))
 		},
@@ -156,12 +156,12 @@ func TokenNEQ(v string) predicate2.Ticket {
 }
 
 // TokenIn applies the In predicate on the "token" field.
-func TokenIn(vs ...string) predicate2.Ticket {
+func TokenIn(vs ...string) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -175,12 +175,12 @@ func TokenIn(vs ...string) predicate2.Ticket {
 }
 
 // TokenNotIn applies the NotIn predicate on the "token" field.
-func TokenNotIn(vs ...string) predicate2.Ticket {
+func TokenNotIn(vs ...string) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -194,8 +194,8 @@ func TokenNotIn(vs ...string) predicate2.Ticket {
 }
 
 // TokenGT applies the GT predicate on the "token" field.
-func TokenGT(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenGT(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GT(s.C(FieldToken), v))
 		},
@@ -203,8 +203,8 @@ func TokenGT(v string) predicate2.Ticket {
 }
 
 // TokenGTE applies the GTE predicate on the "token" field.
-func TokenGTE(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenGTE(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GTE(s.C(FieldToken), v))
 		},
@@ -212,8 +212,8 @@ func TokenGTE(v string) predicate2.Ticket {
 }
 
 // TokenLT applies the LT predicate on the "token" field.
-func TokenLT(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenLT(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LT(s.C(FieldToken), v))
 		},
@@ -221,8 +221,8 @@ func TokenLT(v string) predicate2.Ticket {
 }
 
 // TokenLTE applies the LTE predicate on the "token" field.
-func TokenLTE(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenLTE(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LTE(s.C(FieldToken), v))
 		},
@@ -230,8 +230,8 @@ func TokenLTE(v string) predicate2.Ticket {
 }
 
 // TokenContains applies the Contains predicate on the "token" field.
-func TokenContains(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenContains(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.Contains(s.C(FieldToken), v))
 		},
@@ -239,8 +239,8 @@ func TokenContains(v string) predicate2.Ticket {
 }
 
 // TokenHasPrefix applies the HasPrefix predicate on the "token" field.
-func TokenHasPrefix(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenHasPrefix(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.HasPrefix(s.C(FieldToken), v))
 		},
@@ -248,8 +248,8 @@ func TokenHasPrefix(v string) predicate2.Ticket {
 }
 
 // TokenHasSuffix applies the HasSuffix predicate on the "token" field.
-func TokenHasSuffix(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenHasSuffix(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.HasSuffix(s.C(FieldToken), v))
 		},
@@ -257,8 +257,8 @@ func TokenHasSuffix(v string) predicate2.Ticket {
 }
 
 // TokenEqualFold applies the EqualFold predicate on the "token" field.
-func TokenEqualFold(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenEqualFold(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EqualFold(s.C(FieldToken), v))
 		},
@@ -266,8 +266,8 @@ func TokenEqualFold(v string) predicate2.Ticket {
 }
 
 // TokenContainsFold applies the ContainsFold predicate on the "token" field.
-func TokenContainsFold(v string) predicate2.Ticket {
-	return predicate2.Ticket(
+func TokenContainsFold(v string) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.ContainsFold(s.C(FieldToken), v))
 		},
@@ -275,8 +275,8 @@ func TokenContainsFold(v string) predicate2.Ticket {
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtEQ(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldCreatedAt), v))
 		},
@@ -284,8 +284,8 @@ func CreatedAtEQ(v time.Time) predicate2.Ticket {
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtNEQ(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
 		},
@@ -293,12 +293,12 @@ func CreatedAtNEQ(v time.Time) predicate2.Ticket {
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate2.Ticket {
+func CreatedAtIn(vs ...time.Time) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -312,12 +312,12 @@ func CreatedAtIn(vs ...time.Time) predicate2.Ticket {
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate2.Ticket {
+func CreatedAtNotIn(vs ...time.Time) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -331,8 +331,8 @@ func CreatedAtNotIn(vs ...time.Time) predicate2.Ticket {
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtGT(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GT(s.C(FieldCreatedAt), v))
 		},
@@ -340,8 +340,8 @@ func CreatedAtGT(v time.Time) predicate2.Ticket {
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtGTE(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GTE(s.C(FieldCreatedAt), v))
 		},
@@ -349,8 +349,8 @@ func CreatedAtGTE(v time.Time) predicate2.Ticket {
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtLT(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LT(s.C(FieldCreatedAt), v))
 		},
@@ -358,8 +358,8 @@ func CreatedAtLT(v time.Time) predicate2.Ticket {
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func CreatedAtLTE(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LTE(s.C(FieldCreatedAt), v))
 		},
@@ -367,8 +367,8 @@ func CreatedAtLTE(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
-func ExpiresAtEQ(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtEQ(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(FieldExpiresAt), v))
 		},
@@ -376,8 +376,8 @@ func ExpiresAtEQ(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtNEQ applies the NEQ predicate on the "expires_at" field.
-func ExpiresAtNEQ(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtNEQ(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.NEQ(s.C(FieldExpiresAt), v))
 		},
@@ -385,12 +385,12 @@ func ExpiresAtNEQ(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtIn applies the In predicate on the "expires_at" field.
-func ExpiresAtIn(vs ...time.Time) predicate2.Ticket {
+func ExpiresAtIn(vs ...time.Time) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -404,12 +404,12 @@ func ExpiresAtIn(vs ...time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtNotIn applies the NotIn predicate on the "expires_at" field.
-func ExpiresAtNotIn(vs ...time.Time) predicate2.Ticket {
+func ExpiresAtNotIn(vs ...time.Time) predicate.Ticket {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
-	return predicate2.Ticket(
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			// if not arguments were provided, append the FALSE constants,
 			// since we can't apply "IN ()". This will make this predicate falsy.
@@ -423,8 +423,8 @@ func ExpiresAtNotIn(vs ...time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtGT applies the GT predicate on the "expires_at" field.
-func ExpiresAtGT(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtGT(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GT(s.C(FieldExpiresAt), v))
 		},
@@ -432,8 +432,8 @@ func ExpiresAtGT(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtGTE applies the GTE predicate on the "expires_at" field.
-func ExpiresAtGTE(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtGTE(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.GTE(s.C(FieldExpiresAt), v))
 		},
@@ -441,8 +441,8 @@ func ExpiresAtGTE(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtLT applies the LT predicate on the "expires_at" field.
-func ExpiresAtLT(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtLT(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LT(s.C(FieldExpiresAt), v))
 		},
@@ -450,8 +450,8 @@ func ExpiresAtLT(v time.Time) predicate2.Ticket {
 }
 
 // ExpiresAtLTE applies the LTE predicate on the "expires_at" field.
-func ExpiresAtLTE(v time.Time) predicate2.Ticket {
-	return predicate2.Ticket(
+func ExpiresAtLTE(v time.Time) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s.Where(sql.LTE(s.C(FieldExpiresAt), v))
 		},
@@ -459,8 +459,8 @@ func ExpiresAtLTE(v time.Time) predicate2.Ticket {
 }
 
 // HasUsers applies the HasEdge predicate on the "users" edge.
-func HasUsers() predicate2.Ticket {
-	return predicate2.Ticket(
+func HasUsers() predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			step := sql.NewStep(
 				sql.From(Table, FieldID),
@@ -473,8 +473,8 @@ func HasUsers() predicate2.Ticket {
 }
 
 // HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
-func HasUsersWith(preds ...predicate2.User) predicate2.Ticket {
-	return predicate2.Ticket(
+func HasUsersWith(preds ...predicate.User) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			step := sql.NewStep(
 				sql.From(Table, FieldID),
@@ -491,8 +491,8 @@ func HasUsersWith(preds ...predicate2.User) predicate2.Ticket {
 }
 
 // And groups list of predicates with the AND operator between them.
-func And(predicates ...predicate2.Ticket) predicate2.Ticket {
-	return predicate2.Ticket(
+func And(predicates ...predicate.Ticket) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s1 := s.Clone().SetP(nil)
 			for _, p := range predicates {
@@ -504,8 +504,8 @@ func And(predicates ...predicate2.Ticket) predicate2.Ticket {
 }
 
 // Or groups list of predicates with the OR operator between them.
-func Or(predicates ...predicate2.Ticket) predicate2.Ticket {
-	return predicate2.Ticket(
+func Or(predicates ...predicate.Ticket) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			s1 := s.Clone().SetP(nil)
 			for i, p := range predicates {
@@ -520,8 +520,8 @@ func Or(predicates ...predicate2.Ticket) predicate2.Ticket {
 }
 
 // Not applies the not operator on the given predicate.
-func Not(p predicate2.Ticket) predicate2.Ticket {
-	return predicate2.Ticket(
+func Not(p predicate.Ticket) predicate.Ticket {
+	return predicate.Ticket(
 		func(s *sql.Selector) {
 			p(s.Not())
 		},

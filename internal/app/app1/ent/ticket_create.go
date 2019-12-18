@@ -6,10 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 )
 
 // TicketCreate is the builder for creating a Ticket entity.
@@ -66,7 +66,7 @@ func (tc *TicketCreate) Save(ctx context.Context) (*Ticket, error) {
 	if tc.token == nil {
 		return nil, errors.New("ent: missing required field \"token\"")
 	}
-	if err := ticket2.TokenValidator(*tc.token); err != nil {
+	if err := ticket.TokenValidator(*tc.token); err != nil {
 		return nil, fmt.Errorf("ent: validator failed for field \"token\": %v", err)
 	}
 	if tc.created_at == nil {
@@ -100,30 +100,30 @@ func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 	if err != nil {
 		return nil, err
 	}
-	insert := builder.Insert(ticket2.Table).Default()
+	insert := builder.Insert(ticket.Table).Default()
 	if value := tc.token; value != nil {
-		insert.Set(ticket2.FieldToken, *value)
+		insert.Set(ticket.FieldToken, *value)
 		t.Token = *value
 	}
 	if value := tc.created_at; value != nil {
-		insert.Set(ticket2.FieldCreatedAt, *value)
+		insert.Set(ticket.FieldCreatedAt, *value)
 		t.CreatedAt = *value
 	}
 	if value := tc.expires_at; value != nil {
-		insert.Set(ticket2.FieldExpiresAt, *value)
+		insert.Set(ticket.FieldExpiresAt, *value)
 		t.ExpiresAt = *value
 	}
 
-	id, err := insertLastID(ctx, tx, insert.Returning(ticket2.FieldID))
+	id, err := insertLastID(ctx, tx, insert.Returning(ticket.FieldID))
 	if err != nil {
 		return nil, rollback(tx, err)
 	}
 	t.ID = int(id)
 	if len(tc.users) > 0 {
 		for eid := range tc.users {
-			query, args := builder.Update(ticket2.UsersTable).
-				Set(ticket2.UsersColumn, eid).
-				Where(sql.EQ(ticket2.FieldID, id)).
+			query, args := builder.Update(ticket.UsersTable).
+				Set(ticket.UsersColumn, eid).
+				Where(sql.EQ(ticket.FieldID, id)).
 				Query()
 			if err := tx.Exec(ctx, query, args, &res); err != nil {
 				return nil, rollback(tx, err)

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
-	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"testing"
 	"time"
 )
@@ -17,7 +16,7 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 	email := "simo.alakotila@gmail.com"
 	password := "p4sw0rd"
 
-	user, err := repo.CreateUser(ctx, username, email, password, Admin)
+	user, role, err := repo.CreateUser(ctx, username, email, password)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -28,6 +27,9 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 		t.FailNow()
 	}
 	if userById.ID != user.ID {
+		t.FailNow()
+	}
+	if Role(role.Role) != User {
 		t.FailNow()
 	}
 }
@@ -42,7 +44,7 @@ func TestUserMySQL_GetUserByIdNotFound(t *testing.T) {
 		t.Log(user)
 		t.FailNow()
 	}
-	if !ent.IsNotFound(err) {
+	if err != ErrUserNotExist {
 		t.FailNow()
 	}
 }
@@ -52,8 +54,8 @@ func TestUserMySQL_GetUsers(t *testing.T) {
 	client := NewEntClient()
 	repo := NewUserRepository(client)
 
-	repo.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo", User)
-	repo.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo", User)
+	repo.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo")
+	repo.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo")
 
 	users, err := repo.GetUsers(ctx, 0, 20)
 	if err != nil {
@@ -72,8 +74,8 @@ func TestUserMySQL_GetUserTicketsByUserId(t *testing.T) {
 	users := NewUserRepository(client)
 	ticketsrepo := NewTicketRepository(client)
 	users.DeleteAll(ctx)
-	ssiimoo,_ := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo", User)
-	piiia,_ := users.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo", User)
+	ssiimoo,_, _ := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo")
+	piiia,_, _ := users.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo")
 	_, tickets, err := users.GetUserTicketsByUserId(ctx, ssiimoo.ID)
 	if err != nil {
 		t.Error(err)
@@ -100,8 +102,9 @@ func TestUserMySQL_UpdateUser(t *testing.T) {
 	client := NewEntClient()
 	users := NewUserRepository(client)
 	users.DeleteAll(ctx)
-	user,_ := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", "p4sw0rd", Admin)
-	updated, err := users.UpdateUser(ctx, user.Update().SetUsername("ssimooo"))
+	user,_,_ := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", "p4sw0rd")
+	selected,_ := users.GetUserById(ctx, user.ID)
+	updated, err := users.UpdateUser(ctx, selected.Update().SetUsername("ssimooo"))
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -119,7 +122,7 @@ func TestUserMySQL_UpdatePasswordOk(t *testing.T) {
 	users.DeleteAll(ctx)
 	password := "p4sw0rd"
 	newpw := "new_"+password
-	user, err := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", password, Admin)
+	user,_, err := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", password)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -143,7 +146,7 @@ func TestUserMySQL_UpdatePasswordFail(t *testing.T) {
 	users.DeleteAll(ctx)
 	password := "p4sw0rd"
 	newpw := "new_"+password
-	user, err := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", password, Admin)
+	user,_, err := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", password)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -170,7 +173,7 @@ func TestUserMySQL_BanUserUnLock(t *testing.T) {
 	client := NewEntClient()
 	users := NewUserRepository(client)
 	users.DeleteAll(ctx)
-	user,_ := users.CreateUser(ctx, "simo", "simo.alakotila@gmail.com", "simo", Admin)
+	user,_,_ := users.CreateUser(ctx, "simo", "simo.alakotila@gmail.com", "simo")
 	err := users.BanUser(ctx, user.ID)
 	if err != nil {
 		t.FailNow()
@@ -201,20 +204,81 @@ func TestUserMySQL_CreateUserEmailAndUsernameExist(t *testing.T) {
 	client := NewEntClient()
 	users := NewUserRepository(client)
 	users.DeleteAll(ctx)
-	users.CreateUser(ctx, "simo1", "simo.alakotila@gmail.com", "simo", Admin)
-	users.CreateUser(ctx, "simo", "simo1.alakotila@gmail.com", "simo", Admin)
-	_, err := users.CreateUser(ctx, "simo1", "a@a.com", "asd", Admin)
+	users.CreateUser(ctx, "simo1", "simo.alakotila@gmail.com", "simo")
+	users.CreateUser(ctx, "simo", "simo1.alakotila@gmail.com", "simo")
+	_,_, err := users.CreateUser(ctx, "simo1", "a@a.com", "asd")
 	if err == nil {
 		t.FailNow()
 	}
 	if err != ErrUsernameExist {
 		t.FailNow()
 	}
-	_, err = users.CreateUser(ctx, "simo2", "simo1.alakotila@gmail.com", "asd", Admin)
+	_,_, err = users.CreateUser(ctx, "simo2", "simo1.alakotila@gmail.com", "asd")
 	if err == nil {
 		t.FailNow()
 	}
 	if err != ErrEmailExist {
+		t.FailNow()
+	}
+}
+
+func TestUserMySQL_GetUserRolesByUsername(t *testing.T) {
+	ctx := context.TODO()
+	client := NewEntClient()
+	users := NewUserRepository(client)
+	users.DeleteAll(ctx)
+	repo := NewRolesRepository(client)
+	user, _,_ := users.CreateUser(ctx, "simo", "simo.alakotila@gmail.com", "p4sw0rd")
+	user, roles, err := users.GetUserRolesByUserId(ctx, user.ID)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(roles) != 1 {
+		t.FailNow()
+	}
+	err = repo.AddRole(ctx, user.ID, Admin)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	user, roles, err = users.GetUserRolesByUserId(ctx, user.ID)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(roles) != 2 {
+		t.FailNow()
+	}
+}
+
+func TestUserMySQL_GetUserRolesByUserId(t *testing.T) {
+	ctx := context.TODO()
+	client := NewEntClient()
+	users := NewUserRepository(client)
+	users.DeleteAll(ctx)
+	repo := NewRolesRepository(client)
+	username := "simo"
+	user, _,_ := users.CreateUser(ctx, username, "simo.alakotila@gmail.com", "p4sw0rd")
+	user, roles, err := users.GetUserRolesByUsername(ctx, username)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(roles) != 1 {
+		t.FailNow()
+	}
+	err = repo.AddRole(ctx, user.ID, Admin)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	user, roles, err = users.GetUserRolesByUserId(ctx, user.ID)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(roles) != 2 {
 		t.FailNow()
 	}
 }

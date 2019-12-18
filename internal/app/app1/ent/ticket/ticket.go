@@ -3,7 +3,7 @@
 package ticket
 
 import (
-	schema2 "github.com/pepeunlimited/users/internal/app/app1/ent/schema"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/schema"
 )
 
 const (
@@ -38,7 +38,7 @@ var Columns = []string{
 }
 
 var (
-	fields = schema2.Ticket{}.Fields()
+	fields = schema.Ticket{}.Fields()
 
 	// descToken is the schema descriptor for token field.
 	descToken = fields[0].Descriptor()

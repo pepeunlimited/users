@@ -61,7 +61,7 @@ message User {
     int64 id = 1;
     string username = 2;
     string email = 3;
-    string role = 4;
+    repeated string roles = 4;
 }
 
 message ResetPasswordParams {

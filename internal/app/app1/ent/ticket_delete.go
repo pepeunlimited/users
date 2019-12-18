@@ -4,20 +4,20 @@ package ent
 
 import (
 	"context"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 )
 
 // TicketDelete is the builder for deleting a Ticket entity.
 type TicketDelete struct {
 	config
-	predicates []predicate2.Ticket
+	predicates []predicate.Ticket
 }
 
 // Where adds a new predicate to the delete builder.
-func (td *TicketDelete) Where(ps ...predicate2.Ticket) *TicketDelete {
+func (td *TicketDelete) Where(ps ...predicate.Ticket) *TicketDelete {
 	td.predicates = append(td.predicates, ps...)
 	return td
 }
@@ -41,11 +41,11 @@ func (td *TicketDelete) sqlExec(ctx context.Context) (int, error) {
 		res     sql.Result
 		builder = sql.Dialect(td.driver.Dialect())
 	)
-	selector := builder.Select().From(sql.Table(ticket2.Table))
+	selector := builder.Select().From(sql.Table(ticket.Table))
 	for _, p := range td.predicates {
 		p(selector)
 	}
-	query, args := builder.Delete(ticket2.Table).FromSelect(selector).Query()
+	query, args := builder.Delete(ticket.Table).FromSelect(selector).Query()
 	if err := td.driver.Exec(ctx, query, args, &res); err != nil {
 		return 0, err
 	}
@@ -68,7 +68,7 @@ func (tdo *TicketDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &ErrNotFound{ticket2.Label}
+		return &ErrNotFound{ticket.Label}
 	default:
 		return nil
 	}

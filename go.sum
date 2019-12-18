@@ -7,6 +7,10 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/facebookincubator/ent v0.0.0-20191213050818-1311f5f2f246 h1:mRAF7MUDJjAS9vJ2pyXqTeB3RIAen2gE3oL7TYwz2A0=
 github.com/facebookincubator/ent v0.0.0-20191213050818-1311f5f2f246/go.mod h1:3CGvz1m+D78JUti7JFkY6AkKj88McWuT80UcamLqEJQ=
+github.com/facebookincubator/ent v0.0.0-20191215171026-58b53892756e h1:JUEdfMFedBR3cu62LmU3EH7GEt837zO2fQY2ya8HZm0=
+github.com/facebookincubator/ent v0.0.0-20191215171026-58b53892756e/go.mod h1:3CGvz1m+D78JUti7JFkY6AkKj88McWuT80UcamLqEJQ=
+github.com/facebookincubator/ent v0.0.0-20191217163758-5e9d13be9747 h1:gXmPRrI5YZbvL8ZdyF7aPc0ZsswM9oK6TxRBrBOqefk=
+github.com/facebookincubator/ent v0.0.0-20191217163758-5e9d13be9747/go.mod h1:3CGvz1m+D78JUti7JFkY6AkKj88McWuT80UcamLqEJQ=
 github.com/go-bindata/go-bindata v1.0.1-0.20190711162640-ee3c2418e368/go.mod h1:7xCgX1lzlrXPHkfvn3EhumqHkmSlzt8at9q7v0ax19c=
 github.com/go-openapi/inflect v0.18.0/go.mod h1:lHpZVlpIQqLyKwJ4N+YSc9hchQy/i12fJykb83CRBH4=
 github.com/go-sql-driver/mysql v1.4.1-0.20190510102335-877a9775f068 h1:q2kwd9Bcgl2QpSi/Wjcx9jzwyICt3EWTP5to43QhwaA=

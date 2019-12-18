@@ -25,7 +25,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 	if err != nil {
 		return nil, err
 	}
-	user, err := server.users.GetUserByUsername(ctx, params.Username)
+	user, roles, err := server.users.GetUserRolesByUsername(ctx, params.Username)
 	if err != nil {
 		return nil, server.isUserError(err)
 	}
@@ -39,7 +39,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 		Id:       int64(user.ID),
 		Username: user.Username,
 		Email:    user.Email,
-		Role:     user.Role,
+		Roles:    rolesToString(roles),
 	}, nil
 }
 
@@ -63,7 +63,7 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 	if err := server.validator.CreateUser(params); err != nil {
 		return nil, err
 	}
-	user, err := server.users.CreateUser(ctx, params.Username, params.Email, params.Password, repository.User)
+	user, role, err := server.users.CreateUser(ctx, params.Username, params.Email, params.Password)
 	if err  != nil {
 		switch err {
 		case repository.ErrUsernameExist:
@@ -77,7 +77,7 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 		Id:                   int64(user.ID),
 		Username:             user.Username,
 		Email:                user.Email,
-		Role:   			  user.Role,
+		Roles:   			  []string{role.Role},
 	}, nil
 }
 
@@ -99,7 +99,8 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	if err != nil {
 		return nil, twirp.InternalError("can't access userId from ctx err: "+err.Error())
 	}
-	user, err := server.users.GetUserById(ctx, int(userId))
+
+	user, roles, err := server.users.GetUserRolesByUserId(ctx, int(userId))
 	if err != nil {
 		return nil, server.isUserError(err)
 	}
@@ -107,7 +108,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 		Id:       int64(user.ID),
 		Username: user.Username,
 		Email:    user.Email,
-		Role:     user.Role,
+		Roles:    rolesToString(roles),
 	}, nil
 }
 

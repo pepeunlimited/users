@@ -6,6 +6,9 @@ import (
 	"github.com/facebookincubator/ent/dialect/sql"
 )
 
+// Role is the predicate function for role builders.
+type Role func(*sql.Selector)
+
 // Ticket is the predicate function for ticket builders.
 type Ticket func(*sql.Selector)
 

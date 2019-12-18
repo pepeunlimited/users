@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	ticket2 "github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // TicketUpdate is the builder for updating Ticket entities.
@@ -22,11 +22,11 @@ type TicketUpdate struct {
 	expires_at   *time.Time
 	users        map[int]struct{}
 	clearedUsers bool
-	predicates   []predicate2.Ticket
+	predicates   []predicate.Ticket
 }
 
 // Where adds a new predicate for the builder.
-func (tu *TicketUpdate) Where(ps ...predicate2.Ticket) *TicketUpdate {
+func (tu *TicketUpdate) Where(ps ...predicate.Ticket) *TicketUpdate {
 	tu.predicates = append(tu.predicates, ps...)
 	return tu
 }
@@ -80,7 +80,7 @@ func (tu *TicketUpdate) ClearUsers() *TicketUpdate {
 // Save executes the query and returns the number of rows/vertices matched by this operation.
 func (tu *TicketUpdate) Save(ctx context.Context) (int, error) {
 	if tu.token != nil {
-		if err := ticket2.TokenValidator(*tu.token); err != nil {
+		if err := ticket.TokenValidator(*tu.token); err != nil {
 			return 0, fmt.Errorf("ent: validator failed for field \"token\": %v", err)
 		}
 	}
@@ -115,7 +115,7 @@ func (tu *TicketUpdate) ExecX(ctx context.Context) {
 func (tu *TicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	var (
 		builder  = sql.Dialect(tu.driver.Dialect())
-		selector = builder.Select(ticket2.FieldID).From(builder.Table(ticket2.Table))
+		selector = builder.Select(ticket.FieldID).From(builder.Table(ticket.Table))
 	)
 	for _, p := range tu.predicates {
 		p(selector)
@@ -145,17 +145,17 @@ func (tu *TicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	var (
 		res     sql.Result
-		updater = builder.Update(ticket2.Table)
+		updater = builder.Update(ticket.Table)
 	)
-	updater = updater.Where(sql.InInts(ticket2.FieldID, ids...))
+	updater = updater.Where(sql.InInts(ticket.FieldID, ids...))
 	if value := tu.token; value != nil {
-		updater.Set(ticket2.FieldToken, *value)
+		updater.Set(ticket.FieldToken, *value)
 	}
 	if value := tu.created_at; value != nil {
-		updater.Set(ticket2.FieldCreatedAt, *value)
+		updater.Set(ticket.FieldCreatedAt, *value)
 	}
 	if value := tu.expires_at; value != nil {
-		updater.Set(ticket2.FieldExpiresAt, *value)
+		updater.Set(ticket.FieldExpiresAt, *value)
 	}
 	if !updater.Empty() {
 		query, args := updater.Query()
@@ -164,9 +164,9 @@ func (tu *TicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if tu.clearedUsers {
-		query, args := builder.Update(ticket2.UsersTable).
-			SetNull(ticket2.UsersColumn).
-			Where(sql.InInts(user2.FieldID, ids...)).
+		query, args := builder.Update(ticket.UsersTable).
+			SetNull(ticket.UsersColumn).
+			Where(sql.InInts(user.FieldID, ids...)).
 			Query()
 		if err := tx.Exec(ctx, query, args, &res); err != nil {
 			return 0, rollback(tx, err)
@@ -174,9 +174,9 @@ func (tu *TicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if len(tu.users) > 0 {
 		for eid := range tu.users {
-			query, args := builder.Update(ticket2.UsersTable).
-				Set(ticket2.UsersColumn, eid).
-				Where(sql.InInts(ticket2.FieldID, ids...)).
+			query, args := builder.Update(ticket.UsersTable).
+				Set(ticket.UsersColumn, eid).
+				Where(sql.InInts(ticket.FieldID, ids...)).
 				Query()
 			if err := tx.Exec(ctx, query, args, &res); err != nil {
 				return 0, rollback(tx, err)
@@ -249,7 +249,7 @@ func (tuo *TicketUpdateOne) ClearUsers() *TicketUpdateOne {
 // Save executes the query and returns the updated entity.
 func (tuo *TicketUpdateOne) Save(ctx context.Context) (*Ticket, error) {
 	if tuo.token != nil {
-		if err := ticket2.TokenValidator(*tuo.token); err != nil {
+		if err := ticket.TokenValidator(*tuo.token); err != nil {
 			return nil, fmt.Errorf("ent: validator failed for field \"token\": %v", err)
 		}
 	}
@@ -284,9 +284,9 @@ func (tuo *TicketUpdateOne) ExecX(ctx context.Context) {
 func (tuo *TicketUpdateOne) sqlSave(ctx context.Context) (t *Ticket, err error) {
 	var (
 		builder  = sql.Dialect(tuo.driver.Dialect())
-		selector = builder.Select(ticket2.Columns...).From(builder.Table(ticket2.Table))
+		selector = builder.Select(ticket.Columns...).From(builder.Table(ticket.Table))
 	)
-	ticket2.ID(tuo.id)(selector)
+	ticket.ID(tuo.id)(selector)
 	rows := &sql.Rows{}
 	query, args := selector.Query()
 	if err = tuo.driver.Query(ctx, query, args, rows); err != nil {
@@ -317,19 +317,19 @@ func (tuo *TicketUpdateOne) sqlSave(ctx context.Context) (t *Ticket, err error) 
 	}
 	var (
 		res     sql.Result
-		updater = builder.Update(ticket2.Table)
+		updater = builder.Update(ticket.Table)
 	)
-	updater = updater.Where(sql.InInts(ticket2.FieldID, ids...))
+	updater = updater.Where(sql.InInts(ticket.FieldID, ids...))
 	if value := tuo.token; value != nil {
-		updater.Set(ticket2.FieldToken, *value)
+		updater.Set(ticket.FieldToken, *value)
 		t.Token = *value
 	}
 	if value := tuo.created_at; value != nil {
-		updater.Set(ticket2.FieldCreatedAt, *value)
+		updater.Set(ticket.FieldCreatedAt, *value)
 		t.CreatedAt = *value
 	}
 	if value := tuo.expires_at; value != nil {
-		updater.Set(ticket2.FieldExpiresAt, *value)
+		updater.Set(ticket.FieldExpiresAt, *value)
 		t.ExpiresAt = *value
 	}
 	if !updater.Empty() {
@@ -339,9 +339,9 @@ func (tuo *TicketUpdateOne) sqlSave(ctx context.Context) (t *Ticket, err error) 
 		}
 	}
 	if tuo.clearedUsers {
-		query, args := builder.Update(ticket2.UsersTable).
-			SetNull(ticket2.UsersColumn).
-			Where(sql.InInts(user2.FieldID, ids...)).
+		query, args := builder.Update(ticket.UsersTable).
+			SetNull(ticket.UsersColumn).
+			Where(sql.InInts(user.FieldID, ids...)).
 			Query()
 		if err := tx.Exec(ctx, query, args, &res); err != nil {
 			return nil, rollback(tx, err)
@@ -349,9 +349,9 @@ func (tuo *TicketUpdateOne) sqlSave(ctx context.Context) (t *Ticket, err error) 
 	}
 	if len(tuo.users) > 0 {
 		for eid := range tuo.users {
-			query, args := builder.Update(ticket2.UsersTable).
-				Set(ticket2.UsersColumn, eid).
-				Where(sql.InInts(ticket2.FieldID, ids...)).
+			query, args := builder.Update(ticket.UsersTable).
+				Set(ticket.UsersColumn, eid).
+				Where(sql.InInts(ticket.FieldID, ids...)).
 				Query()
 			if err := tx.Exec(ctx, query, args, &res); err != nil {
 				return nil, rollback(tx, err)

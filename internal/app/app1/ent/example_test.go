@@ -16,6 +16,30 @@ import (
 //
 var dsn string
 
+func ExampleRole() {
+	if dsn == "" {
+		return
+	}
+	ctx := context.Background()
+	drv, err := sql.Open("mysql", dsn)
+	if err != nil {
+		log.Fatalf("failed creating database client: %v", err)
+	}
+	defer drv.Close()
+	client := NewClient(Driver(drv))
+	// creating vertices for the role's edges.
+
+	// create role vertex with its edges.
+	r := client.Role.
+		Create().
+		SetRole("string").
+		SaveX(ctx)
+	log.Println("role created:", r)
+
+	// query edges.
+
+	// Output:
+}
 func ExampleTicket() {
 	if dsn == "" {
 		return
@@ -61,11 +85,15 @@ func ExampleUser() {
 		SetExpiresAt(time.Now()).
 		SaveX(ctx)
 	log.Println("ticket created:", t0)
+	r1 := client.Role.
+		Create().
+		SetRole("string").
+		SaveX(ctx)
+	log.Println("role created:", r1)
 
 	// create user vertex with its edges.
 	u := client.User.
 		Create().
-		SetRole("string").
 		SetUsername("string").
 		SetEmail("string").
 		SetPassword("string").
@@ -74,6 +102,7 @@ func ExampleUser() {
 		SetIsLocked(true).
 		SetLastModified(time.Now()).
 		AddTickets(t0).
+		AddRoles(r1).
 		SaveX(ctx)
 	log.Println("user created:", u)
 
@@ -83,6 +112,12 @@ func ExampleUser() {
 		log.Fatalf("failed querying tickets: %v", err)
 	}
 	log.Println("tickets found:", t0)
+
+	r1, err = u.QueryRoles().First(ctx)
+	if err != nil {
+		log.Fatalf("failed querying roles: %v", err)
+	}
+	log.Println("roles found:", r1)
 
 	// Output:
 }

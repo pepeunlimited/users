@@ -4,20 +4,20 @@ package ent
 
 import (
 	"context"
-	predicate2 "github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
-	user2 "github.com/pepeunlimited/users/internal/app/app1/ent/user"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // UserDelete is the builder for deleting a User entity.
 type UserDelete struct {
 	config
-	predicates []predicate2.User
+	predicates []predicate.User
 }
 
 // Where adds a new predicate to the delete builder.
-func (ud *UserDelete) Where(ps ...predicate2.User) *UserDelete {
+func (ud *UserDelete) Where(ps ...predicate.User) *UserDelete {
 	ud.predicates = append(ud.predicates, ps...)
 	return ud
 }
@@ -41,11 +41,11 @@ func (ud *UserDelete) sqlExec(ctx context.Context) (int, error) {
 		res     sql.Result
 		builder = sql.Dialect(ud.driver.Dialect())
 	)
-	selector := builder.Select().From(sql.Table(user2.Table))
+	selector := builder.Select().From(sql.Table(user.Table))
 	for _, p := range ud.predicates {
 		p(selector)
 	}
-	query, args := builder.Delete(user2.Table).FromSelect(selector).Query()
+	query, args := builder.Delete(user.Table).FromSelect(selector).Query()
 	if err := ud.driver.Exec(ctx, query, args, &res); err != nil {
 		return 0, err
 	}
@@ -68,7 +68,7 @@ func (udo *UserDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &ErrNotFound{user2.Label}
+		return &ErrNotFound{user.Label}
 	default:
 		return nil
 	}

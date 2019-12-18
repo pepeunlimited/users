@@ -9,9 +9,9 @@ A starting point project to create `users`-service
 ### `/cmd`
 
 ### `/deployments`
-Deployments folder contains files for the `k8s` environment; `service`, `deployment` and `ingress`. Dev have an additional `external-mysql-service.yaml` which allow access from local cluster to external MySQL database.  
+Deployments folder contains files for the `k8s` environment; `service`, `deployment` and `ingress`. `dev` folder have an additional `external-mysql-service.yaml` file which allow access from local cluster to external MySQL database.  
 
-`docker-compose` spin up the MySQL database for local development 
+`docker-compose up` spin up the MySQL database for local development 
 
 ### `/init`
 
@@ -33,6 +33,6 @@ Speed up implementing the database access using [`ent`](https://github.com/faceb
 
 #### `misc`
 ```$ brew install jq > curl ... | jq```
-##### display's MySQL logs
+##### Show MySQL's logs
 ```$ SET global general_log = 1;```  
 ```$ SHOW VARIABLES LIKE "general_log%";```

@@ -1,40 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/init/mysql/initdb.d/users.sql" beforeDir="false" afterPath="$PROJECT_DIR$/init/mysql/initdb.d/users.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/client.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/config.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/context.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ent.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/example_test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/migrate/migrate.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/migrate/schema.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/predicate/predicate.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/schema/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/ent/schema/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket/ticket.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket/where.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket_create.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket_delete.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket_query.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/ticket_update.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/tx.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user/user.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user/where.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user_create.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user_delete.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user_query.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/ent/user_update.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" afterDir="false" />
-    </list>
+    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -119,16 +86,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserMySQL_CreateUser in github.com/pepeunlimited/users/internal/app/app1/repository">
-    <configuration name="go build github.com/pepeunlimited/users/cmd/app1" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
-      <package value="github.com/pepeunlimited/users/cmd/app1" />
-      <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go Test.user_service_test.go">
     <configuration name="TestRolesMySQL_AddRole in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
@@ -140,15 +98,25 @@
       <pattern value="^TestRolesMySQL_AddRole$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestUserMySQL_CreateUser in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
       <package value="github.com/pepeunlimited/users/internal/app/app1/repository" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserMySQL_CreateUser$" />
+      <filePath value="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" />
+      <pattern value="^TestUserMySQL_GetUserByIdNotFound$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ticket_repository_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <package value="github.com/pepeunlimited/users" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" />
       <method v="2" />
     </configuration>
     <configuration name="user_repository_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -173,11 +141,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestUserMySQL_CreateUser in github.com/pepeunlimited/users/internal/app/app1/repository" />
-        <item itemvalue="Go Test.user_repository_test.go" />
-        <item itemvalue="Go Test.TestRolesMySQL_AddRole in github.com/pepeunlimited/users/internal/app/app1/repository" />
         <item itemvalue="Go Test.user_service_test.go" />
-        <item itemvalue="Go Build.go build github.com/pepeunlimited/users/cmd/app1" />
+        <item itemvalue="Go Test.user_repository_test.go" />
+        <item itemvalue="Go Test.TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" />
+        <item itemvalue="Go Test.ticket_repository_test.go" />
+        <item itemvalue="Go Test.TestRolesMySQL_AddRole in github.com/pepeunlimited/users/internal/app/app1/repository" />
       </list>
     </recent_temporary>
   </component>
@@ -249,22 +217,22 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576679463568">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576682339640">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576679463568" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576679463565">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576682339640" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576682339637">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576679463565" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576679463564">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576682339637" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576682339636">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576679463564" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576679463566">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576682339636" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576682339639">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576679463566" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576682339639" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576575609933">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -289,10 +257,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="570" y="275" width="540" height="524" key="StructurePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1576670034111" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1576672018226">
+    <state width="500" height="445" key="SwitcherDM" timestamp="1576681715383">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576672018226" />
+    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1576681715383" />
     <state x="200" y="0" width="1480" height="1050" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1576670559472">
       <screen x="0" y="23" width="1680" height="984" />
     </state>
@@ -305,10 +273,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="602" y="140" key="refactoring.ChangeSignatureDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1576252230617" />
-    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup" timestamp="1576672953592">
+    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup" timestamp="1576680199123">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1576672953592" />
+    <state x="505" y="233" width="670" height="676" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1576680199123" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

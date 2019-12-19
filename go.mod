@@ -9,5 +9,4 @@ require (
 	github.com/pepeunlimited/microservice-kit v0.0.0-20191218200034-08dd8ebc45a6
 	github.com/twitchtv/twirp v5.9.0+incompatible
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413
-
 )

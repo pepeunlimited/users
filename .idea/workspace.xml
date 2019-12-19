@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="" />
+    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/user.proto" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,14 +76,15 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/rpc/js" />
       <recent name="$PROJECT_DIR$/internal/app/app1" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/rpc" />
       <recent name="$PROJECT_DIR$/deployments/production" />
-      <recent name="$PROJECT_DIR$/deployments" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/deployments/dev" />
@@ -217,22 +225,22 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576700504516">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576701506561">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576700504516" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576700504512">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506561" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576701506558">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576700504512" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576700504510">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506558" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576701506557">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576700504510" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576700504514">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506557" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576701506559">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576700504514" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506559" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576575609933">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

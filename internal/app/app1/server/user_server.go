@@ -11,6 +11,7 @@ import (
 	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type UserServer struct {
@@ -95,12 +96,13 @@ func (server UserServer) isUserError(err error) error {
 }
 
 func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {
-	userId, err := rpcz.GetUserId(ctx)
+	token, err := rpcz.GetAuthorization(ctx)
 	if err != nil {
-		return nil, twirp.InternalError("can't access userId from ctx err: "+err.Error())
+		return nil, twirp.InternalError("can't access token from ctx err: "+err.Error())
 	}
-
-	user, roles, err := server.users.GetUserRolesByUserId(ctx, int(userId))
+	// call the authorization to validate token
+	userId := int(13)
+	user, roles, err := server.users.GetUserRolesByUserId(ctx, userId)
 	if err != nil {
 		return nil, server.isUserError(err)
 	}

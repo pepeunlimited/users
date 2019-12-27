@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="" />
+    <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app1/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app1/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,7 +70,7 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.dep.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/deployments/dev" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/rpc" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -80,14 +87,23 @@
       <recent name="$PROJECT_DIR$/deployments/production" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/rpc" />
       <recent name="$PROJECT_DIR$/deployments/dev" />
       <recent name="$PROJECT_DIR$/deployments" />
       <recent name="$PROJECT_DIR$/deployments/staging" />
       <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server">
+  <component name="RunManager" selected="Go Build.go build main.go">
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
+      <package value="github.com/pepeunlimited/users" />
+      <directory value="$PROJECT_DIR$/" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
@@ -108,16 +124,6 @@
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
       <pattern value="^TestUserServer_CreateUserFail$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="ticket_repository_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
-      <framework value="gotest" />
-      <kind value="FILE" />
-      <package value="github.com/pepeunlimited/users" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" />
       <method v="2" />
     </configuration>
     <configuration name="user_repository_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -142,11 +148,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.user_service_test.go" />
         <item itemvalue="Go Test.user_repository_test.go" />
         <item itemvalue="Go Test.TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" />
-        <item itemvalue="Go Test.ticket_repository_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -218,38 +224,38 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1576701506561">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577387566966">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506561" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1576701506558">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566966" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577387566963">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506558" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1576701506557">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566963" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577387566962">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506557" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1576701506559">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566962" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577387566965">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576701506559" />
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1576575609933">
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566964" />
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577105504326">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609933" />
-    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1576575609930">
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504326" />
+    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577105504323">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609930" />
-    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1576575609929">
+    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504323" />
+    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577105504322">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609929" />
-    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1576575609931">
+    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504322" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577105504324">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1576575609931" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504324" />
     <state x="349" y="164" key="SettingsEditor" timestamp="1576576019170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

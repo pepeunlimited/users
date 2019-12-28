@@ -2,12 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app1/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app1/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +26,7 @@
   <component name="GOROOT" path="/usr/local/Cellar/go/1.13.4/libexec" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
@@ -53,7 +53,7 @@
     <option name="height" value="987" />
   </component>
   <component name="ProjectId" id="1Ul0jmmAdwjkEvX2aKcdWnVIpUS" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -63,6 +63,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
@@ -94,7 +95,7 @@
       <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
+  <component name="RunManager" selected="Go Test.TestUserServiceMock_GetUserError in github.com/pepeunlimited/users/rpc">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$" />
@@ -102,17 +103,6 @@
       <filePath value="$PROJECT_DIR$/cmd/app1/main.go" />
       <package value="github.com/pepeunlimited/users" />
       <directory value="$PROJECT_DIR$/" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/repository" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" />
-      <pattern value="^TestUserMySQL_GetUserByIdNotFound$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -126,14 +116,26 @@
       <pattern value="^TestUserServer_CreateUserFail$" />
       <method v="2" />
     </configuration>
-    <configuration name="user_repository_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestUserServiceMock_CreateUser in github.com/pepeunlimited/users/rpc" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
+      <working_directory value="$PROJECT_DIR$/rpc" />
       <framework value="gotest" />
-      <kind value="FILE" />
-      <package value="github.com/pepeunlimited/users" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/rpc" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServiceMock_CreateUser$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUserServiceMock_GetUserError in github.com/pepeunlimited/users/rpc" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/rpc" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/rpc" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServiceMock_GetUserError$" />
       <method v="2" />
     </configuration>
     <configuration name="user_service_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -148,11 +150,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestUserServiceMock_GetUserError in github.com/pepeunlimited/users/rpc" />
+        <item itemvalue="Go Test.TestUserServiceMock_CreateUser in github.com/pepeunlimited/users/rpc" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.user_service_test.go" />
-        <item itemvalue="Go Test.user_repository_test.go" />
-        <item itemvalue="Go Test.TestUserMySQL_GetUserByIdNotFound in github.com/pepeunlimited/users/internal/app/app1/repository" />
       </list>
     </recent_temporary>
   </component>
@@ -224,38 +226,38 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577387566966">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577553328866">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566966" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577387566963">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577553328866" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577553328862">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566963" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577387566962">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577553328862" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577553328859">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566962" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577387566965">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577553328859" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577553328864">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577387566964" />
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577105504326">
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577553328864" />
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577553243504">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504326" />
-    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577105504323">
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577553243504" />
+    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577553243500">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504323" />
-    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577105504322">
+    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577553243500" />
+    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577553243495">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504322" />
-    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577105504324">
+    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577553243495" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577553243503">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577105504324" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577553243503" />
     <state x="349" y="164" key="SettingsEditor" timestamp="1576576019170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -272,6 +274,10 @@
       <screen x="0" y="23" width="1680" height="984" />
     </state>
     <state x="200" y="0" width="1480" height="1050" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.23.1680.984@0.23.1680.984" timestamp="1576670559472" />
+    <state x="629" y="449" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1577548024434">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="629" y="449" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1577548024434" />
     <state x="715" y="400" width="250" height="278" key="jetbrains.javascript.buildTools.run-task-popup" timestamp="1576579049863">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -292,6 +298,11 @@
           <url>file:///usr/local/Cellar/go/1.12.2/libexec/src/database/sql/sql.go</url>
           <line>3051</line>
           <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/rpc/mock_test.go</url>
+          <line>31</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

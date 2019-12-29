@@ -13,13 +13,6 @@ $ curl -H "Content-Type: application/json" \
 -X POST "localhost:8080/twirp/pepeunlimited.users.UserService/GetUser" \
 -d '{}'
 ```
-##### `NOTE: test without nginx-ingress controller`
-```
-$ curl -H "Content-Type: application/json" \
--H "X-JWT-UserId: 1" \
--X POST "localhost:8080/twirp/pepeunlimited.users.UserService/GetUser" \
--d '{}'
-```
 ### `VerifySignIn`
 ```
 $ curl -H "Content-Type: application/json" \

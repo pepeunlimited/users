@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/rpc"
@@ -11,7 +12,7 @@ import (
 
 func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
@@ -26,7 +27,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 
 func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
@@ -53,7 +54,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 
 func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.GetUser(ctx, &rpc.GetUserParams{})
 	if err == nil {
@@ -67,7 +68,7 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 
 func TestUserServer_SignInOk(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -94,7 +95,7 @@ func TestUserServer_SignInOk(t *testing.T) {
 
 func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",
@@ -110,10 +111,9 @@ func TestUserServer_SignInFail(t *testing.T) {
 
 }
 
-
 func TestUserServer_SignInFailCred(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient())
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",

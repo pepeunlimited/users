@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
+	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
@@ -11,7 +12,6 @@ import (
 	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type UserServer struct {
@@ -19,6 +19,7 @@ type UserServer struct {
 	users repository.UserRepository
 	crypto  cryptoz.Crypto
 	validator validator.UserServerValidator
+	authService rpc2.AuthorizationService
 }
 
 func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySignInParams) (*rpc.User, error) {
@@ -96,29 +97,29 @@ func (server UserServer) isUserError(err error) error {
 }
 
 func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {
-	token, err := rpcz.GetAuthorization(ctx)
+	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
-		return nil, twirp.InternalError("can't access token from ctx err: "+err.Error())
+		return nil, twirp.RequiredArgumentError("Authorization")
 	}
-	// call the authorization to validate token
-	userId := int(13)
-	user, roles, err := server.users.GetUserRolesByUserId(ctx, userId)
+	// verify the token from the authorization service: blacklist and expired..
+	resp, err := server.authService.Verify(ctx, &rpc2.VerifyParams{Token:token})
 	if err != nil {
-		return nil, server.isUserError(err)
+		return nil, err
 	}
 	return &rpc.User{
-		Id:       int64(user.ID),
-		Username: user.Username,
-		Email:    user.Email,
-		Roles:    rolesToString(roles),
+		Id:       resp.UserId,
+		Username: resp.Username,
+		Email:    resp.Email,
+		Roles:    resp.Roles,
 	}, nil
 }
 
-func NewUserServer(client *ent.Client) UserServer {
+func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService) UserServer {
 	return UserServer{
-		users: 		repository.NewUserRepository(client),
-		tickets: 	repository.NewTicketRepository(client),
-		crypto:		cryptoz.NewCrypto(),
-		validator: 	validator.NewUserServerValidator(),
+		users: 			repository.NewUserRepository(client),
+		tickets: 		repository.NewTicketRepository(client),
+		crypto:			cryptoz.NewCrypto(),
+		validator: 		validator.NewUserServerValidator(),
+		authService: 	authService,
 	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	Version = "0.1.1"
+	Version = "0.1.2"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle(us.PathPrefix(), middleware.Adapt(us, headers.Authorizationz()))
 
-	if err := http.ListenAndServe(":8081", mux); err != nil {
+	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Panic(err)
 	}
 }

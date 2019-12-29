@@ -3,13 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API.md" beforeDir="false" afterPath="$PROJECT_DIR$/API.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/app1/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app1/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +96,7 @@
       <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
+  <component name="RunManager" selected="Go Test.TestUserServer_CreateUser in github.com/pepeunlimited/users/internal/app/app1/server">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$" />
@@ -130,15 +128,15 @@
       <pattern value="^TestUserServer_CreateUserFail$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestUserServiceMock_GetUser in github.com/pepeunlimited/users/rpc" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/rpc" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/rpc" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServiceMock_GetUser$" />
+      <pattern value="^TestUserServer_SignInOk$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUserServiceMock_GetUserError in github.com/pepeunlimited/users/rpc" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -154,11 +152,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestUserServer_CreateUser in github.com/pepeunlimited/users/internal/app/app1/server" />
+        <item itemvalue="Go Test.TestUserServer_SignInOk in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.TestUserServer_CreateUserFail in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_CreateUser in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServiceMock_GetUserError in github.com/pepeunlimited/users/rpc" />
-        <item itemvalue="Go Test.TestUserServiceMock_GetUser in github.com/pepeunlimited/users/rpc" />
       </list>
     </recent_temporary>
   </component>
@@ -230,38 +228,38 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576359502586" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577615778604">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577626431772">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577615778604" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577615778600">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577626431772" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577626431770">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577615778600" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577615778599">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577626431770" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577626431768">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577615778599" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577615778602">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577626431768" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577626431771">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577615778602" />
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577613896474">
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577626431771" />
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577625921615">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577613896474" />
-    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577613896471">
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577625921615" />
+    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577625921613">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577613896471" />
-    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577613896469">
+    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577625921613" />
+    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577625921613">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577613896469" />
-    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577613896472">
+    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577625921613" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577625921614">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577613896472" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577625921614" />
     <state x="349" y="164" key="SettingsEditor" timestamp="1576576019170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -270,10 +268,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="570" y="275" width="540" height="524" key="StructurePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1576670034111" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1577614162487">
+    <state width="500" height="445" key="SwitcherDM" timestamp="1577625996739">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1577614162487" />
+    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1577625996739" />
     <state x="200" y="0" width="1480" height="1050" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1576670559472">
       <screen x="0" y="23" width="1680" height="984" />
     </state>

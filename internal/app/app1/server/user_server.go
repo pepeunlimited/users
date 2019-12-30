@@ -177,7 +177,7 @@ func (server UserServer) isUserError(err error) error {
 
 func (server UserServer) isCryptoError(err error) error {
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return twirp.NewError(twirp.InvalidArgument, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
+		return twirp.NewError(twirp.InvalidArgument, err.Error()).WithMeta(rpcz.Reason, rpc.InvalidCredentials)
 	}
 	return twirp.InternalError("user-service: unknown isCryptoError: "+err.Error())
 }

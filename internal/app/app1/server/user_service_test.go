@@ -378,7 +378,7 @@ func TestUserServer_UpdatePasswordFail(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpc.IsReason(err.(twirp.Error), rpc.Credentials) {
+	if !rpc.IsReason(err.(twirp.Error), rpc.InvalidCredentials) {
 		t.FailNow()
 	}
 }

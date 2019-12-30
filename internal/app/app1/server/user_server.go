@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
+	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
@@ -12,6 +13,9 @@ import (
 	"github.com/pepeunlimited/users/rpc"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/crypto/bcrypt"
+	"log"
+	"path"
+	"time"
 )
 
 type UserServer struct {
@@ -20,10 +24,15 @@ type UserServer struct {
 	crypto  cryptoz.Crypto
 	validator validator.UserServerValidator
 	authService rpc2.AuthorizationService
+
+
+	smtpUsername 		string
+	smtpPassword 		string
+	smtpProvider 		mail.Provider
 }
 
 func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySignInParams) (*rpc.User, error) {
-	err := server.validator.SignIn(params)
+	err := server.validator.VerifySignIn(params)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +58,48 @@ func (server UserServer) UpdatePassword(context.Context, *rpc.UpdatePasswordPara
 	panic("implement me")
 }
 
-func (server UserServer) ForgotPassword(context.Context, *rpc.ForgotPasswordParams) (*empty.Empty, error) {
-	panic("implement me")
+func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotPasswordParams) (*empty.Empty, error) {
+	if err :=  server.validator.ValidForgotPassword(params); err != nil {
+		return nil, err
+	}
+	user, err := server.users.GetUserByUsername(ctx, params.Username)
+	if err != nil {
+		if err == repository.ErrUserNotExist {
+			return nil, twirp.NewError(twirp.NotFound, "user not exist").WithMeta(rpcz.Reason, rpc.UserNotFound)
+		} else {
+			log.Print("users-service: unknown error during get user on forgot password: "+err.Error())
+			return nil, twirp.InternalErrorWith(err)
+		}
+	}
+	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
+	if err != nil {
+		if ent.IsConstraintFailure(err) {
+			return nil, twirp.NewError(twirp.Aborted, "ticket token already exist").WithMeta(rpcz.Reason, rpc.TicketTokenExist)
+		}
+		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
+		return nil, twirp.InternalErrorWith(err)
+	}
+
+	baseURL := mail.CreateBaseURL("http://api.dev.pepeunlimited.com")
+	baseURL.Path = path.Join(baseURL.Path, "reset_password")
+	baseURL.Path = path.Join(baseURL.Path, ticket.Token)
+
+	client := mail.NewBuilder(
+		server.smtpUsername,
+		server.smtpPassword).
+		From(mail.PepeUnlimited, "Pepe Unlimited Oy").
+		To([]string{user.Email}).
+		Subject("Reset Password").
+		Content(baseURL.String()).
+		Build(server.smtpProvider)
+
+	err = client.Send()
+	if err != nil {
+		log.Print("users-service: unknown error during mail send on forgot password: "+err.Error())
+		server.tickets.UseTicket(ctx, ticket.Token)
+		return nil, twirp.NewError(twirp.Aborted, "failed to send mail for user").WithMeta(rpcz.Reason, mail.MailSendFailed)
+	}
+	return &empty.Empty{}, nil
 }
 
 func (server UserServer) VerifyResetPassword(context.Context, *rpc.VerifyPasswordParams) (*rpc.VerifyPasswordResponse, error) {
@@ -114,12 +163,15 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	}, nil
 }
 
-func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService) UserServer {
+func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider) UserServer {
 	return UserServer{
 		users: 			repository.NewUserRepository(client),
 		tickets: 		repository.NewTicketRepository(client),
 		crypto:			cryptoz.NewCrypto(),
 		validator: 		validator.NewUserServerValidator(),
 		authService: 	authService,
+		smtpPassword:	smtpPassword,
+		smtpUsername:	smtpUsername,
+		smtpProvider:	provider,
 	}
 }

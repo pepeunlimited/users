@@ -3,6 +3,7 @@ package main
 import (
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/headers"
+	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/middleware"
 	"github.com/pepeunlimited/microservice-kit/misc"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
@@ -13,15 +14,27 @@ import (
 )
 
 const (
-	Version = "0.1.2"
+	Version = "0.1.3"
 )
 
 func main() {
 	log.Printf("Starting the UsersServer... version=[%v]", Version)
 
 	client := repository.NewEntClient()
-	authorizationAddress := misc.GetEnv(rpc2.RpcAuthorizationHost, "http://localhost:8080")
-	us := rpc.NewUserServiceServer(server.NewUserServer(client, rpc2.NewAuthorizationServiceProtobufClient(authorizationAddress, http.DefaultClient)), nil)
+	authorizationAddress := misc.GetEnv(rpc2.RpcAuthorizationHost, "http://api.dev.pepeunlimited.com")
+
+	stmpUsername := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
+	stmpPassword := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
+	smtpProvider := mail.Provider(misc.GetEnv(mail.SmtpClient,   mail.Mock))
+
+	us := rpc.NewUserServiceServer(server.NewUserServer(
+		client,
+		rpc2.NewAuthorizationServiceProtobufClient(authorizationAddress, http.DefaultClient),
+		stmpUsername,
+		stmpPassword,
+		smtpProvider),
+		nil)
+
 	mux := http.NewServeMux()
 	mux.Handle(us.PathPrefix(), middleware.Adapt(us, headers.Authorizationz()))
 

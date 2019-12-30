@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
+	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/rpc"
@@ -11,9 +12,13 @@ import (
 	"testing"
 )
 
+var username string 		= "username"
+var password string 		= "password"
+var provider mail.Provider 	= mail.Mock
+
 func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 	resp0, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
@@ -47,7 +52,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 
 func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 	_, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: "simo",
@@ -74,7 +79,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 
 func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 	_, err := server.GetUser(ctx, &rpc.GetUserParams{})
 	if err == nil {
@@ -88,7 +93,7 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 
 func TestUserServer_SignInOk(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -115,7 +120,7 @@ func TestUserServer_SignInOk(t *testing.T) {
 
 func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",
@@ -133,7 +138,7 @@ func TestUserServer_SignInFail(t *testing.T) {
 
 func TestUserServer_SignInFailCred(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil))
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: "simo",
@@ -147,4 +152,79 @@ func TestUserServer_SignInFailCred(t *testing.T) {
 		t.FailNow()
 	}
 
+}
+
+func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+	username := "simo"
+	user,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: "p4sw04d",
+		Email:    "simo@gmail.com",
+	})
+	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
+		Username: username,
+		Language: "fi",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, tickets, err := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(tickets) != 1 {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail)
+	server.users.DeleteAll(ctx)
+	username := "simo"
+	user,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: "p4sw04d",
+		Email:    "simo@gmail.com",
+	})
+	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
+		Username: username,
+		Language: "fi",
+	})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), mail.MailSendFailed) {
+		t.FailNow()
+	}
+	_, tickets, err := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if len(tickets) != 0 {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail)
+	server.users.DeleteAll(ctx)
+	username := "simo"
+	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
+		Username: username,
+		Language: "fi",
+	})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
+		t.FailNow()
+	}
 }

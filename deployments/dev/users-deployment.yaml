@@ -21,13 +21,19 @@ spec:
             - name: MYSQL_HOST
               value: external-mysql
             - name: MYSQL_PORT
-              value: "3306"
+              value: 3306
             - name: MYSQL_ROOT_PASSWORD
               value: root
             - name: MYSQL_USER
               value: root
             - name: RPC_AUTHORIZATION_HOST
-              value: http://authorization-twirp.default.svc
+              value: http://authorization-twirp.default.svc.cluster.local
+            - name: SMTP_USERNAME
+              value: us3rn4m3
+            - name: SMTP_PASSWORD
+              value: p4ssw0rd
+            - name: SMTP_CLIENT
+              value: mock
           image: pepeunlimited/users:0.1.2
           name: users
           ports:

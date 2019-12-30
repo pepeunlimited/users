@@ -30,12 +30,22 @@ func (UserServerValidator) GetUser(params *rpc.GetUserParams) error {
 	return nil
 }
 
-func (UserServerValidator) SignIn(params *rpc.VerifySignInParams) error {
+func (UserServerValidator) VerifySignIn(params *rpc.VerifySignInParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}
  	if validator.IsEmpty(params.Password) {
  		return twirp.RequiredArgumentError("password")
+	}
+	return nil
+}
+
+func (UserServerValidator) ValidForgotPassword(params *rpc.ForgotPasswordParams) error {
+	if validator.IsEmpty(params.Username) {
+		return twirp.RequiredArgumentError("username")
+	}
+	if validator.IsEmpty(params.Language) {
+		return twirp.RequiredArgumentError("language")
 	}
 	return nil
 }

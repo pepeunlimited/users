@@ -14,6 +14,8 @@ const (
 	UsernameExist   	= "username_exist"
 	EmailExist      	= "email_exist"
 	TicketTokenExist	= "ticket_token_exist"
+	TicketNotTokenExist	= "ticket_not_token_exist"
+	TicketExpired		= "ticket_expired"
 )
 
 func IsReason(error twirp.Error, key string) bool {

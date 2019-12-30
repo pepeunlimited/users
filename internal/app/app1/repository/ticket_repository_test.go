@@ -110,3 +110,18 @@ func TestTicketMySQL_UseTicket(t *testing.T) {
 		}
 	}
 }
+
+func TestTicketMySQL_GetTicketUserByToken(t *testing.T) {
+	ctx := context.TODO()
+	client := NewEntClient()
+	users := NewUserRepository(client)
+	tickets := NewTicketRepository(client)
+	users.DeleteAll(ctx)
+	_, _, err := tickets.GetTicketUserByToken(ctx, "a")
+	if err == nil {
+		t.FailNow()
+	}
+	if err != ErrTicketNotExist {
+		t.FailNow()
+	}
+}

@@ -7,6 +7,31 @@ import (
 	"time"
 )
 
+func TestUserMySQL_ResetPassword(t *testing.T) {
+	ctx := context.TODO()
+	client := NewEntClient()
+	repo := NewUserRepository(client)
+	repo.DeleteAll(ctx)
+	username := "ssiimoo"
+	email := "simo.alakotila@gmail.com"
+	password := "p4sw0rd"
+	user,_, err := repo.CreateUser(ctx, username, email, password)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	reseted, err := repo.ResetPassword(ctx, user.ID, "newpw")
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if err := cryptoz.NewCrypto().Check(reseted.Password, "newpw"); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+}
+
 func TestUserMySQL_CreateUser(t *testing.T) {
 	ctx := context.TODO()
 	client := NewEntClient()

@@ -10,6 +10,7 @@ import (
 	"github.com/twitchtv/twirp"
 	"log"
 	"testing"
+	"time"
 )
 
 var username string 		= "username"
@@ -225,6 +226,92 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 		t.FailNow()
 	}
 	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock)
+	server.users.DeleteAll(ctx)
+	user,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: "simo",
+		Password: "simo",
+		Email:    "simo@gmail.com",
+	})
+	ticket,_ := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Second), int(user.Id))
+	time.Sleep(2 * time.Second)
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{Token: ticket.Token})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), rpc.TicketExpired) {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock)
+	server.users.DeleteAll(ctx)
+	server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: "simo",
+		Password: "simo",
+		Email:    "simo@gmail.com",
+	})
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{Token: "asd"})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), rpc.TicketNotTokenExist) {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+	username := "simo"
+	user,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: "p4sw04d",
+		Email:    "simo@gmail.com",
+	})
+	server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
+		Username: username,
+		Language: "fi",
+	})
+	_, tickets,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if len(tickets) != 1 {
+		t.FailNow()
+	}
+	token := tickets[0].Token
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{
+		Token: token,
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = server.ResetPassword(ctx, &rpc.ResetPasswordParams{
+		Token:    token,
+		Password: "newpw",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = server.VerifySignIn(ctx, &rpc.VerifySignInParams{
+		Username: username,
+		Password: "newpw",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, tickets2,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if len(tickets2) != 0 {
 		t.FailNow()
 	}
 }

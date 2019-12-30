@@ -28,6 +28,7 @@ type UserRepository interface {
 	GetUsers(ctx context.Context, offset int, limit int) ([]*ent.User, error)
 	UpdateUser(ctx context.Context, user *ent.UserUpdateOne) (*ent.User, error)
 	UpdatePassword(ctx context.Context, userId int, current string, new string) (*ent.User, error)
+	ResetPassword(ctx context.Context, userId int, new string) (*ent.User, error)
 	DeleteUsers(ctx context.Context)
 	DeleteUser(ctx context.Context, userId int) error
 	BanUser(ctx context.Context, userId int) error
@@ -48,6 +49,18 @@ type UserRepository interface {
 type userMySQL struct {
 	client *ent.Client
 	crypto cryptoz.Crypto
+}
+
+func (repo userMySQL) ResetPassword(ctx context.Context, userId int, new string) (*ent.User, error) {
+	user, err := repo.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	hash, err := repo.crypto.Hash(new)
+	if err != nil {
+		return nil, err
+	}
+	return repo.UpdateUser(ctx, user.Update().SetPassword(hash))
 }
 
 func (repo userMySQL) GetUserRolesByUsername(ctx context.Context, username string) (*ent.User, []*ent.Role, error) {

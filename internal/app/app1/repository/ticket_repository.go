@@ -11,7 +11,8 @@ import (
 
 
 var (
-	ErrTicketExpired = errors.New("tickets: ticket is expired")
+	ErrTicketExpired 	= errors.New("tickets: ticket is expired")
+	ErrTicketNotExist 	= errors.New("tickets: ticket not exist")
 )
 
 // Access the tickets table
@@ -48,10 +49,16 @@ func (repo ticketMySQL) UseTicket(ctx context.Context, token string) error {
 func (repo ticketMySQL) GetTicketUserByToken(ctx context.Context, token string) (*ent.Ticket, *ent.User, error) {
 	ticket, err := repo.client.Ticket.Query().Where(ticket.TokenEQ(token)).Only(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil, ErrTicketNotExist
+		}
 		return nil, nil, err
 	}
 	user, err := ticket.QueryUsers().Only(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil, ErrUserNotExist
+		}
 		return nil, nil, err
 	}
 	if err := repo.isTicketValid(ticket); err != nil {

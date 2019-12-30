@@ -24,8 +24,6 @@ type UserServer struct {
 	crypto  cryptoz.Crypto
 	validator validator.UserServerValidator
 	authService rpc2.AuthorizationService
-
-
 	smtpUsername 		string
 	smtpPassword 		string
 	smtpProvider 		mail.Provider
@@ -64,12 +62,7 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 	}
 	user, err := server.users.GetUserByUsername(ctx, params.Username)
 	if err != nil {
-		if err == repository.ErrUserNotExist {
-			return nil, twirp.NewError(twirp.NotFound, "user not exist").WithMeta(rpcz.Reason, rpc.UserNotFound)
-		} else {
-			log.Print("users-service: unknown error during get user on forgot password: "+err.Error())
-			return nil, twirp.InternalErrorWith(err)
-		}
+		return nil, server.isUserError(err)
 	}
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
@@ -102,12 +95,31 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 	return &empty.Empty{}, nil
 }
 
-func (server UserServer) VerifyResetPassword(context.Context, *rpc.VerifyPasswordParams) (*rpc.VerifyPasswordResponse, error) {
-	panic("implement me")
+func (server UserServer) VerifyResetPassword(ctx context.Context, params *rpc.VerifyPasswordParams) (*rpc.VerifyPasswordResponse, error) {
+	if err := server.validator.VerifyResetPassword(params); err != nil {
+		return nil, err
+	}
+	_, _, err := server.tickets.GetTicketUserByToken(ctx, params.Token)
+	if err != nil {
+		return nil, server.isTicketError(err)
+	}
+	return &rpc.VerifyPasswordResponse{}, nil
 }
 
-func (server UserServer) ResetPassword(context.Context, *rpc.ResetPasswordParams) (*rpc.ResetPasswordResponse, error) {
-	panic("implement me")
+func (server UserServer) ResetPassword(ctx context.Context, params *rpc.ResetPasswordParams) (*rpc.ResetPasswordResponse, error) {
+	if err := server.validator.ResetPassword(params); err != nil {
+		return nil, err
+	}
+	ticket,user, err := server.tickets.GetTicketUserByToken(ctx, params.Token)
+	if err != nil {
+		return nil, server.isTicketError(err)
+	}
+	_, err = server.users.ResetPassword(ctx, user.ID, params.Password)
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+	server.tickets.UseTicket(ctx, ticket.Token)
+	return &rpc.ResetPasswordResponse{}, nil
 }
 
 func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserParams) (*rpc.User, error) {
@@ -141,8 +153,22 @@ func (server UserServer) isUserError(err error) error {
 	case repository.ErrUserBanned:
 		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpc.UserIsBanned)
 	}
+	log.Print("user-service: unknown isUserError: "+err.Error())
 	//unknown
 	return twirp.NewError(twirp.Internal ,"unknown error: "+err.Error())
+}
+
+
+func (server UserServer) isTicketError(err error) error {
+	switch err {
+	case repository.ErrTicketNotExist:
+		return twirp.NewError(twirp.NotFound, "ticket not exist").WithMeta(rpcz.Reason, rpc.TicketNotTokenExist)
+	case repository.ErrTicketExpired:
+		return twirp.NewError(twirp.Unauthenticated, "token expired").WithMeta(rpcz.Reason, rpc.TicketExpired)
+	}
+	log.Print("user-service: unknown isTicketError: "+err.Error())
+	// unknown
+	return twirp.InternalErrorWith(err)
 }
 
 func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {

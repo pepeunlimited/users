@@ -49,3 +49,20 @@ func (UserServerValidator) ValidForgotPassword(params *rpc.ForgotPasswordParams)
 	}
 	return nil
 }
+
+func (UserServerValidator) VerifyResetPassword(params *rpc.VerifyPasswordParams) error {
+	if validator.IsEmpty(params.Token) {
+		return twirp.RequiredArgumentError("token")
+	}
+	return nil
+}
+
+func (UserServerValidator) ResetPassword(params *rpc.ResetPasswordParams) error {
+	if validator.IsEmpty(params.Token) {
+		return twirp.RequiredArgumentError("token")
+	}
+	if validator.IsEmpty(params.Password) {
+		return twirp.RequiredArgumentError("password")
+	}
+	return nil
+}

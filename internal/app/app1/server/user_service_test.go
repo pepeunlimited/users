@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -80,14 +81,14 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 
 func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
-	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock([]error{fmt.Errorf("custom-error")}), username, password, provider)
 	server.users.DeleteAll(ctx)
+	ctx = rpcz.AddAuthorization("1")
 	_, err := server.GetUser(ctx, &rpc.GetUserParams{})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpc.IsReason(err.(twirp.Error), rpc.UserNotFound) {
-		t.Log(err.(twirp.Error).Error())
+	if err.Error() != "custom-error" {
 		t.FailNow()
 	}
 }

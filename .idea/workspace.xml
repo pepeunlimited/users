@@ -3,16 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API.md" beforeDir="false" afterPath="$PROJECT_DIR$/API.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/ticket_repository_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/user_repository.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/repository/user_repository_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/validator/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/validator/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/meta.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/meta.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/user.proto" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,16 +95,38 @@
       <recent name="$PROJECT_DIR$/deployments/production" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server">
-    <configuration name="TestUserMySQL_ResetPassword in github.com/pepeunlimited/users/internal/app/app1/repository" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server">
+    <configuration name="TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/repository" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/repository" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserMySQL_ResetPassword$" />
+      <pattern value="^TestUserServer_GetUserNotFound$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUserServer_UpdatePassword in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServer_UpdatePassword$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUserServer_UpdatePasswordFail in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="go-starter-kit" />
+      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestUserServer_UpdatePasswordFail$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUserServer_VerifyResetPasswordAndResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -124,46 +140,23 @@
       <pattern value="^TestUserServer_VerifyResetPasswordAndResetPasswordSuccess$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestUserServer_VerifyResetPasswordExpired in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="user_service_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
       <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
+      <kind value="FILE" />
+      <package value="github.com/pepeunlimited/users" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_VerifyResetPasswordExpired$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserServer_VerifyResetPasswordNotFound in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_VerifyResetPasswordNotFound$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestUserServer_VerifyResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="go-starter-kit" />
-      <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_VerifyResetPasswordSuccess$" />
+      <filePath value="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
+        <item itemvalue="Go Test.user_service_test.go" />
+        <item itemvalue="Go Test.TestUserServer_UpdatePasswordFail in github.com/pepeunlimited/users/internal/app/app1/server" />
+        <item itemvalue="Go Test.TestUserServer_UpdatePassword in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserMySQL_ResetPassword in github.com/pepeunlimited/users/internal/app/app1/repository" />
-        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordExpired in github.com/pepeunlimited/users/internal/app/app1/server" />
       </list>
     </recent_temporary>
   </component>
@@ -231,26 +224,26 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576614983234" />
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1577724709365">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1577726961670">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577724709365" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577724829634">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577726961670" />
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577727394858">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577724829634" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577724829632">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577727394858" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577727394856">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577724829632" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577724829631">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577727394856" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577727394854">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577724829631" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577724829633">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577727394854" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577727394857">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577724829633" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577727394857" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577724416928">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

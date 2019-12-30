@@ -65,6 +65,8 @@ github.com/pepeunlimited/authorization-twirp v0.0.0-20191229102332-8432240f95e0 
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191229102332-8432240f95e0/go.mod h1:CTtjpO/wjhzRaIOyE3SoyZf0IzpIyys9DvSursxzjXI=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191229132943-4201665321d7 h1:+HOs0d8AAVlfSGHAiq5CTfRuumzj6Kuxg64ltYm3JHQ=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191229132943-4201665321d7/go.mod h1:CTtjpO/wjhzRaIOyE3SoyZf0IzpIyys9DvSursxzjXI=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20191229153204-4566e4069aa6 h1:iPVbSLQteDjSrLuhfcU0EEeIIxNQ4IT3DvzYfjj4cfs=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20191229153204-4566e4069aa6/go.mod h1:CTtjpO/wjhzRaIOyE3SoyZf0IzpIyys9DvSursxzjXI=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191210170159-5cadda36c9a8 h1:T8U7hpS02+SOPDmUEzablGoevxHKKAcJ9mKDGxrzcx4=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191210170159-5cadda36c9a8/go.mod h1:40wd+99+zSd3O9hZFhhwzJXYhWpTTmfAofTTiXX6DCg=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191212102325-e83f82f36d67 h1:botFtZhSBFTO/KmUkNjDu1YnQSy9xUCO3RtVLhSAr8I=

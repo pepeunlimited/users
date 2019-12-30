@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	UserNotFound 		= "user_not_found"
-	UserIsBanned 		= "user_is_banned"
-	UserIsLocked		= "user_is_locked"
-	Credentials     	= "credentials"
-	UsernameExist   	= "username_exist"
-	EmailExist      	= "email_exist"
-	TicketTokenExist	= "ticket_token_exist"
-	TicketNotTokenExist	= "ticket_not_token_exist"
-	TicketExpired		= "ticket_expired"
+	UserNotFound        = "user_not_found"
+	UserIsBanned        = "user_is_banned"
+	UserIsLocked        = "user_is_locked"
+	Credentials         = "credentials"
+	UsernameExist       = "username_exist"
+	EmailExist          = "email_exist"
+	TicketExist    		= "ticket_exist"
+	TicketNotFound 		= "ticket_not_found"
+	TicketExpired       = "ticket_expired"
 )
 
 func IsReason(error twirp.Error, key string) bool {

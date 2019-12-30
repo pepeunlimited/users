@@ -84,7 +84,7 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
 		if ent.IsConstraintFailure(err) {
-			return nil, twirp.NewError(twirp.Aborted, "ticket token already exist").WithMeta(rpcz.Reason, rpc.TicketTokenExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, rpc.TicketExist)
 		}
 		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
 		return nil, twirp.InternalErrorWith(err)
@@ -177,7 +177,7 @@ func (server UserServer) isUserError(err error) error {
 
 func (server UserServer) isCryptoError(err error) error {
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return twirp.NewError(twirp.Unauthenticated, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
+		return twirp.NewError(twirp.InvalidArgument, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
 	}
 	return twirp.InternalError("user-service: unknown isCryptoError: "+err.Error())
 }
@@ -185,9 +185,9 @@ func (server UserServer) isCryptoError(err error) error {
 func (server UserServer) isTicketError(err error) error {
 	switch err {
 	case repository.ErrTicketNotExist:
-		return twirp.NewError(twirp.NotFound, "ticket not exist").WithMeta(rpcz.Reason, rpc.TicketNotTokenExist)
+		return twirp.NewError(twirp.NotFound, "ticket not found").WithMeta(rpcz.Reason, rpc.TicketNotFound)
 	case repository.ErrTicketExpired:
-		return twirp.NewError(twirp.Unauthenticated, "token expired").WithMeta(rpcz.Reason, rpc.TicketExpired)
+		return twirp.NewError(twirp.InvalidArgument, "token expired").WithMeta(rpcz.Reason, rpc.TicketExpired)
 	}
 	log.Print("user-service: unknown isTicketError: "+err.Error())
 	// unknown

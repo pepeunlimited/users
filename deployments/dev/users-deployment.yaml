@@ -21,7 +21,7 @@ spec:
             - name: MYSQL_HOST
               value: external-mysql
             - name: MYSQL_PORT
-              value: 3306
+              value: "3306"
             - name: MYSQL_ROOT_PASSWORD
               value: root
             - name: MYSQL_USER

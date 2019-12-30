@@ -270,7 +270,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpc.IsReason(err.(twirp.Error), rpc.TicketNotTokenExist) {
+	if !rpc.IsReason(err.(twirp.Error), rpc.TicketNotFound) {
 		t.FailNow()
 	}
 }

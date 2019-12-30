@@ -101,11 +101,17 @@ func TestUserServer_SignInOk(t *testing.T) {
 	username := email
 	password := "p4sw0rd"
 
-	server.CreateUser(ctx, &rpc.CreateUserParams{
+	user0, err := server.CreateUser(ctx, &rpc.CreateUserParams{
 		Username: username,
 		Password: password,
 		Email:    email,
 	})
+
+	server.authService.(*rpc2.Mock).Username 	= username
+	server.authService.(*rpc2.Mock).Email 		= email
+	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authService.(*rpc2.Mock).UserId		= user0.Id
+
 	user, err := server.VerifySignIn(ctx, &rpc.VerifySignInParams{
 		Username: username,
 		Password: password,
@@ -312,6 +318,66 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 	}
 	_, tickets2,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
 	if len(tickets2) != 0 {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_UpdatePassword(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+
+	email := "simo@gmail.com"
+	username := email
+	password := "p4sw0rd"
+
+	user0,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: password,
+		Email:    email,
+	})
+	server.authService.(*rpc2.Mock).Username 	= username
+	server.authService.(*rpc2.Mock).Email 		= email
+	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authService.(*rpc2.Mock).UserId		= user0.Id
+	ctx = rpcz.AddAuthorization("token")
+	_, err := server.UpdatePassword(ctx, &rpc.UpdatePasswordParams{
+		CurrentPassword: password,
+		NewPassword:     "newpw",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+}
+
+func TestUserServer_UpdatePasswordFail(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+
+	email := "simo@gmail.com"
+	username := email
+	password := "p4sw0rd"
+
+	user0,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: password,
+		Email:    email,
+	})
+	server.authService.(*rpc2.Mock).Username 	= username
+	server.authService.(*rpc2.Mock).Email 		= email
+	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authService.(*rpc2.Mock).UserId		= user0.Id
+	ctx = rpcz.AddAuthorization("token")
+	_, err := server.UpdatePassword(ctx, &rpc.UpdatePasswordParams{
+		CurrentPassword: "wronpw",
+		NewPassword:     "newpw",
+	})
+	if err == nil {
+		t.FailNow()
+	}
+	if !rpc.IsReason(err.(twirp.Error), rpc.Credentials) {
 		t.FailNow()
 	}
 }

@@ -39,10 +39,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 		return nil, server.isUserError(err)
 	}
 	if err := server.crypto.Check(user.Password, params.Password); err != nil {
-		if err == bcrypt.ErrMismatchedHashAndPassword {
-			return nil, twirp.NewError(twirp.Unauthenticated, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
-		}
-		return nil, twirp.InternalError("unknown error during sign-in err: "+err.Error())
+		return nil, server.isCryptoError(err)
 	}
 	return &rpc.User{
 		Id:       int64(user.ID),
@@ -52,8 +49,28 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 	}, nil
 }
 
-func (server UserServer) UpdatePassword(context.Context, *rpc.UpdatePasswordParams) (*rpc.UpdatePasswordResponse, error) {
-	panic("implement me")
+func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdatePasswordParams) (*rpc.UpdatePasswordResponse, error) {
+	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
+	if err != nil {
+		return nil, twirp.RequiredArgumentError("Authorization")
+	}
+	// verify the token from the authorization service: blacklist and expired..
+	verified, err := server.authService.Verify(ctx, &rpc2.VerifyParams{Token:token})
+	if err != nil {
+		return nil, err
+	}
+	user,_, err := server.users.GetUserRolesByUsername(ctx, verified.Username)
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+	if err := server.crypto.Check(user.Password, params.CurrentPassword); err != nil {
+		return nil, server.isCryptoError(err)
+	}
+	_, err = server.users.UpdatePassword(ctx, int(verified.UserId), params.CurrentPassword, params.NewPassword)
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+	return &rpc.UpdatePasswordResponse{}, nil
 }
 
 func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotPasswordParams) (*empty.Empty, error) {
@@ -158,6 +175,12 @@ func (server UserServer) isUserError(err error) error {
 	return twirp.NewError(twirp.Internal ,"unknown error: "+err.Error())
 }
 
+func (server UserServer) isCryptoError(err error) error {
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return twirp.NewError(twirp.Unauthenticated, err.Error()).WithMeta(rpcz.Reason, rpc.Credentials)
+	}
+	return twirp.InternalError("user-service: unknown isCryptoError: "+err.Error())
+}
 
 func (server UserServer) isTicketError(err error) error {
 	switch err {

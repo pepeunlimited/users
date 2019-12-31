@@ -3,11 +3,11 @@ package server
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
-	validator2 "github.com/pepeunlimited/microservice-kit/validator"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
@@ -75,15 +75,15 @@ func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdateP
 }
 
 
-func (server UserServer) findUserByUsernameOrEmail(ctx context.Context, username string, email string) (*ent.User, error) {
-	if !validator2.IsEmpty(username) {
-		user, err := server.users.GetUserByUsername(ctx, username)
+func (server UserServer) findUserByUsernameOrEmail(ctx context.Context, username *wrappers.StringValue, email *wrappers.StringValue) (*ent.User, error) {
+	if email == nil  {
+		user, err := server.users.GetUserByUsername(ctx, username.Value)
 		if err != nil {
 			return nil, server.isUserError(err)
 		}
 		return user, nil
 	}
-	user, err := server.users.GetUserByEmail(ctx, email)
+	user, err := server.users.GetUserByEmail(ctx, email.Value)
 	if err != nil {
 		return nil, server.isUserError(err)
 	}

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -175,7 +176,9 @@ func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 		Email:    "simo@gmail.com",
 	})
 	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Username: username,
+		Username: &wrappers.StringValue{
+			Value: username,
+		},
 		Language: "fi",
 	})
 	if err != nil {
@@ -203,7 +206,9 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 		Email:    "simo@gmail.com",
 	})
 	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Username: username,
+		Username: &wrappers.StringValue{
+			Value: username,
+		},
 		Language: "fi",
 	})
 	if err == nil {
@@ -228,7 +233,9 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Username: username,
+		Username: &wrappers.StringValue{
+			Value: username,
+		},
 		Language: "fi",
 	})
 	if err == nil {
@@ -288,7 +295,9 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 		Email:    "simo@gmail.com",
 	})
 	server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Username: username,
+		Username: &wrappers.StringValue{
+			Value: username,
+		},
 		Language: "fi",
 	})
 	_, tickets,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
@@ -336,7 +345,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 		Email:    "simo@gmail.com",
 	})
 	server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Email: user.Email,
+		Email: &wrappers.StringValue{Value: user.Email},
 		Language: "fi",
 	})
 	_, tickets,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))

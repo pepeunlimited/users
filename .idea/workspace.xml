@@ -4,9 +4,9 @@
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/validator/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/validator/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/protobuf/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf/user.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpc/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
     </list>
@@ -76,13 +76,6 @@
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/rpc" />
-      <recent name="$PROJECT_DIR$/deployments/dev" />
-      <recent name="$PROJECT_DIR$/deployments" />
-      <recent name="$PROJECT_DIR$/deployments/staging" />
-      <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/rpc/js" />
       <recent name="$PROJECT_DIR$/internal/app/app1" />
@@ -90,8 +83,15 @@
       <recent name="$PROJECT_DIR$/rpc" />
       <recent name="$PROJECT_DIR$/deployments/production" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/rpc" />
+      <recent name="$PROJECT_DIR$/deployments/dev" />
+      <recent name="$PROJECT_DIR$/deployments" />
+      <recent name="$PROJECT_DIR$/deployments/staging" />
+      <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
+    </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server">
+  <component name="RunManager" selected="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server">
     <configuration name="TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
@@ -125,7 +125,7 @@
       <pattern value="^TestUserServer_UpdatePasswordFail$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestUserServer_VerifyResetPasswordAndResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
       <framework value="gotest" />
@@ -133,7 +133,7 @@
       <package value="github.com/pepeunlimited/users/internal/app/app1/server" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestUserServer_VerifyResetPasswordAndResetPasswordSuccess$" />
+      <pattern value="^TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2$" />
       <method v="2" />
     </configuration>
     <configuration name="user_service_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -148,11 +148,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
+        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.user_service_test.go" />
+        <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_UpdatePasswordFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_UpdatePassword in github.com/pepeunlimited/users/internal/app/app1/server" />
-        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess in github.com/pepeunlimited/users/internal/app/app1/server" />
       </list>
     </recent_temporary>
   </component>
@@ -220,26 +220,26 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="579" y="335" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1576614983234" />
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1577726961670">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser" timestamp="1577786929509">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577726961670" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577730727833">
+    <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577786929509" />
+    <state width="1638" height="363" key="GridCell.Tab.0.bottom" timestamp="1577787051591">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577730727833" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577730727831">
+    <state width="1638" height="363" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051591" />
+    <state width="1638" height="363" key="GridCell.Tab.0.center" timestamp="1577787051590">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577730727831" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577730727829">
+    <state width="1638" height="363" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051590" />
+    <state width="1638" height="363" key="GridCell.Tab.0.left" timestamp="1577787051589">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577730727829" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577730727832">
+    <state width="1638" height="363" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051589" />
+    <state width="1638" height="363" key="GridCell.Tab.0.right" timestamp="1577787051591">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577730727832" />
+    <state width="1638" height="363" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051591" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577724416928">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -305,6 +305,11 @@
           <url>file://$PROJECT_DIR$/internal/app/app1/repository/user_repository.go</url>
           <line>62</line>
           <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/internal/app/app1/server/user_service_test.go</url>
+          <line>346</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

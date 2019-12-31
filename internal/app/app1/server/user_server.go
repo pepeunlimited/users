@@ -20,11 +20,11 @@ import (
 )
 
 type UserServer struct {
-	tickets repository.TicketRepository
-	users repository.UserRepository
-	crypto  cryptoz.Crypto
-	validator validator.UserServerValidator
-	authService rpc2.AuthorizationService
+	tickets 			repository.TicketRepository
+	users 				repository.UserRepository
+	crypto  			cryptoz.Crypto
+	validator 			validator.UserServerValidator
+	authService 		rpc2.AuthorizationService
 	smtpUsername 		string
 	smtpPassword 		string
 	smtpProvider 		mail.Provider

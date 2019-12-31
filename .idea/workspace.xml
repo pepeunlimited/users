@@ -3,7 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/meta.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/meta.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/app1/validator/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/validator/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/protobuf/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf/user.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,12 +47,6 @@
         <option value="$PROJECT_DIR$/.idea/modules.xml" />
       </list>
     </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
-    <option name="x" value="765" />
-    <option name="y" value="23" />
-    <option name="width" value="915" />
-    <option name="height" value="987" />
   </component>
   <component name="ProjectId" id="1Ul0jmmAdwjkEvX2aKcdWnVIpUS" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -265,10 +264,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="570" y="275" width="540" height="524" key="StructurePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1577706137921" />
-    <state width="500" height="445" key="SwitcherDM" timestamp="1577625996739">
+    <state width="500" height="445" key="SwitcherDM" timestamp="1577782093632">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1577625996739" />
+    <state width="500" height="445" key="SwitcherDM/0.0.1680.1050@0.0.1680.1050" timestamp="1577782093632" />
     <state x="619" y="251" key="com.goide.refactor.move.GoMoveDeclarationDialog" timestamp="1577724414489">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

@@ -41,8 +41,8 @@ func (UserServerValidator) VerifySignIn(params *rpc.VerifySignInParams) error {
 }
 
 func (UserServerValidator) ValidForgotPassword(params *rpc.ForgotPasswordParams) error {
-	if validator.IsEmpty(params.Username) {
-		return twirp.RequiredArgumentError("username")
+	if validator.IsEmpty(params.Username) && validator.IsEmpty(params.Email) {
+		return twirp.RequiredArgumentError("username_or_email")
 	}
 	if validator.IsEmpty(params.Language) {
 		return twirp.RequiredArgumentError("language")

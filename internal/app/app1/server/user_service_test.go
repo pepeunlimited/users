@@ -50,6 +50,8 @@ func TestUserServer_CreateUser(t *testing.T) {
 	if user.Id != resp0.Id {
 		t.FailNow()
 	}
+
+
 }
 
 func TestUserServer_CreateUserFail(t *testing.T) {
@@ -287,6 +289,54 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 	})
 	server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
 		Username: username,
+		Language: "fi",
+	})
+	_, tickets,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if len(tickets) != 1 {
+		t.FailNow()
+	}
+	token := tickets[0].Token
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{
+		Token: token,
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = server.ResetPassword(ctx, &rpc.ResetPasswordParams{
+		Token:    token,
+		Password: "newpw",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = server.VerifySignIn(ctx, &rpc.VerifySignInParams{
+		Username: username,
+		Password: "newpw",
+	})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, tickets2,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
+	if len(tickets2) != 0 {
+		t.FailNow()
+	}
+}
+
+func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+	username := "simo"
+	user,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: username,
+		Password: "p4sw04d",
+		Email:    "simo@gmail.com",
+	})
+	server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
+		Email: user.Email,
 		Language: "fi",
 	})
 	_, tickets,_ := server.users.GetUserTicketsByUserId(ctx, int(user.Id))

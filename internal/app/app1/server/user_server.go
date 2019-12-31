@@ -7,6 +7,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
+	validator2 "github.com/pepeunlimited/microservice-kit/validator"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
@@ -73,14 +74,32 @@ func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdateP
 	return &rpc.UpdatePasswordResponse{}, nil
 }
 
+
+func (server UserServer) findUserByUsernameOrEmail(ctx context.Context, username string, email string) (*ent.User, error) {
+	if !validator2.IsEmpty(username) {
+		user, err := server.users.GetUserByUsername(ctx, username)
+		if err != nil {
+			return nil, server.isUserError(err)
+		}
+		return user, nil
+	}
+	user, err := server.users.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+	return user, nil
+}
+
 func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotPasswordParams) (*empty.Empty, error) {
 	if err :=  server.validator.ValidForgotPassword(params); err != nil {
 		return nil, err
 	}
-	user, err := server.users.GetUserByUsername(ctx, params.Username)
+
+	user, err := server.findUserByUsernameOrEmail(ctx, params.Username, params.Email)
 	if err != nil {
-		return nil, server.isUserError(err)
+		return nil, err
 	}
+
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
 		if ent.IsConstraintFailure(err) {

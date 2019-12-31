@@ -23,7 +23,7 @@ $ curl -H "Content-Type: application/json" \
 ```
 $ curl -H "Content-Type: application/json" \
 -X POST "http://api.dev.pepeunlimited.com/twirp/pepeunlimited.users.UserService/ForgotPassword" \
--d '{"username": "ssimoo", "language": "fi"}'
+-d '{"username": "ssimoo", "email": "ssimoo@gmail.com", "language": "fi"}'
 ```
 ### `VerifyForgotPassword`
 ```

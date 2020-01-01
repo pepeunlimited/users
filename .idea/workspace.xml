@@ -3,17 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app1/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app1/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/validator/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/validator/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/protobuf/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf/user.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +90,7 @@
       <recent name="$PROJECT_DIR$/internal/app/app1/repository" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server">
+  <component name="RunManager" selected="Go Test.user_service_test.go">
     <configuration name="TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="go-starter-kit" />
       <working_directory value="$PROJECT_DIR$/internal/app/app1/server" />
@@ -153,8 +147,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.user_service_test.go" />
+        <item itemvalue="Go Test.TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2 in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_GetUserNotFound in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_UpdatePasswordFail in github.com/pepeunlimited/users/internal/app/app1/server" />
         <item itemvalue="Go Test.TestUserServer_UpdatePassword in github.com/pepeunlimited/users/internal/app/app1/server" />
@@ -229,22 +223,22 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577786929509" />
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577787167312">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577873787881">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167312" />
-    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577787167309">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577873787881" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577873787879">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167309" />
-    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577787167308">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577873787878" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577873787877">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167308" />
-    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577787167311">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577873787877" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577873787880">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167311" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577873787880" />
     <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577787105520">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

@@ -53,7 +53,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdatePasswordParams) (*rpc.UpdatePasswordResponse, error) {
 	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
-		return nil, twirp.RequiredArgumentError("Authorization")
+		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
 	verified, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
@@ -216,7 +216,7 @@ func (server UserServer) isTicketError(err error) error {
 func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {
 	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
-		return nil, twirp.RequiredArgumentError("Authorization")
+		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
 	resp, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})

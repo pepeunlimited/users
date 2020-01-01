@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app1/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app1/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

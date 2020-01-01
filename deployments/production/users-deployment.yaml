@@ -33,8 +33,8 @@ spec:
             - name: SMTP_PASSWORD
               value: p4ssw0rd
             - name: SMTP_CLIENT
-              value: mock
-          image: pepeunlimited/users:0.1.3.4
+              value: Mock
+          image: pepeunlimited/users:0.1.3.5
           name: users
           ports:
             - containerPort: 8080

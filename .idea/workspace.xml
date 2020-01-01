@@ -3,10 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="a1e4a88c-dc40-49e6-b550-c4f666b3c047" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/dev/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/production/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/deployments/staging/users-deployment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/server/user_service_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/app/app1/validator/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/app1/validator/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpc/protobuf" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpc/protobuf/user.proto" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/protobuf/user.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpc/user.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.pb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpc/user.twirp.go" beforeDir="false" afterPath="$PROJECT_DIR$/rpc/user.twirp.go" afterDir="false" />
     </list>
@@ -72,7 +77,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Console Font" />
     <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
@@ -224,42 +229,42 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="619" y="241" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1577786929509" />
-    <state width="1638" height="363" key="GridCell.Tab.0.bottom" timestamp="1577787051591">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom" timestamp="1577787167312">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051591" />
-    <state width="1638" height="363" key="GridCell.Tab.0.center" timestamp="1577787051590">
+    <state width="1638" height="487" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167312" />
+    <state width="1638" height="487" key="GridCell.Tab.0.center" timestamp="1577787167309">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051590" />
-    <state width="1638" height="363" key="GridCell.Tab.0.left" timestamp="1577787051589">
+    <state width="1638" height="487" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167309" />
+    <state width="1638" height="487" key="GridCell.Tab.0.left" timestamp="1577787167308">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051589" />
-    <state width="1638" height="363" key="GridCell.Tab.0.right" timestamp="1577787051591">
+    <state width="1638" height="487" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167308" />
+    <state width="1638" height="487" key="GridCell.Tab.0.right" timestamp="1577787167311">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577787051591" />
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577724416928">
+    <state width="1638" height="487" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577787167311" />
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom" timestamp="1577787105520">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577724416928" />
-    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577724416924">
+    <state width="1638" height="363" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1577787105520" />
+    <state width="1638" height="363" key="GridCell.Tab.1.center" timestamp="1577787105518">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577724416924" />
-    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577724416922">
+    <state width="1638" height="363" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1577787105518" />
+    <state width="1638" height="363" key="GridCell.Tab.1.left" timestamp="1577787105516">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577724416922" />
-    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577724416926">
+    <state width="1638" height="363" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1577787105516" />
+    <state width="1638" height="363" key="GridCell.Tab.1.right" timestamp="1577787105519">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577724416926" />
-    <state x="349" y="164" key="SettingsEditor" timestamp="1576576019170">
+    <state width="1638" height="363" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1577787105519" />
+    <state x="349" y="164" key="SettingsEditor" timestamp="1577873248644">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="349" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1576576019170" />
+    <state x="349" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1577873248644" />
     <state x="570" y="275" width="540" height="524" key="StructurePopup" timestamp="1577706137921">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -305,11 +310,6 @@
           <url>file://$PROJECT_DIR$/internal/app/app1/repository/user_repository.go</url>
           <line>62</line>
           <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/internal/app/app1/server/user_service_test.go</url>
-          <line>346</line>
-          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

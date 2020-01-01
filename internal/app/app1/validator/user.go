@@ -51,15 +51,15 @@ func (UserServerValidator) ValidForgotPassword(params *rpc.ForgotPasswordParams)
 }
 
 func (UserServerValidator) VerifyResetPassword(params *rpc.VerifyPasswordParams) error {
-	if validator.IsEmpty(params.Token) {
-		return twirp.RequiredArgumentError("token")
+	if validator.IsEmpty(params.TicketToken) {
+		return twirp.RequiredArgumentError("ticket_token")
 	}
 	return nil
 }
 
 func (UserServerValidator) ResetPassword(params *rpc.ResetPasswordParams) error {
-	if validator.IsEmpty(params.Token) {
-		return twirp.RequiredArgumentError("token")
+	if validator.IsEmpty(params.TicketToken) {
+		return twirp.RequiredArgumentError("ticket_token")
 	}
 	if validator.IsEmpty(params.Password) {
 		return twirp.RequiredArgumentError("password")

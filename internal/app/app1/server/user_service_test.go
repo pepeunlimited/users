@@ -257,7 +257,7 @@ func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 	})
 	ticket,_ := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Second), int(user.Id))
 	time.Sleep(2 * time.Second)
-	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{Token: ticket.Token})
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{TicketToken: ticket.Token})
 	if err == nil {
 		t.FailNow()
 	}
@@ -275,7 +275,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 		Password: "simo",
 		Email:    "simo@gmail.com",
 	})
-	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{Token: "asd"})
+	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{TicketToken: "asd"})
 	if err == nil {
 		t.FailNow()
 	}
@@ -306,14 +306,14 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 	}
 	token := tickets[0].Token
 	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{
-		Token: token,
+		TicketToken: token,
 	})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 	_, err = server.ResetPassword(ctx, &rpc.ResetPasswordParams{
-		Token:    token,
+		TicketToken:    token,
 		Password: "newpw",
 	})
 	if err != nil {
@@ -354,14 +354,14 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 	}
 	token := tickets[0].Token
 	_, err := server.VerifyResetPassword(ctx, &rpc.VerifyPasswordParams{
-		Token: token,
+		TicketToken: token,
 	})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 	_, err = server.ResetPassword(ctx, &rpc.ResetPasswordParams{
-		Token:    token,
+		TicketToken:    token,
 		Password: "newpw",
 	})
 	if err != nil {

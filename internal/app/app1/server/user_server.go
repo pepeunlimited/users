@@ -56,7 +56,7 @@ func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdateP
 		return nil, twirp.RequiredArgumentError("Authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	verified, err := server.authService.Verify(ctx, &rpc2.VerifyParams{Token:token})
+	verified, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (server UserServer) VerifyResetPassword(ctx context.Context, params *rpc.Ve
 	if err := server.validator.VerifyResetPassword(params); err != nil {
 		return nil, err
 	}
-	_, _, err := server.tickets.GetTicketUserByToken(ctx, params.Token)
+	_, _, err := server.tickets.GetTicketUserByToken(ctx, params.TicketToken)
 	if err != nil {
 		return nil, server.isTicketError(err)
 	}
@@ -146,7 +146,7 @@ func (server UserServer) ResetPassword(ctx context.Context, params *rpc.ResetPas
 	if err := server.validator.ResetPassword(params); err != nil {
 		return nil, err
 	}
-	ticket,user, err := server.tickets.GetTicketUserByToken(ctx, params.Token)
+	ticket,user, err := server.tickets.GetTicketUserByToken(ctx, params.TicketToken)
 	if err != nil {
 		return nil, server.isTicketError(err)
 	}
@@ -219,7 +219,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 		return nil, twirp.RequiredArgumentError("Authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	resp, err := server.authService.Verify(ctx, &rpc2.VerifyParams{Token:token})
+	resp, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}

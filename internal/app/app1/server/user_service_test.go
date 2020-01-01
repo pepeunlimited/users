@@ -176,8 +176,8 @@ func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 		Email:    "simo@gmail.com",
 	})
 	_, err := server.ForgotPassword(ctx, &rpc.ForgotPasswordParams{
-		Username: &wrappers.StringValue{
-			Value: username,
+		Email: &wrappers.StringValue{
+			Value: user.Email,
 		},
 		Language: "fi",
 	})

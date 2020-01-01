@@ -45,10 +45,8 @@ func (UserServerValidator) ValidForgotPassword(params *rpc.ForgotPasswordParams)
 		return twirp.RequiredArgumentError("username_or_email")
 	}
 
-	if params.Email != nil && params.Username != nil {
-		if validator.IsEmpty(params.Email.Value) && validator.IsEmpty(params.Username.Value) {
-			return twirp.RequiredArgumentError("username_or_email")
-		}
+	if params.Email != nil && validator.IsEmpty(params.Email.Value) || params.Username != nil && validator.IsEmpty(params.Username.Value)  {
+		return twirp.RequiredArgumentError("username_or_email")
 	}
 
 	if validator.IsEmpty(params.Language) {

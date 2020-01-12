@@ -307,3 +307,45 @@ func TestUserMySQL_GetUserRolesByUserId(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestUserMySQL_SetProfilePictureIDAndDelete(t *testing.T) {
+	ctx := context.TODO()
+	client := NewEntClient()
+	users := NewUserRepository(client)
+	users.DeleteAll(ctx)
+	username := "simo0"
+	users.DeleteAll(ctx)
+	user, _,err := users.CreateUser(ctx, username, "sim0.alakotila@gmail.com", "p4sw0rd")
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if err := users.SetProfilePictureID(ctx, user.ID, 3); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	afterUpdate, err := users.GetUserById(ctx, user.ID)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if afterUpdate.ProfilePictureID == nil {
+		t.FailNow()
+	}
+	if *afterUpdate.ProfilePictureID != 3 {
+		t.FailNow()
+	}
+	if err := users.DeleteProfilePictureID(ctx, user.ID); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	afterUpdate2, err := users.GetUserById(ctx, user.ID)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	if afterUpdate2.ProfilePictureID != nil {
+		t.FailNow()
+	}
+}

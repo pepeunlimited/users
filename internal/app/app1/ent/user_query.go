@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
@@ -23,7 +25,7 @@ type UserQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.User
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -54,24 +56,24 @@ func (uq *UserQuery) Order(o ...Order) *UserQuery {
 // QueryTickets chains the current query on the tickets edge.
 func (uq *UserQuery) QueryTickets() *TicketQuery {
 	query := &TicketQuery{config: uq.config}
-	step := sql.NewStep(
-		sql.From(user.Table, user.FieldID, uq.sqlQuery()),
-		sql.To(ticket.Table, ticket.FieldID),
-		sql.Edge(sql.O2M, false, user.TicketsTable, user.TicketsColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
+		sqlgraph.To(ticket.Table, ticket.FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, user.TicketsTable, user.TicketsColumn),
 	)
-	query.sql = sql.SetNeighbors(uq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 	return query
 }
 
 // QueryRoles chains the current query on the roles edge.
 func (uq *UserQuery) QueryRoles() *RoleQuery {
 	query := &RoleQuery{config: uq.config}
-	step := sql.NewStep(
-		sql.From(user.Table, user.FieldID, uq.sqlQuery()),
-		sql.To(role.Table, role.FieldID),
-		sql.Edge(sql.O2M, false, user.RolesTable, user.RolesColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(user.Table, user.FieldID, uq.sqlQuery()),
+		sqlgraph.To(role.Table, role.FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, user.RolesTable, user.RolesColumn),
 	)
-	query.sql = sql.SetNeighbors(uq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 	return query
 }
 
@@ -239,7 +241,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		order:      append([]Order{}, uq.order...),
 		unique:     append([]string{}, uq.unique...),
 		predicates: append([]predicate.User{}, uq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: uq.sql.Clone(),
 	}
 }
@@ -286,45 +288,31 @@ func (uq *UserQuery) Select(field string, fields ...string) *UserSelect {
 }
 
 func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
-	rows := &sql.Rows{}
-	selector := uq.sqlQuery()
-	if unique := uq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*User
+		spec  = uq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &User{config: uq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := uq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, uq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var us Users
-	if err := us.FromRows(rows); err != nil {
-		return nil, err
-	}
-	us.config(uq.config)
-	return us, nil
+	return nodes, nil
 }
 
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := uq.sqlQuery()
-	unique := []string{user.FieldID}
-	if len(uq.unique) > 0 {
-		unique = uq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := uq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := uq.querySpec()
+	return sqlgraph.CountNodes(ctx, uq.driver, spec)
 }
 
 func (uq *UserQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -333,6 +321,42 @@ func (uq *UserQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   user.Table,
+			Columns: user.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		},
+		From:   uq.sql,
+		Unique: true,
+	}
+	if ps := uq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := uq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := uq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := uq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (uq *UserQuery) sqlQuery() *sql.Selector {
@@ -365,7 +389,7 @@ type UserGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -486,7 +510,7 @@ func (ugb *UserGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(ugb.fields)+len(ugb.fns))
 	columns = append(columns, ugb.fields...)
 	for _, fn := range ugb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(ugb.fields...)
 }
@@ -606,7 +630,7 @@ func (us *UserSelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (us *UserSelect) sqlQuery() sql.Querier {
-	view := "user_view"
-	return sql.Dialect(us.driver.Dialect()).
-		Select(us.fields...).From(us.sql.As(view))
+	selector := us.sql
+	selector.Select(selector.Columns(us.fields...)...)
+	return selector
 }

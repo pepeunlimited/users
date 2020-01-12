@@ -15,6 +15,7 @@ import (
 
 	"github.com/facebookincubator/ent/dialect"
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -54,7 +55,6 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 			return nil, err
 		}
 		return NewClient(append(options, Driver(drv))...), nil
-
 	default:
 		return nil, fmt.Errorf("unsupported driver: %q", driverName)
 	}
@@ -172,12 +172,12 @@ func (c *RoleClient) GetX(ctx context.Context, id int) *Role {
 func (c *RoleClient) QueryUsers(r *Role) *UserQuery {
 	query := &UserQuery{config: c.config}
 	id := r.ID
-	step := sql.NewStep(
-		sql.From(role.Table, role.FieldID, id),
-		sql.To(user.Table, user.FieldID),
-		sql.Edge(sql.M2O, true, role.UsersTable, role.UsersColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(role.Table, role.FieldID, id),
+		sqlgraph.To(user.Table, user.FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, role.UsersTable, role.UsersColumn),
 	)
-	query.sql = sql.Neighbors(r.driver.Dialect(), step)
+	query.sql = sqlgraph.Neighbors(r.driver.Dialect(), step)
 
 	return query
 }
@@ -250,12 +250,12 @@ func (c *TicketClient) GetX(ctx context.Context, id int) *Ticket {
 func (c *TicketClient) QueryUsers(t *Ticket) *UserQuery {
 	query := &UserQuery{config: c.config}
 	id := t.ID
-	step := sql.NewStep(
-		sql.From(ticket.Table, ticket.FieldID, id),
-		sql.To(user.Table, user.FieldID),
-		sql.Edge(sql.M2O, true, ticket.UsersTable, ticket.UsersColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(ticket.Table, ticket.FieldID, id),
+		sqlgraph.To(user.Table, user.FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ticket.UsersTable, ticket.UsersColumn),
 	)
-	query.sql = sql.Neighbors(t.driver.Dialect(), step)
+	query.sql = sqlgraph.Neighbors(t.driver.Dialect(), step)
 
 	return query
 }
@@ -328,12 +328,12 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 func (c *UserClient) QueryTickets(u *User) *TicketQuery {
 	query := &TicketQuery{config: c.config}
 	id := u.ID
-	step := sql.NewStep(
-		sql.From(user.Table, user.FieldID, id),
-		sql.To(ticket.Table, ticket.FieldID),
-		sql.Edge(sql.O2M, false, user.TicketsTable, user.TicketsColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(user.Table, user.FieldID, id),
+		sqlgraph.To(ticket.Table, ticket.FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, user.TicketsTable, user.TicketsColumn),
 	)
-	query.sql = sql.Neighbors(u.driver.Dialect(), step)
+	query.sql = sqlgraph.Neighbors(u.driver.Dialect(), step)
 
 	return query
 }
@@ -342,12 +342,12 @@ func (c *UserClient) QueryTickets(u *User) *TicketQuery {
 func (c *UserClient) QueryRoles(u *User) *RoleQuery {
 	query := &RoleQuery{config: c.config}
 	id := u.ID
-	step := sql.NewStep(
-		sql.From(user.Table, user.FieldID, id),
-		sql.To(role.Table, role.FieldID),
-		sql.Edge(sql.O2M, false, user.RolesTable, user.RolesColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(user.Table, user.FieldID, id),
+		sqlgraph.To(role.Table, role.FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, user.RolesTable, user.RolesColumn),
 	)
-	query.sql = sql.Neighbors(u.driver.Dialect(), step)
+	query.sql = sqlgraph.Neighbors(u.driver.Dialect(), step)
 
 	return query
 }

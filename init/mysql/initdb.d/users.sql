@@ -11,6 +11,7 @@ CREATE TABLE users (
     is_banned BOOLEAN NOT NULL DEFAULT FALSE,
     is_locked BOOLEAN NOT NULL DEFAULT FALSE,
     last_modified DATETIME(3) NOT NULL,
+    profile_picture_id BIGINT NULL, -- reference from the files-service
     PRIMARY KEY (id)
 );
 

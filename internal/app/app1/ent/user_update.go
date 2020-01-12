@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
@@ -17,18 +19,21 @@ import (
 // UserUpdate is the builder for updating User entities.
 type UserUpdate struct {
 	config
-	username       *string
-	email          *string
-	password       *string
-	is_deleted     *bool
-	is_banned      *bool
-	is_locked      *bool
-	last_modified  *time.Time
-	tickets        map[int]struct{}
-	roles          map[int]struct{}
-	removedTickets map[int]struct{}
-	removedRoles   map[int]struct{}
-	predicates     []predicate.User
+	username                *string
+	email                   *string
+	password                *string
+	is_deleted              *bool
+	is_banned               *bool
+	is_locked               *bool
+	last_modified           *time.Time
+	profile_picture_id      *int64
+	addprofile_picture_id   *int64
+	clearprofile_picture_id bool
+	tickets                 map[int]struct{}
+	roles                   map[int]struct{}
+	removedTickets          map[int]struct{}
+	removedRoles            map[int]struct{}
+	predicates              []predicate.User
 }
 
 // Where adds a new predicate for the builder.
@@ -100,6 +105,38 @@ func (uu *UserUpdate) SetNillableIsLocked(b *bool) *UserUpdate {
 // SetLastModified sets the last_modified field.
 func (uu *UserUpdate) SetLastModified(t time.Time) *UserUpdate {
 	uu.last_modified = &t
+	return uu
+}
+
+// SetProfilePictureID sets the profile_picture_id field.
+func (uu *UserUpdate) SetProfilePictureID(i int64) *UserUpdate {
+	uu.profile_picture_id = &i
+	uu.addprofile_picture_id = nil
+	return uu
+}
+
+// SetNillableProfilePictureID sets the profile_picture_id field if the given value is not nil.
+func (uu *UserUpdate) SetNillableProfilePictureID(i *int64) *UserUpdate {
+	if i != nil {
+		uu.SetProfilePictureID(*i)
+	}
+	return uu
+}
+
+// AddProfilePictureID adds i to profile_picture_id.
+func (uu *UserUpdate) AddProfilePictureID(i int64) *UserUpdate {
+	if uu.addprofile_picture_id == nil {
+		uu.addprofile_picture_id = &i
+	} else {
+		*uu.addprofile_picture_id += i
+	}
+	return uu
+}
+
+// ClearProfilePictureID clears the value of profile_picture_id.
+func (uu *UserUpdate) ClearProfilePictureID() *UserUpdate {
+	uu.profile_picture_id = nil
+	uu.clearprofile_picture_id = true
 	return uu
 }
 
@@ -226,161 +263,195 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 }
 
 func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	var (
-		builder  = sql.Dialect(uu.driver.Dialect())
-		selector = builder.Select(user.FieldID).From(builder.Table(user.Table))
-	)
-	for _, p := range uu.predicates {
-		p(selector)
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   user.Table,
+			Columns: user.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		},
 	}
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = uu.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		if err := rows.Scan(&id); err != nil {
-			return 0, fmt.Errorf("ent: failed reading id: %v", err)
+	if ps := uu.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
 		}
-		ids = append(ids, id)
 	}
-	if len(ids) == 0 {
-		return 0, nil
-	}
-
-	tx, err := uu.driver.Tx(ctx)
-	if err != nil {
-		return 0, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(user.Table)
-	)
-	updater = updater.Where(sql.InInts(user.FieldID, ids...))
 	if value := uu.username; value != nil {
-		updater.Set(user.FieldUsername, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldUsername,
+		})
 	}
 	if value := uu.email; value != nil {
-		updater.Set(user.FieldEmail, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldEmail,
+		})
 	}
 	if value := uu.password; value != nil {
-		updater.Set(user.FieldPassword, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldPassword,
+		})
 	}
 	if value := uu.is_deleted; value != nil {
-		updater.Set(user.FieldIsDeleted, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsDeleted,
+		})
 	}
 	if value := uu.is_banned; value != nil {
-		updater.Set(user.FieldIsBanned, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsBanned,
+		})
 	}
 	if value := uu.is_locked; value != nil {
-		updater.Set(user.FieldIsLocked, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsLocked,
+		})
 	}
 	if value := uu.last_modified; value != nil {
-		updater.Set(user.FieldLastModified, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: user.FieldLastModified,
+		})
 	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
-		}
+	if value := uu.profile_picture_id; value != nil {
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  *value,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uu.removedTickets) > 0 {
-		eids := make([]int, len(uu.removedTickets))
-		for eid := range uu.removedTickets {
-			eids = append(eids, eid)
-		}
-		query, args := builder.Update(user.TicketsTable).
-			SetNull(user.TicketsColumn).
-			Where(sql.InInts(user.TicketsColumn, ids...)).
-			Where(sql.InInts(ticket.FieldID, eids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
-		}
+	if value := uu.addprofile_picture_id; value != nil {
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  *value,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uu.tickets) > 0 {
-		for _, id := range ids {
-			p := sql.P()
-			for eid := range uu.tickets {
-				p.Or().EQ(ticket.FieldID, eid)
-			}
-			query, args := builder.Update(user.TicketsTable).
-				Set(user.TicketsColumn, id).
-				Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return 0, rollback(tx, err)
-			}
-			affected, err := res.RowsAffected()
-			if err != nil {
-				return 0, rollback(tx, err)
-			}
-			if int(affected) < len(uu.tickets) {
-				return 0, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"tickets\" %v already connected to a different \"User\"", keys(uu.tickets))})
-			}
-		}
+	if uu.clearprofile_picture_id {
+		spec.Fields.Clear = append(spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uu.removedRoles) > 0 {
-		eids := make([]int, len(uu.removedRoles))
-		for eid := range uu.removedRoles {
-			eids = append(eids, eid)
+	if nodes := uu.removedTickets; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TicketsTable,
+			Columns: []string{user.TicketsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: ticket.FieldID,
+				},
+			},
 		}
-		query, args := builder.Update(user.RolesTable).
-			SetNull(user.RolesColumn).
-			Where(sql.InInts(user.RolesColumn, ids...)).
-			Where(sql.InInts(role.FieldID, eids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
 	}
-	if len(uu.roles) > 0 {
-		for _, id := range ids {
-			p := sql.P()
-			for eid := range uu.roles {
-				p.Or().EQ(role.FieldID, eid)
-			}
-			query, args := builder.Update(user.RolesTable).
-				Set(user.RolesColumn, id).
-				Where(sql.And(p, sql.IsNull(user.RolesColumn))).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return 0, rollback(tx, err)
-			}
-			affected, err := res.RowsAffected()
-			if err != nil {
-				return 0, rollback(tx, err)
-			}
-			if int(affected) < len(uu.roles) {
-				return 0, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uu.roles))})
-			}
+	if nodes := uu.tickets; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TicketsTable,
+			Columns: []string{user.TicketsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: ticket.FieldID,
+				},
+			},
 		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
 	}
-	if err = tx.Commit(); err != nil {
+	if nodes := uu.removedRoles; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RolesTable,
+			Columns: []string{user.RolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
+	}
+	if nodes := uu.roles; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RolesTable,
+			Columns: []string{user.RolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
+	}
+	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return 0, err
 	}
-	return len(ids), nil
+	return n, nil
 }
 
 // UserUpdateOne is the builder for updating a single User entity.
 type UserUpdateOne struct {
 	config
-	id             int
-	username       *string
-	email          *string
-	password       *string
-	is_deleted     *bool
-	is_banned      *bool
-	is_locked      *bool
-	last_modified  *time.Time
-	tickets        map[int]struct{}
-	roles          map[int]struct{}
-	removedTickets map[int]struct{}
-	removedRoles   map[int]struct{}
+	id                      int
+	username                *string
+	email                   *string
+	password                *string
+	is_deleted              *bool
+	is_banned               *bool
+	is_locked               *bool
+	last_modified           *time.Time
+	profile_picture_id      *int64
+	addprofile_picture_id   *int64
+	clearprofile_picture_id bool
+	tickets                 map[int]struct{}
+	roles                   map[int]struct{}
+	removedTickets          map[int]struct{}
+	removedRoles            map[int]struct{}
 }
 
 // SetUsername sets the username field.
@@ -446,6 +517,38 @@ func (uuo *UserUpdateOne) SetNillableIsLocked(b *bool) *UserUpdateOne {
 // SetLastModified sets the last_modified field.
 func (uuo *UserUpdateOne) SetLastModified(t time.Time) *UserUpdateOne {
 	uuo.last_modified = &t
+	return uuo
+}
+
+// SetProfilePictureID sets the profile_picture_id field.
+func (uuo *UserUpdateOne) SetProfilePictureID(i int64) *UserUpdateOne {
+	uuo.profile_picture_id = &i
+	uuo.addprofile_picture_id = nil
+	return uuo
+}
+
+// SetNillableProfilePictureID sets the profile_picture_id field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableProfilePictureID(i *int64) *UserUpdateOne {
+	if i != nil {
+		uuo.SetProfilePictureID(*i)
+	}
+	return uuo
+}
+
+// AddProfilePictureID adds i to profile_picture_id.
+func (uuo *UserUpdateOne) AddProfilePictureID(i int64) *UserUpdateOne {
+	if uuo.addprofile_picture_id == nil {
+		uuo.addprofile_picture_id = &i
+	} else {
+		*uuo.addprofile_picture_id += i
+	}
+	return uuo
+}
+
+// ClearProfilePictureID clears the value of profile_picture_id.
+func (uuo *UserUpdateOne) ClearProfilePictureID() *UserUpdateOne {
+	uuo.profile_picture_id = nil
+	uuo.clearprofile_picture_id = true
 	return uuo
 }
 
@@ -572,151 +675,169 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (u *User, err error) {
-	var (
-		builder  = sql.Dialect(uuo.driver.Dialect())
-		selector = builder.Select(user.Columns...).From(builder.Table(user.Table))
-	)
-	user.ID(uuo.id)(selector)
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = uuo.driver.Query(ctx, query, args, rows); err != nil {
-		return nil, err
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   user.Table,
+			Columns: user.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Value:  uuo.id,
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		},
 	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		u = &User{config: uuo.config}
-		if err := u.FromRows(rows); err != nil {
-			return nil, fmt.Errorf("ent: failed scanning row into User: %v", err)
-		}
-		id = u.ID
-		ids = append(ids, id)
-	}
-	switch n := len(ids); {
-	case n == 0:
-		return nil, &ErrNotFound{fmt.Sprintf("User with id: %v", uuo.id)}
-	case n > 1:
-		return nil, fmt.Errorf("ent: more than one User with the same id: %v", uuo.id)
-	}
-
-	tx, err := uuo.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(user.Table)
-	)
-	updater = updater.Where(sql.InInts(user.FieldID, ids...))
 	if value := uuo.username; value != nil {
-		updater.Set(user.FieldUsername, *value)
-		u.Username = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldUsername,
+		})
 	}
 	if value := uuo.email; value != nil {
-		updater.Set(user.FieldEmail, *value)
-		u.Email = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldEmail,
+		})
 	}
 	if value := uuo.password; value != nil {
-		updater.Set(user.FieldPassword, *value)
-		u.Password = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldPassword,
+		})
 	}
 	if value := uuo.is_deleted; value != nil {
-		updater.Set(user.FieldIsDeleted, *value)
-		u.IsDeleted = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsDeleted,
+		})
 	}
 	if value := uuo.is_banned; value != nil {
-		updater.Set(user.FieldIsBanned, *value)
-		u.IsBanned = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsBanned,
+		})
 	}
 	if value := uuo.is_locked; value != nil {
-		updater.Set(user.FieldIsLocked, *value)
-		u.IsLocked = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsLocked,
+		})
 	}
 	if value := uuo.last_modified; value != nil {
-		updater.Set(user.FieldLastModified, *value)
-		u.LastModified = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: user.FieldLastModified,
+		})
 	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
-		}
+	if value := uuo.profile_picture_id; value != nil {
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  *value,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uuo.removedTickets) > 0 {
-		eids := make([]int, len(uuo.removedTickets))
-		for eid := range uuo.removedTickets {
-			eids = append(eids, eid)
-		}
-		query, args := builder.Update(user.TicketsTable).
-			SetNull(user.TicketsColumn).
-			Where(sql.InInts(user.TicketsColumn, ids...)).
-			Where(sql.InInts(ticket.FieldID, eids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
-		}
+	if value := uuo.addprofile_picture_id; value != nil {
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  *value,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uuo.tickets) > 0 {
-		for _, id := range ids {
-			p := sql.P()
-			for eid := range uuo.tickets {
-				p.Or().EQ(ticket.FieldID, eid)
-			}
-			query, args := builder.Update(user.TicketsTable).
-				Set(user.TicketsColumn, id).
-				Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return nil, rollback(tx, err)
-			}
-			affected, err := res.RowsAffected()
-			if err != nil {
-				return nil, rollback(tx, err)
-			}
-			if int(affected) < len(uuo.tickets) {
-				return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"tickets\" %v already connected to a different \"User\"", keys(uuo.tickets))})
-			}
-		}
+	if uuo.clearprofile_picture_id {
+		spec.Fields.Clear = append(spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Column: user.FieldProfilePictureID,
+		})
 	}
-	if len(uuo.removedRoles) > 0 {
-		eids := make([]int, len(uuo.removedRoles))
-		for eid := range uuo.removedRoles {
-			eids = append(eids, eid)
+	if nodes := uuo.removedTickets; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TicketsTable,
+			Columns: []string{user.TicketsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: ticket.FieldID,
+				},
+			},
 		}
-		query, args := builder.Update(user.RolesTable).
-			SetNull(user.RolesColumn).
-			Where(sql.InInts(user.RolesColumn, ids...)).
-			Where(sql.InInts(role.FieldID, eids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
 	}
-	if len(uuo.roles) > 0 {
-		for _, id := range ids {
-			p := sql.P()
-			for eid := range uuo.roles {
-				p.Or().EQ(role.FieldID, eid)
-			}
-			query, args := builder.Update(user.RolesTable).
-				Set(user.RolesColumn, id).
-				Where(sql.And(p, sql.IsNull(user.RolesColumn))).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return nil, rollback(tx, err)
-			}
-			affected, err := res.RowsAffected()
-			if err != nil {
-				return nil, rollback(tx, err)
-			}
-			if int(affected) < len(uuo.roles) {
-				return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uuo.roles))})
-			}
+	if nodes := uuo.tickets; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TicketsTable,
+			Columns: []string{user.TicketsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: ticket.FieldID,
+				},
+			},
 		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
 	}
-	if err = tx.Commit(); err != nil {
+	if nodes := uuo.removedRoles; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RolesTable,
+			Columns: []string{user.RolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.roles; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RolesTable,
+			Columns: []string{user.RolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
+		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
+	}
+	u = &User{config: uuo.config}
+	spec.Assign = u.assignValues
+	spec.ScanValues = u.scanValues()
+	if err = sqlgraph.UpdateNode(ctx, uuo.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
 	return u, nil

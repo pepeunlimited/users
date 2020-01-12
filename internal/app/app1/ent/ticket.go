@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 )
 
 // Ticket is the model entity for the Ticket schema.
@@ -23,27 +24,43 @@ type Ticket struct {
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 }
 
-// FromRows scans the sql response data into Ticket.
-func (t *Ticket) FromRows(rows *sql.Rows) error {
-	var scant struct {
-		ID        int
-		Token     sql.NullString
-		CreatedAt sql.NullTime
-		ExpiresAt sql.NullTime
+// scanValues returns the types for scanning values from sql.Rows.
+func (*Ticket) scanValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{},
+		&sql.NullString{},
+		&sql.NullTime{},
+		&sql.NullTime{},
 	}
-	// the order here should be the same as in the `ticket.Columns`.
-	if err := rows.Scan(
-		&scant.ID,
-		&scant.Token,
-		&scant.CreatedAt,
-		&scant.ExpiresAt,
-	); err != nil {
-		return err
+}
+
+// assignValues assigns the values that were returned from sql.Rows (after scanning)
+// to the Ticket fields.
+func (t *Ticket) assignValues(values ...interface{}) error {
+	if m, n := len(values), len(ticket.Columns); m != n {
+		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	t.ID = scant.ID
-	t.Token = scant.Token.String
-	t.CreatedAt = scant.CreatedAt.Time
-	t.ExpiresAt = scant.ExpiresAt.Time
+	value, ok := values[0].(*sql.NullInt64)
+	if !ok {
+		return fmt.Errorf("unexpected type %T for field id", value)
+	}
+	t.ID = int(value.Int64)
+	values = values[1:]
+	if value, ok := values[0].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field token", values[0])
+	} else if value.Valid {
+		t.Token = value.String
+	}
+	if value, ok := values[1].(*sql.NullTime); !ok {
+		return fmt.Errorf("unexpected type %T for field created_at", values[1])
+	} else if value.Valid {
+		t.CreatedAt = value.Time
+	}
+	if value, ok := values[2].(*sql.NullTime); !ok {
+		return fmt.Errorf("unexpected type %T for field expires_at", values[2])
+	} else if value.Valid {
+		t.ExpiresAt = value.Time
+	}
 	return nil
 }
 
@@ -87,18 +104,6 @@ func (t *Ticket) String() string {
 
 // Tickets is a parsable slice of Ticket.
 type Tickets []*Ticket
-
-// FromRows scans the sql response data into Tickets.
-func (t *Tickets) FromRows(rows *sql.Rows) error {
-	for rows.Next() {
-		scant := &Ticket{}
-		if err := scant.FromRows(rows); err != nil {
-			return err
-		}
-		*t = append(*t, scant)
-	}
-	return nil
-}
 
 func (t Tickets) config(cfg config) {
 	for _i := range t {

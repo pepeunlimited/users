@@ -101,6 +101,7 @@ func ExampleUser() {
 		SetIsBanned(true).
 		SetIsLocked(true).
 		SetLastModified(time.Now()).
+		SetProfilePictureID(1).
 		AddTickets(t0).
 		AddRoles(r1).
 		SaveX(ctx)

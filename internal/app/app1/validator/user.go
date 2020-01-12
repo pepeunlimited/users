@@ -26,6 +26,13 @@ func (UserServerValidator) CreateUser(params *rpc.CreateUserParams) error {
 	return nil
 }
 
+func (UserServerValidator) SetProfilePicture(params *rpc.SetProfilePictureParams) error {
+	if params.ProfilePictureId == 0 {
+		return twirp.RequiredArgumentError("profile_picture_id")
+	}
+	return nil
+}
+
 func (UserServerValidator) GetUser(params *rpc.GetUserParams) error {
 	return nil
 }

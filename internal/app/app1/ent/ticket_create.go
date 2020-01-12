@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // TicketCreate is the builder for creating a Ticket entity.
@@ -92,46 +94,65 @@ func (tc *TicketCreate) SaveX(ctx context.Context) *Ticket {
 
 func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 	var (
-		res     sql.Result
-		builder = sql.Dialect(tc.driver.Dialect())
-		t       = &Ticket{config: tc.config}
+		t    = &Ticket{config: tc.config}
+		spec = &sqlgraph.CreateSpec{
+			Table: ticket.Table,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: ticket.FieldID,
+			},
+		}
 	)
-	tx, err := tc.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	insert := builder.Insert(ticket.Table).Default()
 	if value := tc.token; value != nil {
-		insert.Set(ticket.FieldToken, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: ticket.FieldToken,
+		})
 		t.Token = *value
 	}
 	if value := tc.created_at; value != nil {
-		insert.Set(ticket.FieldCreatedAt, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldCreatedAt,
+		})
 		t.CreatedAt = *value
 	}
 	if value := tc.expires_at; value != nil {
-		insert.Set(ticket.FieldExpiresAt, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldExpiresAt,
+		})
 		t.ExpiresAt = *value
 	}
-
-	id, err := insertLastID(ctx, tx, insert.Returning(ticket.FieldID))
-	if err != nil {
-		return nil, rollback(tx, err)
-	}
-	t.ID = int(id)
-	if len(tc.users) > 0 {
-		for eid := range tc.users {
-			query, args := builder.Update(ticket.UsersTable).
-				Set(ticket.UsersColumn, eid).
-				Where(sql.EQ(ticket.FieldID, id)).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return nil, rollback(tx, err)
-			}
+	if nodes := tc.users; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ticket.UsersTable,
+			Columns: []string{ticket.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
 		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges = append(spec.Edges, edge)
 	}
-	if err := tx.Commit(); err != nil {
+	if err := sqlgraph.CreateNode(ctx, tc.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
+	id := spec.ID.Value.(int64)
+	t.ID = int(id)
 	return t, nil
 }

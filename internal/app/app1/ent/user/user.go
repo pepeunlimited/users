@@ -25,6 +25,8 @@ const (
 	FieldIsLocked = "is_locked"
 	// FieldLastModified holds the string denoting the last_modified vertex property in the database.
 	FieldLastModified = "last_modified"
+	// FieldProfilePictureID holds the string denoting the profile_picture_id vertex property in the database.
+	FieldProfilePictureID = "profile_picture_id"
 
 	// Table holds the table name of the user in the database.
 	Table = "users"
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldIsBanned,
 	FieldIsLocked,
 	FieldLastModified,
+	FieldProfilePictureID,
 }
 
 var (

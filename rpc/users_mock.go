@@ -12,6 +12,22 @@ type Mock struct {
 	User 		*User
 }
 
+func (u *Mock) SetProfilePicture(ctx context.Context,  params *SetProfilePictureParams) (*ProfilePicture, error) {
+	if u.Errors.IsEmpty() {
+		return &ProfilePicture{
+			ProfilePictureId: params.ProfilePictureId,
+		}, nil
+	}
+	return nil, u.Errors.Pop()
+}
+
+func (u *Mock) DeleteProfilePicture(context.Context, *DeleteProfilePictureParams) (*ProfilePicture, error) {
+	if u.Errors.IsEmpty() {
+		return &ProfilePicture{ProfilePictureId: 3}, nil
+	}
+	return nil, u.Errors.Pop()
+}
+
 func (u *Mock) CreateUser(context.Context, *CreateUserParams) (*User, error) {
 	if u.Errors.IsEmpty() {
 		return u.user(), nil
@@ -58,6 +74,8 @@ func (u *Mock) VerifySignIn(context.Context, *VerifySignInParams) (*User, error)
 func NewUserServiceMock(errors []error, isAdmin bool) UserService {
 	return &Mock{Errors: errorz.NewErrorStack(errors), IsAdmin:isAdmin}
 }
+
+
 
 func (u *Mock) user() *User {
 	roles := []string{"User"}

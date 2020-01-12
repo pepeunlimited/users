@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
@@ -113,80 +115,86 @@ func (tu *TicketUpdate) ExecX(ctx context.Context) {
 }
 
 func (tu *TicketUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	var (
-		builder  = sql.Dialect(tu.driver.Dialect())
-		selector = builder.Select(ticket.FieldID).From(builder.Table(ticket.Table))
-	)
-	for _, p := range tu.predicates {
-		p(selector)
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   ticket.Table,
+			Columns: ticket.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: ticket.FieldID,
+			},
+		},
 	}
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = tu.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		if err := rows.Scan(&id); err != nil {
-			return 0, fmt.Errorf("ent: failed reading id: %v", err)
-		}
-		ids = append(ids, id)
-	}
-	if len(ids) == 0 {
-		return 0, nil
-	}
-
-	tx, err := tu.driver.Tx(ctx)
-	if err != nil {
-		return 0, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(ticket.Table)
-	)
-	updater = updater.Where(sql.InInts(ticket.FieldID, ids...))
-	if value := tu.token; value != nil {
-		updater.Set(ticket.FieldToken, *value)
-	}
-	if value := tu.created_at; value != nil {
-		updater.Set(ticket.FieldCreatedAt, *value)
-	}
-	if value := tu.expires_at; value != nil {
-		updater.Set(ticket.FieldExpiresAt, *value)
-	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
-		}
-	}
-	if tu.clearedUsers {
-		query, args := builder.Update(ticket.UsersTable).
-			SetNull(ticket.UsersColumn).
-			Where(sql.InInts(user.FieldID, ids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
-		}
-	}
-	if len(tu.users) > 0 {
-		for eid := range tu.users {
-			query, args := builder.Update(ticket.UsersTable).
-				Set(ticket.UsersColumn, eid).
-				Where(sql.InInts(ticket.FieldID, ids...)).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return 0, rollback(tx, err)
+	if ps := tu.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
 			}
 		}
 	}
-	if err = tx.Commit(); err != nil {
+	if value := tu.token; value != nil {
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: ticket.FieldToken,
+		})
+	}
+	if value := tu.created_at; value != nil {
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldCreatedAt,
+		})
+	}
+	if value := tu.expires_at; value != nil {
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldExpiresAt,
+		})
+	}
+	if tu.clearedUsers {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ticket.UsersTable,
+			Columns: []string{ticket.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
+	}
+	if nodes := tu.users; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ticket.UsersTable,
+			Columns: []string{ticket.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
+		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
+	}
+	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return 0, err
 	}
-	return len(ids), nil
+	return n, nil
 }
 
 // TicketUpdateOne is the builder for updating a single Ticket entity.
@@ -282,83 +290,80 @@ func (tuo *TicketUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (tuo *TicketUpdateOne) sqlSave(ctx context.Context) (t *Ticket, err error) {
-	var (
-		builder  = sql.Dialect(tuo.driver.Dialect())
-		selector = builder.Select(ticket.Columns...).From(builder.Table(ticket.Table))
-	)
-	ticket.ID(tuo.id)(selector)
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = tuo.driver.Query(ctx, query, args, rows); err != nil {
-		return nil, err
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   ticket.Table,
+			Columns: ticket.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Value:  tuo.id,
+				Type:   field.TypeInt,
+				Column: ticket.FieldID,
+			},
+		},
 	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		t = &Ticket{config: tuo.config}
-		if err := t.FromRows(rows); err != nil {
-			return nil, fmt.Errorf("ent: failed scanning row into Ticket: %v", err)
-		}
-		id = t.ID
-		ids = append(ids, id)
-	}
-	switch n := len(ids); {
-	case n == 0:
-		return nil, &ErrNotFound{fmt.Sprintf("Ticket with id: %v", tuo.id)}
-	case n > 1:
-		return nil, fmt.Errorf("ent: more than one Ticket with the same id: %v", tuo.id)
-	}
-
-	tx, err := tuo.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(ticket.Table)
-	)
-	updater = updater.Where(sql.InInts(ticket.FieldID, ids...))
 	if value := tuo.token; value != nil {
-		updater.Set(ticket.FieldToken, *value)
-		t.Token = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: ticket.FieldToken,
+		})
 	}
 	if value := tuo.created_at; value != nil {
-		updater.Set(ticket.FieldCreatedAt, *value)
-		t.CreatedAt = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldCreatedAt,
+		})
 	}
 	if value := tuo.expires_at; value != nil {
-		updater.Set(ticket.FieldExpiresAt, *value)
-		t.ExpiresAt = *value
-	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
-		}
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: ticket.FieldExpiresAt,
+		})
 	}
 	if tuo.clearedUsers {
-		query, args := builder.Update(ticket.UsersTable).
-			SetNull(ticket.UsersColumn).
-			Where(sql.InInts(user.FieldID, ids...)).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ticket.UsersTable,
+			Columns: []string{ticket.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
 		}
+		spec.Edges.Clear = append(spec.Edges.Clear, edge)
 	}
-	if len(tuo.users) > 0 {
-		for eid := range tuo.users {
-			query, args := builder.Update(ticket.UsersTable).
-				Set(ticket.UsersColumn, eid).
-				Where(sql.InInts(ticket.FieldID, ids...)).
-				Query()
-			if err := tx.Exec(ctx, query, args, &res); err != nil {
-				return nil, rollback(tx, err)
-			}
+	if nodes := tuo.users; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ticket.UsersTable,
+			Columns: []string{ticket.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: user.FieldID,
+				},
+			},
 		}
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		spec.Edges.Add = append(spec.Edges.Add, edge)
 	}
-	if err = tx.Commit(); err != nil {
+	t = &Ticket{config: tuo.config}
+	spec.Assign = t.assignValues
+	spec.ScanValues = t.scanValues()
+	if err = sqlgraph.UpdateNode(ctx, tuo.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
 	return t, nil

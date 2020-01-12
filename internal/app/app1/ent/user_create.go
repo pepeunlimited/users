@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
@@ -17,15 +18,16 @@ import (
 // UserCreate is the builder for creating a User entity.
 type UserCreate struct {
 	config
-	username      *string
-	email         *string
-	password      *string
-	is_deleted    *bool
-	is_banned     *bool
-	is_locked     *bool
-	last_modified *time.Time
-	tickets       map[int]struct{}
-	roles         map[int]struct{}
+	username           *string
+	email              *string
+	password           *string
+	is_deleted         *bool
+	is_banned          *bool
+	is_locked          *bool
+	last_modified      *time.Time
+	profile_picture_id *int64
+	tickets            map[int]struct{}
+	roles              map[int]struct{}
 }
 
 // SetUsername sets the username field.
@@ -91,6 +93,20 @@ func (uc *UserCreate) SetNillableIsLocked(b *bool) *UserCreate {
 // SetLastModified sets the last_modified field.
 func (uc *UserCreate) SetLastModified(t time.Time) *UserCreate {
 	uc.last_modified = &t
+	return uc
+}
+
+// SetProfilePictureID sets the profile_picture_id field.
+func (uc *UserCreate) SetProfilePictureID(i int64) *UserCreate {
+	uc.profile_picture_id = &i
+	return uc
+}
+
+// SetNillableProfilePictureID sets the profile_picture_id field if the given value is not nil.
+func (uc *UserCreate) SetNillableProfilePictureID(i *int64) *UserCreate {
+	if i != nil {
+		uc.SetProfilePictureID(*i)
+	}
 	return uc
 }
 
@@ -183,91 +199,124 @@ func (uc *UserCreate) SaveX(ctx context.Context) *User {
 
 func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	var (
-		res     sql.Result
-		builder = sql.Dialect(uc.driver.Dialect())
-		u       = &User{config: uc.config}
+		u    = &User{config: uc.config}
+		spec = &sqlgraph.CreateSpec{
+			Table: user.Table,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		}
 	)
-	tx, err := uc.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	insert := builder.Insert(user.Table).Default()
 	if value := uc.username; value != nil {
-		insert.Set(user.FieldUsername, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldUsername,
+		})
 		u.Username = *value
 	}
 	if value := uc.email; value != nil {
-		insert.Set(user.FieldEmail, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldEmail,
+		})
 		u.Email = *value
 	}
 	if value := uc.password; value != nil {
-		insert.Set(user.FieldPassword, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldPassword,
+		})
 		u.Password = *value
 	}
 	if value := uc.is_deleted; value != nil {
-		insert.Set(user.FieldIsDeleted, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsDeleted,
+		})
 		u.IsDeleted = *value
 	}
 	if value := uc.is_banned; value != nil {
-		insert.Set(user.FieldIsBanned, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsBanned,
+		})
 		u.IsBanned = *value
 	}
 	if value := uc.is_locked; value != nil {
-		insert.Set(user.FieldIsLocked, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  *value,
+			Column: user.FieldIsLocked,
+		})
 		u.IsLocked = *value
 	}
 	if value := uc.last_modified; value != nil {
-		insert.Set(user.FieldLastModified, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: user.FieldLastModified,
+		})
 		u.LastModified = *value
 	}
-
-	id, err := insertLastID(ctx, tx, insert.Returning(user.FieldID))
-	if err != nil {
-		return nil, rollback(tx, err)
+	if value := uc.profile_picture_id; value != nil {
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  *value,
+			Column: user.FieldProfilePictureID,
+		})
+		u.ProfilePictureID = value
 	}
-	u.ID = int(id)
-	if len(uc.tickets) > 0 {
-		p := sql.P()
-		for eid := range uc.tickets {
-			p.Or().EQ(ticket.FieldID, eid)
+	if nodes := uc.tickets; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TicketsTable,
+			Columns: []string{user.TicketsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: ticket.FieldID,
+				},
+			},
 		}
-		query, args := builder.Update(user.TicketsTable).
-			Set(user.TicketsColumn, id).
-			Where(sql.And(p, sql.IsNull(user.TicketsColumn))).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		affected, err := res.RowsAffected()
-		if err != nil {
-			return nil, rollback(tx, err)
-		}
-		if int(affected) < len(uc.tickets) {
-			return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"tickets\" %v already connected to a different \"User\"", keys(uc.tickets))})
-		}
+		spec.Edges = append(spec.Edges, edge)
 	}
-	if len(uc.roles) > 0 {
-		p := sql.P()
-		for eid := range uc.roles {
-			p.Or().EQ(role.FieldID, eid)
+	if nodes := uc.roles; len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.RolesTable,
+			Columns: []string{user.RolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: role.FieldID,
+				},
+			},
 		}
-		query, args := builder.Update(user.RolesTable).
-			Set(user.RolesColumn, id).
-			Where(sql.And(p, sql.IsNull(user.RolesColumn))).
-			Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
+		for k, _ := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		affected, err := res.RowsAffected()
-		if err != nil {
-			return nil, rollback(tx, err)
-		}
-		if int(affected) < len(uc.roles) {
-			return nil, rollback(tx, &ErrConstraintFailed{msg: fmt.Sprintf("one of \"roles\" %v already connected to a different \"User\"", keys(uc.roles))})
-		}
+		spec.Edges = append(spec.Edges, edge)
 	}
-	if err := tx.Commit(); err != nil {
+	if err := sqlgraph.CreateNode(ctx, uc.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
+	id := spec.ID.Value.(int64)
+	u.ID = int(id)
 	return u, nil
 }

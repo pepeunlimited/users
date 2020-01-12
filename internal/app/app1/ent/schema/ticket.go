@@ -23,6 +23,6 @@ func (Ticket) Fields() []ent.Field {
 // Edges of the Ticket.
 func (Ticket) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("users", User.Type).Ref("tickets").Unique(),
+		edge.From("users", User.Type).Ref("tickets").Unique(), // many-to-one
 	}
 }

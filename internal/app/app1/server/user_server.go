@@ -30,6 +30,53 @@ type UserServer struct {
 	smtpProvider 		mail.Provider
 }
 
+func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetProfilePictureParams) (*rpc.ProfilePicture, error) {
+	if err := server.validator.SetProfilePicture(params); err != nil {
+		return nil, err
+	}
+
+	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
+	if err != nil {
+		return nil, twirp.RequiredArgumentError("authorization")
+	}
+	// verify the token from the authorization service: blacklist and expired..
+	user, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.users.SetProfilePictureID(ctx, int(user.UserId), params.ProfilePictureId)
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+
+	return &rpc.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
+}
+
+func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpc.DeleteProfilePictureParams) (*rpc.ProfilePicture, error) {
+	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
+	if err != nil {
+		return nil, twirp.RequiredArgumentError("authorization")
+	}
+	// verify the token from the authorization service: blacklist and expired..
+	user, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	if err != nil {
+		return nil, err
+	}
+	fromDB, err := server.users.GetUserById(ctx, int(user.UserId))
+	if err != nil {
+		return nil, server.isUserError(err)
+	}
+	if fromDB.ProfilePictureID == nil {
+		return &rpc.ProfilePicture{}, nil
+	}
+	if err := server.users.DeleteProfilePictureID(ctx, int(user.UserId)); err != nil {
+		return nil, server.isUserError(err)
+	}
+	profilePictureId := *fromDB.ProfilePictureID
+	return &rpc.ProfilePicture{ProfilePictureId: profilePictureId}, nil
+}
+
 func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySignInParams) (*rpc.User, error) {
 	err := server.validator.VerifySignIn(params)
 	if err != nil {
@@ -42,11 +89,18 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 	if err := server.crypto.Check(user.Password, params.Password); err != nil {
 		return nil, server.isCryptoError(err)
 	}
+
+	userId := &wrappers.Int64Value{}
+	if user.ProfilePictureID != nil {
+		userId.Value = *user.ProfilePictureID
+	}
+
 	return &rpc.User{
-		Id:       int64(user.ID),
-		Username: user.Username,
-		Email:    user.Email,
-		Roles:    rolesToString(roles),
+		Id:               int64(user.ID),
+		Username:         user.Username,
+		Email:            user.Email,
+		Roles:            rolesToString(roles),
+		ProfilePictureId:  userId,
 	}, nil
 }
 
@@ -102,7 +156,7 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
-		if ent.IsConstraintFailure(err) {
+		if ent.IsConstraintError(err) {
 			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, rpc.TicketExist)
 		}
 		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
@@ -223,11 +277,22 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	if err != nil {
 		return nil, err
 	}
+	user, err := server.users.GetUserByEmail(ctx, resp.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	userId := &wrappers.Int64Value{}
+	if user.ProfilePictureID != nil {
+		userId.Value = *user.ProfilePictureID
+	}
+
 	return &rpc.User{
-		Id:       resp.UserId,
-		Username: resp.Username,
-		Email:    resp.Email,
-		Roles:    resp.Roles,
+		Id:               resp.UserId,
+		Username:         resp.Username,
+		Email:            resp.Email,
+		Roles:            resp.Roles,
+		ProfilePictureId:  userId,
 	}, nil
 }
 

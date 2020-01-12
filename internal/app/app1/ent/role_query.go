@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
@@ -22,7 +24,7 @@ type RoleQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Role
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -53,12 +55,12 @@ func (rq *RoleQuery) Order(o ...Order) *RoleQuery {
 // QueryUsers chains the current query on the users edge.
 func (rq *RoleQuery) QueryUsers() *UserQuery {
 	query := &UserQuery{config: rq.config}
-	step := sql.NewStep(
-		sql.From(role.Table, role.FieldID, rq.sqlQuery()),
-		sql.To(user.Table, user.FieldID),
-		sql.Edge(sql.M2O, true, role.UsersTable, role.UsersColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(role.Table, role.FieldID, rq.sqlQuery()),
+		sqlgraph.To(user.Table, user.FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, role.UsersTable, role.UsersColumn),
 	)
-	query.sql = sql.SetNeighbors(rq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 	return query
 }
 
@@ -226,7 +228,7 @@ func (rq *RoleQuery) Clone() *RoleQuery {
 		order:      append([]Order{}, rq.order...),
 		unique:     append([]string{}, rq.unique...),
 		predicates: append([]predicate.Role{}, rq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: rq.sql.Clone(),
 	}
 }
@@ -273,45 +275,31 @@ func (rq *RoleQuery) Select(field string, fields ...string) *RoleSelect {
 }
 
 func (rq *RoleQuery) sqlAll(ctx context.Context) ([]*Role, error) {
-	rows := &sql.Rows{}
-	selector := rq.sqlQuery()
-	if unique := rq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*Role
+		spec  = rq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &Role{config: rq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := rq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, rq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var rs Roles
-	if err := rs.FromRows(rows); err != nil {
-		return nil, err
-	}
-	rs.config(rq.config)
-	return rs, nil
+	return nodes, nil
 }
 
 func (rq *RoleQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := rq.sqlQuery()
-	unique := []string{role.FieldID}
-	if len(rq.unique) > 0 {
-		unique = rq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := rq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := rq.querySpec()
+	return sqlgraph.CountNodes(ctx, rq.driver, spec)
 }
 
 func (rq *RoleQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -320,6 +308,42 @@ func (rq *RoleQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (rq *RoleQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   role.Table,
+			Columns: role.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: role.FieldID,
+			},
+		},
+		From:   rq.sql,
+		Unique: true,
+	}
+	if ps := rq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := rq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := rq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := rq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (rq *RoleQuery) sqlQuery() *sql.Selector {
@@ -352,7 +376,7 @@ type RoleGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -473,7 +497,7 @@ func (rgb *RoleGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(rgb.fields)+len(rgb.fns))
 	columns = append(columns, rgb.fields...)
 	for _, fn := range rgb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(rgb.fields...)
 }
@@ -593,7 +617,7 @@ func (rs *RoleSelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (rs *RoleSelect) sqlQuery() sql.Querier {
-	view := "role_view"
-	return sql.Dialect(rs.driver.Dialect()).
-		Select(rs.fields...).From(rs.sql.As(view))
+	selector := rs.sql
+	selector.Select(selector.Columns(rs.fields...)...)
+	return selector
 }

@@ -44,3 +44,8 @@ $ curl -H "Content-Type: application/json" \
 -X POST "http://api.dev.pepeunlimited.com/twirp/pepeunlimited.users.UserService/UpdatePassword" \
 -d '{"current_password": "currpw", "new_password":"newpw"}'
 ```
+
+
+```
+for ((i=1;i<=100;i++)); do curl https://t-bucket-666.fra1.cdn.digitaloceanspaces.com/simo.txt; done
+```

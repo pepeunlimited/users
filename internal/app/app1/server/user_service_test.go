@@ -51,8 +51,40 @@ func TestUserServer_CreateUser(t *testing.T) {
 	if user.Id != resp0.Id {
 		t.FailNow()
 	}
+}
 
 
+func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
+	ctx := context.TODO()
+	server := NewUserServer(repository.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider)
+	server.users.DeleteAll(ctx)
+	resp0,_ := server.CreateUser(ctx, &rpc.CreateUserParams{
+		Username: "simo",
+		Password: "siimoo",
+		Email:    "simo@gmail.com",
+	})
+	server.authService.(*rpc2.Mock).Username = "simo"
+	server.authService.(*rpc2.Mock).Email 	 = "simo@gmail.com"
+	server.authService.(*rpc2.Mock).UserId 	 = resp0.Id
+	ctx = rpcz.AddAuthorization("1")
+
+	_, err := server.SetProfilePicture(ctx, &rpc.SetProfilePictureParams{
+		ProfilePictureId: 3,
+	})
+
+	user,_ := server.users.GetUserById(ctx, int(resp0.Id))
+	if *user.ProfilePictureID != 3 {
+		t.FailNow()
+	}
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = server.DeleteProfilePicture(ctx, &rpc.DeleteProfilePictureParams{})
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 }
 
 func TestUserServer_CreateUserFail(t *testing.T) {

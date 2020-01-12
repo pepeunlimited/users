@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 )
 
 // Role is the model entity for the Role schema.
@@ -18,21 +19,31 @@ type Role struct {
 	Role string `json:"role,omitempty"`
 }
 
-// FromRows scans the sql response data into Role.
-func (r *Role) FromRows(rows *sql.Rows) error {
-	var scanr struct {
-		ID   int
-		Role sql.NullString
+// scanValues returns the types for scanning values from sql.Rows.
+func (*Role) scanValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{},
+		&sql.NullString{},
 	}
-	// the order here should be the same as in the `role.Columns`.
-	if err := rows.Scan(
-		&scanr.ID,
-		&scanr.Role,
-	); err != nil {
-		return err
+}
+
+// assignValues assigns the values that were returned from sql.Rows (after scanning)
+// to the Role fields.
+func (r *Role) assignValues(values ...interface{}) error {
+	if m, n := len(values), len(role.Columns); m != n {
+		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	r.ID = scanr.ID
-	r.Role = scanr.Role.String
+	value, ok := values[0].(*sql.NullInt64)
+	if !ok {
+		return fmt.Errorf("unexpected type %T for field id", value)
+	}
+	r.ID = int(value.Int64)
+	values = values[1:]
+	if value, ok := values[0].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field role", values[0])
+	} else if value.Valid {
+		r.Role = value.String
+	}
 	return nil
 }
 
@@ -72,18 +83,6 @@ func (r *Role) String() string {
 
 // Roles is a parsable slice of Role.
 type Roles []*Role
-
-// FromRows scans the sql response data into Roles.
-func (r *Roles) FromRows(rows *sql.Rows) error {
-	for rows.Next() {
-		scanr := &Role{}
-		if err := scanr.FromRows(rows); err != nil {
-			return err
-		}
-		*r = append(*r, scanr)
-	}
-	return nil
-}
 
 func (r Roles) config(cfg config) {
 	for _i := range r {

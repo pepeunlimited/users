@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
 )
 
 // User is the model entity for the User schema.
@@ -29,41 +30,78 @@ type User struct {
 	IsLocked bool `json:"is_locked,omitempty"`
 	// LastModified holds the value of the "last_modified" field.
 	LastModified time.Time `json:"last_modified,omitempty"`
+	// ProfilePictureID holds the value of the "profile_picture_id" field.
+	ProfilePictureID *int64 `json:"profile_picture_id,omitempty"`
 }
 
-// FromRows scans the sql response data into User.
-func (u *User) FromRows(rows *sql.Rows) error {
-	var scanu struct {
-		ID           int
-		Username     sql.NullString
-		Email        sql.NullString
-		Password     sql.NullString
-		IsDeleted    sql.NullBool
-		IsBanned     sql.NullBool
-		IsLocked     sql.NullBool
-		LastModified sql.NullTime
+// scanValues returns the types for scanning values from sql.Rows.
+func (*User) scanValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{},
+		&sql.NullString{},
+		&sql.NullString{},
+		&sql.NullString{},
+		&sql.NullBool{},
+		&sql.NullBool{},
+		&sql.NullBool{},
+		&sql.NullTime{},
+		&sql.NullInt64{},
 	}
-	// the order here should be the same as in the `user.Columns`.
-	if err := rows.Scan(
-		&scanu.ID,
-		&scanu.Username,
-		&scanu.Email,
-		&scanu.Password,
-		&scanu.IsDeleted,
-		&scanu.IsBanned,
-		&scanu.IsLocked,
-		&scanu.LastModified,
-	); err != nil {
-		return err
+}
+
+// assignValues assigns the values that were returned from sql.Rows (after scanning)
+// to the User fields.
+func (u *User) assignValues(values ...interface{}) error {
+	if m, n := len(values), len(user.Columns); m != n {
+		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	u.ID = scanu.ID
-	u.Username = scanu.Username.String
-	u.Email = scanu.Email.String
-	u.Password = scanu.Password.String
-	u.IsDeleted = scanu.IsDeleted.Bool
-	u.IsBanned = scanu.IsBanned.Bool
-	u.IsLocked = scanu.IsLocked.Bool
-	u.LastModified = scanu.LastModified.Time
+	value, ok := values[0].(*sql.NullInt64)
+	if !ok {
+		return fmt.Errorf("unexpected type %T for field id", value)
+	}
+	u.ID = int(value.Int64)
+	values = values[1:]
+	if value, ok := values[0].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field username", values[0])
+	} else if value.Valid {
+		u.Username = value.String
+	}
+	if value, ok := values[1].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field email", values[1])
+	} else if value.Valid {
+		u.Email = value.String
+	}
+	if value, ok := values[2].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field password", values[2])
+	} else if value.Valid {
+		u.Password = value.String
+	}
+	if value, ok := values[3].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field is_deleted", values[3])
+	} else if value.Valid {
+		u.IsDeleted = value.Bool
+	}
+	if value, ok := values[4].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field is_banned", values[4])
+	} else if value.Valid {
+		u.IsBanned = value.Bool
+	}
+	if value, ok := values[5].(*sql.NullBool); !ok {
+		return fmt.Errorf("unexpected type %T for field is_locked", values[5])
+	} else if value.Valid {
+		u.IsLocked = value.Bool
+	}
+	if value, ok := values[6].(*sql.NullTime); !ok {
+		return fmt.Errorf("unexpected type %T for field last_modified", values[6])
+	} else if value.Valid {
+		u.LastModified = value.Time
+	}
+	if value, ok := values[7].(*sql.NullInt64); !ok {
+		return fmt.Errorf("unexpected type %T for field profile_picture_id", values[7])
+	} else if value.Valid {
+		u.ProfilePictureID = new(int64)
+		*u.ProfilePictureID = value.Int64
+	}
 	return nil
 }
 
@@ -113,24 +151,16 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("%v", u.IsLocked))
 	builder.WriteString(", last_modified=")
 	builder.WriteString(u.LastModified.Format(time.ANSIC))
+	if v := u.ProfilePictureID; v != nil {
+		builder.WriteString(", profile_picture_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // Users is a parsable slice of User.
 type Users []*User
-
-// FromRows scans the sql response data into Users.
-func (u *Users) FromRows(rows *sql.Rows) error {
-	for rows.Next() {
-		scanu := &User{}
-		if err := scanu.FromRows(rows); err != nil {
-			return err
-		}
-		*u = append(*u, scanu)
-	}
-	return nil
-}
 
 func (u Users) config(cfg config) {
 	for _i := range u {

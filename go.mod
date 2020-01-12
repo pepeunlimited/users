@@ -3,7 +3,7 @@ module github.com/pepeunlimited/users
 go 1.13
 
 require (
-	github.com/facebookincubator/ent v0.0.0-20191215171026-58b53892756e
+	github.com/facebookincubator/ent v0.0.0-20200105152906-13ae2fcea1b4
 	github.com/go-sql-driver/mysql v1.4.1-0.20190510102335-877a9775f068
 	github.com/golang/protobuf v1.3.2
 	github.com/pepeunlimited/authorization-twirp v0.0.0-20200101094727-2b9a43fb6e0c

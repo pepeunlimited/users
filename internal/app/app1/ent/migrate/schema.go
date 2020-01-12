@@ -65,6 +65,7 @@ var (
 		{Name: "is_banned", Type: field.TypeBool, Default: user.DefaultIsBanned},
 		{Name: "is_locked", Type: field.TypeBool, Default: user.DefaultIsLocked},
 		{Name: "last_modified", Type: field.TypeTime},
+		{Name: "profile_picture_id", Type: field.TypeInt64, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

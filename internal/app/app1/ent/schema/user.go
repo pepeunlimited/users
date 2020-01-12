@@ -44,6 +44,7 @@ func (User) Fields() []ent.Field {
 		field.Bool("is_banned").Default(false),
 		field.Bool("is_locked").Default(false),
 		field.Time("last_modified"),
+		field.Int64("profile_picture_id").Optional().Nillable(),
 	}
 }
 

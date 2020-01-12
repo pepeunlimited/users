@@ -6,6 +6,8 @@ import (
 	"context"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/role"
 )
@@ -37,23 +39,23 @@ func (rd *RoleDelete) ExecX(ctx context.Context) int {
 }
 
 func (rd *RoleDelete) sqlExec(ctx context.Context) (int, error) {
-	var (
-		res     sql.Result
-		builder = sql.Dialect(rd.driver.Dialect())
-	)
-	selector := builder.Select().From(sql.Table(role.Table))
-	for _, p := range rd.predicates {
-		p(selector)
+	spec := &sqlgraph.DeleteSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table: role.Table,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: role.FieldID,
+			},
+		},
 	}
-	query, args := builder.Delete(role.Table).FromSelect(selector).Query()
-	if err := rd.driver.Exec(ctx, query, args, &res); err != nil {
-		return 0, err
+	if ps := rd.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
 	}
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-	return int(affected), nil
+	return sqlgraph.DeleteNodes(ctx, rd.driver, spec)
 }
 
 // RoleDeleteOne is the builder for deleting a single Role entity.

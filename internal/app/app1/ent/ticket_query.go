@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/predicate"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
@@ -22,7 +24,7 @@ type TicketQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Ticket
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -53,12 +55,12 @@ func (tq *TicketQuery) Order(o ...Order) *TicketQuery {
 // QueryUsers chains the current query on the users edge.
 func (tq *TicketQuery) QueryUsers() *UserQuery {
 	query := &UserQuery{config: tq.config}
-	step := sql.NewStep(
-		sql.From(ticket.Table, ticket.FieldID, tq.sqlQuery()),
-		sql.To(user.Table, user.FieldID),
-		sql.Edge(sql.M2O, true, ticket.UsersTable, ticket.UsersColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(ticket.Table, ticket.FieldID, tq.sqlQuery()),
+		sqlgraph.To(user.Table, user.FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ticket.UsersTable, ticket.UsersColumn),
 	)
-	query.sql = sql.SetNeighbors(tq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 	return query
 }
 
@@ -226,7 +228,7 @@ func (tq *TicketQuery) Clone() *TicketQuery {
 		order:      append([]Order{}, tq.order...),
 		unique:     append([]string{}, tq.unique...),
 		predicates: append([]predicate.Ticket{}, tq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: tq.sql.Clone(),
 	}
 }
@@ -273,45 +275,31 @@ func (tq *TicketQuery) Select(field string, fields ...string) *TicketSelect {
 }
 
 func (tq *TicketQuery) sqlAll(ctx context.Context) ([]*Ticket, error) {
-	rows := &sql.Rows{}
-	selector := tq.sqlQuery()
-	if unique := tq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*Ticket
+		spec  = tq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &Ticket{config: tq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := tq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, tq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var ts Tickets
-	if err := ts.FromRows(rows); err != nil {
-		return nil, err
-	}
-	ts.config(tq.config)
-	return ts, nil
+	return nodes, nil
 }
 
 func (tq *TicketQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := tq.sqlQuery()
-	unique := []string{ticket.FieldID}
-	if len(tq.unique) > 0 {
-		unique = tq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := tq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := tq.querySpec()
+	return sqlgraph.CountNodes(ctx, tq.driver, spec)
 }
 
 func (tq *TicketQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -320,6 +308,42 @@ func (tq *TicketQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (tq *TicketQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   ticket.Table,
+			Columns: ticket.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: ticket.FieldID,
+			},
+		},
+		From:   tq.sql,
+		Unique: true,
+	}
+	if ps := tq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := tq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := tq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := tq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (tq *TicketQuery) sqlQuery() *sql.Selector {
@@ -352,7 +376,7 @@ type TicketGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -473,7 +497,7 @@ func (tgb *TicketGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(tgb.fields)+len(tgb.fns))
 	columns = append(columns, tgb.fields...)
 	for _, fn := range tgb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(tgb.fields...)
 }
@@ -593,7 +617,7 @@ func (ts *TicketSelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (ts *TicketSelect) sqlQuery() sql.Querier {
-	view := "ticket_view"
-	return sql.Dialect(ts.driver.Dialect()).
-		Select(ts.fields...).From(ts.sql.As(view))
+	selector := ts.sql
+	selector.Select(selector.Columns(ts.fields...)...)
+	return selector
 }

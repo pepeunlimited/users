@@ -44,11 +44,36 @@ type UserRepository interface {
 	UnbanUser(ctx context.Context, userId int) (*ent.User, error)
 	UnlockUser(ctx context.Context, userId int) (*ent.User, error)
 	UndoDeleteByUserId(ctx context.Context, userId int) (*ent.User, error)
+
+	SetProfilePictureID(ctx context.Context, userId int, profilePictureID int64) error
+	DeleteProfilePictureID(ctx context.Context, userId int) 					   error
 }
 
 type userMySQL struct {
 	client *ent.Client
 	crypto cryptoz.Crypto
+}
+
+func (repo userMySQL) SetProfilePictureID(ctx context.Context, userId int, profilePictureID int64) error {
+	user, err := repo.GetUserById(ctx, userId)
+	if err != nil {
+		return err
+	}
+	if _, err := user.Update().SetProfilePictureID(profilePictureID).SetLastModified(time.Now().UTC()).Save(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo userMySQL) DeleteProfilePictureID(ctx context.Context, userId int) error {
+	user, err := repo.GetUserById(ctx, userId)
+	if err != nil {
+		return err
+	}
+	if _, err := user.Update().ClearProfilePictureID().SetLastModified(time.Now().UTC()).Save(ctx); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (repo userMySQL) ResetPassword(ctx context.Context, userId int, new string) (*ent.User, error) {
@@ -203,6 +228,7 @@ func (repo userMySQL) CreateUser(ctx context.Context, username string, email str
 		SetIsDeleted(false).
 		SetIsBanned(false).
 		SetIsLocked(false).
+		SetNillableProfilePictureID(nil).
 		Save(ctx)
 	if err != nil {
 		return nil, nil, err

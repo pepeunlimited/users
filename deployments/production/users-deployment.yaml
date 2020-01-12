@@ -28,6 +28,8 @@ spec:
               value: root
             - name: RPC_AUTHORIZATION_HOST
               value: http://authorization-twirp.default.svc.cluster.local
+            - name: RPC_FILES_HOST
+              value: http://files.default.svc.cluster.local
             - name: SMTP_USERNAME
               value: us3rn4m3
             - name: SMTP_PASSWORD

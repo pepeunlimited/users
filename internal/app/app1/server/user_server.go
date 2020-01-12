@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
+	rpc3 "github.com/pepeunlimited/files/rpc"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -28,6 +29,7 @@ type UserServer struct {
 	smtpUsername 		string
 	smtpPassword 		string
 	smtpProvider 		mail.Provider
+	spacesService       rpc3.SpacesService
 }
 
 func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetProfilePictureParams) (*rpc.ProfilePicture, error) {
@@ -43,6 +45,20 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetP
 	user, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
+	}
+
+	// validate access to the file
+	file, err := server.spacesService.GetFile(ctx, &rpc3.GetFileParams{
+		FileId: &wrappers.Int64Value{
+			Value: params.ProfilePictureId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if file.UserId != user.UserId {
+		return nil, twirp.InvalidArgumentError("profile_picture_id", "can't access other uploader fileID").WithMeta(rpcz.Reason, rpc.ProfilePictureAccessDenied);
 	}
 
 	err = server.users.SetProfilePictureID(ctx, int(user.UserId), params.ProfilePictureId)
@@ -296,7 +312,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	}, nil
 }
 
-func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider) UserServer {
+func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider, spacesService rpc3.SpacesService) UserServer {
 	return UserServer{
 		users: 			repository.NewUserRepository(client),
 		tickets: 		repository.NewTicketRepository(client),
@@ -306,5 +322,6 @@ func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService, sm
 		smtpPassword:	smtpPassword,
 		smtpUsername:	smtpUsername,
 		smtpProvider:	provider,
+		spacesService:  spacesService,
 	}
 }

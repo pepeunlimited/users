@@ -279,7 +279,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 	}
 	user, err := server.users.GetUserByEmail(ctx, resp.Email)
 	if err != nil {
-		return nil, err
+		return nil, server.isUserError(err)
 	}
 
 	userId := &wrappers.Int64Value{}

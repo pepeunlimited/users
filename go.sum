@@ -86,6 +86,10 @@ github.com/pepeunlimited/authorization-twirp v0.0.0-20200101094727-2b9a43fb6e0c 
 github.com/pepeunlimited/authorization-twirp v0.0.0-20200101094727-2b9a43fb6e0c/go.mod h1:CTtjpO/wjhzRaIOyE3SoyZf0IzpIyys9DvSursxzjXI=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20200104135427-e05037d6390f h1:5j5nBwfqaIhEiyX94yCKjDKQfO1XsK+l8H2Pnx+khGY=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20200104135427-e05037d6390f/go.mod h1:JG4rDdGjIbRUrhRIaPDJUNgIkxdbAXGUIB0ubNlbcd0=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20200113103226-63cd20059574 h1:OYLnBLzfom1VSeht/K1dvIWHdRbiWyrwGOjjwin8A08=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20200113103226-63cd20059574/go.mod h1:JG4rDdGjIbRUrhRIaPDJUNgIkxdbAXGUIB0ubNlbcd0=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20200113105308-9ea151052169 h1:1VR2RG+CPj2oiqJ0SliTJR47DVbgd866w5n3ufsUKEc=
+github.com/pepeunlimited/authorization-twirp v0.0.0-20200113105308-9ea151052169/go.mod h1:JG4rDdGjIbRUrhRIaPDJUNgIkxdbAXGUIB0ubNlbcd0=
 github.com/pepeunlimited/files v0.0.0-20200112195640-9ec04777861c h1:fQGiDDxV7C+ZU0TmcrUrhG71l+R8BtejzEsS1ch90PI=
 github.com/pepeunlimited/files v0.0.0-20200112195640-9ec04777861c/go.mod h1:L/4wC/PnaquaEMGNo87KMaezws4TDDLzm3Hhf0VuGB0=
 github.com/pepeunlimited/files v0.0.0-20200112212758-4890b7bc8a00 h1:rzZeO7OtoH9M9JOq4upZFoU5aZrihZ07w5RMrX0MChg=

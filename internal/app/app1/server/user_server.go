@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
+	"github.com/pepeunlimited/authorization-twirp/rpcauthorization"
 	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
@@ -26,7 +26,7 @@ type UserServer struct {
 	users         userrepo.UserRepository
 	crypto        cryptoz.Crypto
 	validator     validator.UserServerValidator
-	authorization rpc2.AuthorizationService
+	authorization rpcauthorization.AuthorizationService
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
@@ -37,17 +37,10 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
-
-	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
-	if err != nil {
-		return nil, twirp.RequiredArgumentError("authorization")
-	}
-	// verify the token from the authorization service: blacklist and expired..
-	user, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	user, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
 	if err != nil {
 		return nil, err
 	}
-
 	// validate access to the file
 	file, err := server.spaces.GetFile(ctx, &rpcspaces.GetFileParams{
 		FileId: &wrappers.Int64Value{
@@ -71,12 +64,7 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 }
 
 func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcusers.DeleteProfilePictureParams) (*rpcusers.ProfilePicture, error) {
-	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
-	if err != nil {
-		return nil, twirp.RequiredArgumentError("authorization")
-	}
-	// verify the token from the authorization service: blacklist and expired..
-	user, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	user, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
 	if err != nil {
 		return nil, err
 	}
@@ -122,12 +110,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpcusers.Veri
 }
 
 func (server UserServer) UpdatePassword(ctx context.Context, params *rpcusers.UpdatePasswordParams) (*rpcusers.UpdatePasswordResponse, error) {
-	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
-	if err != nil {
-		return nil, twirp.RequiredArgumentError("authorization")
-	}
-	// verify the token from the authorization service: blacklist and expired..
-	verified, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	verified, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
 	if err != nil {
 		return nil, err
 	}
@@ -285,12 +268,7 @@ func (server UserServer) isTicketError(err error) error {
 }
 
 func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserParams) (*rpcusers.User, error) {
-	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
-	if err != nil {
-		return nil, twirp.RequiredArgumentError("authorization")
-	}
-	// verify the token from the authorization service: blacklist and expired..
-	resp, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	resp, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +291,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserPa
 	}, nil
 }
 
-func NewUserServer(client *ent.Client, authorization rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider, spaces rpcspaces.SpacesService) UserServer {
+func NewUserServer(client *ent.Client, authorization rpcauthorization.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider, spaces rpcspaces.SpacesService) UserServer {
 	return UserServer{
 		users:         userrepo.NewUserRepository(client),
 		tickets:       ticketrepo.NewTicketRepository(client),

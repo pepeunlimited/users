@@ -1,7 +1,7 @@
 package main
 
 import (
-	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
+	"github.com/pepeunlimited/authorization-twirp/rpcauthorization"
 	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/headers"
 	"github.com/pepeunlimited/microservice-kit/mail"
@@ -15,14 +15,14 @@ import (
 )
 
 const (
-	Version = "0.1.3.11"
+	Version = "0.1.3.12"
 )
 
 func main() {
 	log.Printf("Starting the UsersServer... version=[%v]", Version)
 
 	client := mysql.NewEntClient()
-	authorizationAddress := misc.GetEnv(rpc2.RpcAuthorizationHost, "http://api.dev.pepeunlimited.com")
+	authorizationAddress := misc.GetEnv(rpcauthorization.RpcAuthorizationHost, "http://api.dev.pepeunlimited.com")
 	spacesAddress 		 := misc.GetEnv(rpcspaces.RpcSpacesHost, "http://api.dev.pepeunlimited.com")
 
 	stmpUsername := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
@@ -31,7 +31,7 @@ func main() {
 
 	us := rpcusers.NewUserServiceServer(server.NewUserServer(
 		client,
-		rpc2.NewAuthorizationServiceProtobufClient(authorizationAddress, http.DefaultClient),
+		rpcauthorization.NewAuthorizationServiceProtobufClient(authorizationAddress, http.DefaultClient),
 		stmpUsername,
 		stmpPassword,
 		smtpProvider,

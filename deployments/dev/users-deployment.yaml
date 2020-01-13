@@ -28,7 +28,7 @@ spec:
               value: root
             - name: RPC_AUTHORIZATION_HOST
               value: http://authorization-twirp.default.svc.cluster.local
-            - name: RPC_FILES_HOST
+            - name: RPC_SPACES_HOST
               value: http://files.default.svc.cluster.local
             - name: SMTP_USERNAME
               value: us3rn4m3
@@ -36,7 +36,7 @@ spec:
               value: p4ssw0rd
             - name: SMTP_CLIENT
               value: Mock
-          image: pepeunlimited/users:0.1.3.11
+          image: pepeunlimited/users:0.1.3.12
           name: users
           ports:
             - containerPort: 8080

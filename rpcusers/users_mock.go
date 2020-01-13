@@ -2,10 +2,11 @@ package rpcusers
 
 import (
 	"context"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pepeunlimited/microservice-kit/errorz"
 )
 
-func (u *CredentialsMock) SetProfilePicture(ctx context.Context,  params *SetProfilePictureParams) (*ProfilePicture, error) {
+func (u *UsersMock) SetProfilePicture(ctx context.Context,  params *SetProfilePictureParams) (*ProfilePicture, error) {
 	if u.Errors.IsEmpty() {
 		return &ProfilePicture{
 			ProfilePictureId: params.ProfilePictureId,
@@ -14,35 +15,29 @@ func (u *CredentialsMock) SetProfilePicture(ctx context.Context,  params *SetPro
 	return nil, u.Errors.Pop()
 }
 
-func (u *CredentialsMock) DeleteProfilePicture(context.Context, *DeleteProfilePictureParams) (*ProfilePicture, error) {
-	if u.Errors.IsEmpty() {
-		return &ProfilePicture{ProfilePictureId: 3}, nil
-	}
-	return nil, u.Errors.Pop()
-}
-
-func (u *CredentialsMock) CreateUser(context.Context, *CreateUserParams) (*User, error) {
+func (u *UsersMock) CreateUser(context.Context, *CreateUserParams) (*User, error) {
 	if u.Errors.IsEmpty() {
 		return u.user(), nil
 	}
 	return nil, u.Errors.Pop()
 }
 
-func (u *CredentialsMock) GetUser(context.Context, *GetUserParams) (*User, error) {
+func (u *UsersMock) GetUser(context.Context, *empty.Empty) (*User, error) {
 	if u.Errors.IsEmpty() {
-		if u.User == nil {
-			return u.user(), nil
-		}
-		return u.User, nil
+		return u.user(), nil
 	}
 	return nil, u.Errors.Pop()
 }
 
-func NewUserServiceMock(errors []error, isAdmin bool) UserService {
-	return &Mock{Errors: errorz.NewErrorStack(errors), IsAdmin:isAdmin}
+func (u *UsersMock) DeleteProfilePicture(context.Context, *empty.Empty) (*ProfilePicture, error) {
+	panic("implement me")
 }
 
-func (u *Mock) user() *User {
+func NewUserServiceMock(errors []error, isAdmin bool) UserService {
+	return &UsersMock{Errors: errorz.NewErrorStack(errors), IsAdmin:isAdmin}
+}
+
+func (u *UsersMock) user() *User {
 	roles := []string{"User"}
 	if u.IsAdmin {
 		roles = append(roles, "Admin")
@@ -56,7 +51,7 @@ func (u *Mock) user() *User {
 }
 
 type UsersMock struct {
-
+	Errors 		errorz.Stack
+	IsAdmin 	bool
+	User        *User
 }
-
-

@@ -29,7 +29,7 @@ func (c *CredentialsMock) ResetPassword(context.Context, *ResetPasswordParams) (
 	panic("implement me")
 }
 
-func (c *CredentialsMock) VerifySignIn(context.Context, *empty.Empty) (*VerifySignInResponse, error) {
+func (c *CredentialsMock) VerifySignIn(context.Context, *VerifySignInParams) (*VerifySignInResponse, error) {
 	if c.Errors.IsEmpty() {
 		if c.User == nil {
 			return &VerifySignInResponse{

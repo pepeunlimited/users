@@ -2,6 +2,7 @@ package validator
 
 import (
 	"github.com/pepeunlimited/microservice-kit/validator"
+	"github.com/pepeunlimited/users/rpccredentials"
 	"github.com/pepeunlimited/users/rpcusers"
 	"github.com/twitchtv/twirp"
 )
@@ -33,11 +34,11 @@ func (UserServerValidator) SetProfilePicture(params *rpcusers.SetProfilePictureP
 	return nil
 }
 
-func (UserServerValidator) GetUser(params *rpcusers.GetUserParams) error {
+func (UserServerValidator) GetUser() error {
 	return nil
 }
 
-func (UserServerValidator) VerifySignIn(params *rpcusers.VerifySignInParams) error {
+func (UserServerValidator) VerifySignIn(params *rpccredentials.VerifySignInParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}
@@ -47,7 +48,7 @@ func (UserServerValidator) VerifySignIn(params *rpcusers.VerifySignInParams) err
 	return nil
 }
 
-func (UserServerValidator) ValidForgotPassword(params *rpcusers.ForgotPasswordParams) error {
+func (UserServerValidator) ValidForgotPassword(params *rpccredentials.ForgotPasswordParams) error {
 	if params.Username == nil && params.Email == nil {
 		return twirp.RequiredArgumentError("username_or_email")
 	}
@@ -62,14 +63,14 @@ func (UserServerValidator) ValidForgotPassword(params *rpcusers.ForgotPasswordPa
 	return nil
 }
 
-func (UserServerValidator) VerifyResetPassword(params *rpcusers.VerifyPasswordParams) error {
+func (UserServerValidator) VerifyResetPassword(params *rpccredentials.VerifyPasswordParams) error {
 	if validator.IsEmpty(params.TicketToken) {
 		return twirp.RequiredArgumentError("ticket_token")
 	}
 	return nil
 }
 
-func (UserServerValidator) ResetPassword(params *rpcusers.ResetPasswordParams) error {
+func (UserServerValidator) ResetPassword(params *rpccredentials.ResetPasswordParams) error {
 	if validator.IsEmpty(params.TicketToken) {
 		return twirp.RequiredArgumentError("ticket_token")
 	}

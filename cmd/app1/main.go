@@ -9,7 +9,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/misc"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/internal/app/app1/server"
-	"github.com/pepeunlimited/users/rpc"
+	"github.com/pepeunlimited/users/rpcusers"
 	"log"
 	"net/http"
 )
@@ -29,7 +29,7 @@ func main() {
 	stmpPassword := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
 	smtpProvider := mail.Provider(misc.GetEnv(mail.SmtpClient,   mail.Mock))
 
-	us := rpc.NewUserServiceServer(server.NewUserServer(
+	us := rpcusers.NewUserServiceServer(server.NewUserServer(
 		client,
 		rpc2.NewAuthorizationServiceProtobufClient(authorizationAddress, http.DefaultClient),
 		stmpUsername,

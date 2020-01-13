@@ -7,7 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1-0.20190510102335-877a9775f068
 	github.com/golang/protobuf v1.3.2
 	github.com/pepeunlimited/authorization-twirp v0.0.0-20200104135427-e05037d6390f
-	github.com/pepeunlimited/files v0.0.0-20200112214012-37c6b7caed95
+	github.com/pepeunlimited/files v0.0.0-20200113092916-1be7cbc24f76
 	github.com/pepeunlimited/microservice-kit v0.0.0-20200104135345-a4c82c1180ef
 	github.com/twitchtv/twirp v5.10.0+incompatible
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413

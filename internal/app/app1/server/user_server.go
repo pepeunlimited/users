@@ -12,7 +12,7 @@ import (
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/repository"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
-	"github.com/pepeunlimited/users/rpc"
+	"github.com/pepeunlimited/users/rpcusers"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -32,7 +32,7 @@ type UserServer struct {
 	spacesService       rpc3.SpacesService
 }
 
-func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetProfilePictureParams) (*rpc.ProfilePicture, error) {
+func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers.SetProfilePictureParams) (*rpcusers.ProfilePicture, error) {
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetP
 	}
 
 	if file.UserId != user.UserId {
-		return nil, twirp.InvalidArgumentError("profile_picture_id", "can't access other uploader fileID").WithMeta(rpcz.Reason, rpc.ProfilePictureAccessDenied);
+		return nil, twirp.InvalidArgumentError("profile_picture_id", "can't access other uploader fileID").WithMeta(rpcz.Reason, rpcusers.ProfilePictureAccessDenied);
 	}
 
 	err = server.users.SetProfilePictureID(ctx, int(user.UserId), params.ProfilePictureId)
@@ -66,10 +66,10 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpc.SetP
 		return nil, server.isUserError(err)
 	}
 
-	return &rpc.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
+	return &rpcusers.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
 }
 
-func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpc.DeleteProfilePictureParams) (*rpc.ProfilePicture, error) {
+func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcusers.DeleteProfilePictureParams) (*rpcusers.ProfilePicture, error) {
 	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
 		return nil, twirp.RequiredArgumentError("authorization")
@@ -84,16 +84,16 @@ func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpc.D
 		return nil, server.isUserError(err)
 	}
 	if fromDB.ProfilePictureID == nil {
-		return &rpc.ProfilePicture{}, nil
+		return &rpcusers.ProfilePicture{}, nil
 	}
 	if err := server.users.DeleteProfilePictureID(ctx, int(user.UserId)); err != nil {
 		return nil, server.isUserError(err)
 	}
 	profilePictureId := *fromDB.ProfilePictureID
-	return &rpc.ProfilePicture{ProfilePictureId: profilePictureId}, nil
+	return &rpcusers.ProfilePicture{ProfilePictureId: profilePictureId}, nil
 }
 
-func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySignInParams) (*rpc.User, error) {
+func (server UserServer) VerifySignIn(ctx context.Context, params *rpcusers.VerifySignInParams) (*rpcusers.User, error) {
 	err := server.validator.VerifySignIn(params)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 		userId.Value = *user.ProfilePictureID
 	}
 
-	return &rpc.User{
+	return &rpcusers.User{
 		Id:               int64(user.ID),
 		Username:         user.Username,
 		Email:            user.Email,
@@ -120,7 +120,7 @@ func (server UserServer) VerifySignIn(ctx context.Context, params *rpc.VerifySig
 	}, nil
 }
 
-func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdatePasswordParams) (*rpc.UpdatePasswordResponse, error) {
+func (server UserServer) UpdatePassword(ctx context.Context, params *rpcusers.UpdatePasswordParams) (*rpcusers.UpdatePasswordResponse, error) {
 	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
 		return nil, twirp.RequiredArgumentError("authorization")
@@ -141,7 +141,7 @@ func (server UserServer) UpdatePassword(ctx context.Context, params *rpc.UpdateP
 	if err != nil {
 		return nil, server.isUserError(err)
 	}
-	return &rpc.UpdatePasswordResponse{}, nil
+	return &rpcusers.UpdatePasswordResponse{}, nil
 }
 
 
@@ -160,7 +160,7 @@ func (server UserServer) findUserByUsernameOrEmail(ctx context.Context, username
 	return user, nil
 }
 
-func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotPasswordParams) (*empty.Empty, error) {
+func (server UserServer) ForgotPassword(ctx context.Context, params *rpcusers.ForgotPasswordParams) (*empty.Empty, error) {
 	if err :=  server.validator.ValidForgotPassword(params); err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, rpc.TicketExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, rpcusers.TicketExist)
 		}
 		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
 		return nil, twirp.InternalErrorWith(err)
@@ -201,7 +201,7 @@ func (server UserServer) ForgotPassword(ctx context.Context, params *rpc.ForgotP
 	return &empty.Empty{}, nil
 }
 
-func (server UserServer) VerifyResetPassword(ctx context.Context, params *rpc.VerifyPasswordParams) (*rpc.VerifyPasswordResponse, error) {
+func (server UserServer) VerifyResetPassword(ctx context.Context, params *rpcusers.VerifyPasswordParams) (*rpcusers.VerifyPasswordResponse, error) {
 	if err := server.validator.VerifyResetPassword(params); err != nil {
 		return nil, err
 	}
@@ -209,10 +209,10 @@ func (server UserServer) VerifyResetPassword(ctx context.Context, params *rpc.Ve
 	if err != nil {
 		return nil, server.isTicketError(err)
 	}
-	return &rpc.VerifyPasswordResponse{}, nil
+	return &rpcusers.VerifyPasswordResponse{}, nil
 }
 
-func (server UserServer) ResetPassword(ctx context.Context, params *rpc.ResetPasswordParams) (*rpc.ResetPasswordResponse, error) {
+func (server UserServer) ResetPassword(ctx context.Context, params *rpcusers.ResetPasswordParams) (*rpcusers.ResetPasswordResponse, error) {
 	if err := server.validator.ResetPassword(params); err != nil {
 		return nil, err
 	}
@@ -225,10 +225,10 @@ func (server UserServer) ResetPassword(ctx context.Context, params *rpc.ResetPas
 		return nil, server.isUserError(err)
 	}
 	server.tickets.UseTicket(ctx, ticket.Token)
-	return &rpc.ResetPasswordResponse{}, nil
+	return &rpcusers.ResetPasswordResponse{}, nil
 }
 
-func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserParams) (*rpc.User, error) {
+func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.CreateUserParams) (*rpcusers.User, error) {
 	if err := server.validator.CreateUser(params); err != nil {
 		return nil, err
 	}
@@ -236,13 +236,13 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 	if err  != nil {
 		switch err {
 		case repository.ErrUsernameExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpc.UsernameExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.UsernameExist)
 		case repository.ErrEmailExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpc.EmailExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.EmailExist)
 		}
 		return nil, twirp.NewError(twirp.Aborted, err.Error())
 	}
-	return &rpc.User{
+	return &rpcusers.User{
 		Id:                   int64(user.ID),
 		Username:             user.Username,
 		Email:                user.Email,
@@ -253,11 +253,11 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpc.CreateUserP
 func (server UserServer) isUserError(err error) error {
 	switch err {
 	case repository.ErrUserNotExist:
-		return twirp.NotFoundError("user not exist").WithMeta(rpcz.Reason, rpc.UserNotFound)
+		return twirp.NotFoundError("user not exist").WithMeta(rpcz.Reason, rpcusers.UserNotFound)
 	case repository.ErrUserLocked:
-		return twirp.NewError(twirp.PermissionDenied ,"user is locked").WithMeta(rpcz.Reason, rpc.UserIsLocked)
+		return twirp.NewError(twirp.PermissionDenied ,"user is locked").WithMeta(rpcz.Reason, rpcusers.UserIsLocked)
 	case repository.ErrUserBanned:
-		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpc.UserIsBanned)
+		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpcusers.UserIsBanned)
 	}
 	log.Print("user-service: unknown isUserError: "+err.Error())
 	//unknown
@@ -266,7 +266,7 @@ func (server UserServer) isUserError(err error) error {
 
 func (server UserServer) isCryptoError(err error) error {
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return twirp.NewError(twirp.InvalidArgument, err.Error()).WithMeta(rpcz.Reason, rpc.InvalidCredentials)
+		return twirp.NewError(twirp.InvalidArgument, err.Error()).WithMeta(rpcz.Reason, rpcusers.InvalidCredentials)
 	}
 	return twirp.InternalError("user-service: unknown isCryptoError: "+err.Error())
 }
@@ -274,16 +274,16 @@ func (server UserServer) isCryptoError(err error) error {
 func (server UserServer) isTicketError(err error) error {
 	switch err {
 	case repository.ErrTicketNotExist:
-		return twirp.NewError(twirp.NotFound, "ticket not found").WithMeta(rpcz.Reason, rpc.TicketNotFound)
+		return twirp.NewError(twirp.NotFound, "ticket not found").WithMeta(rpcz.Reason, rpcusers.TicketNotFound)
 	case repository.ErrTicketExpired:
-		return twirp.NewError(twirp.InvalidArgument, "token expired").WithMeta(rpcz.Reason, rpc.TicketExpired)
+		return twirp.NewError(twirp.InvalidArgument, "token expired").WithMeta(rpcz.Reason, rpcusers.TicketExpired)
 	}
 	log.Print("user-service: unknown isTicketError: "+err.Error())
 	// unknown
 	return twirp.InternalErrorWith(err)
 }
 
-func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams) (*rpc.User, error) {
+func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserParams) (*rpcusers.User, error) {
 	token, err := rpcz.GetAuthorizationWithoutPrefix(ctx)
 	if err != nil {
 		return nil, twirp.RequiredArgumentError("authorization")
@@ -303,7 +303,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpc.GetUserParams)
 		userId.Value = *user.ProfilePictureID
 	}
 
-	return &rpc.User{
+	return &rpcusers.User{
 		Id:               resp.UserId,
 		Username:         resp.Username,
 		Email:            resp.Email,

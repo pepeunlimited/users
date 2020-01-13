@@ -96,6 +96,8 @@ github.com/pepeunlimited/files v0.0.0-20200112213544-d5dd4e9de07f h1:WjQz4k9kMFA
 github.com/pepeunlimited/files v0.0.0-20200112213544-d5dd4e9de07f/go.mod h1:L/4wC/PnaquaEMGNo87KMaezws4TDDLzm3Hhf0VuGB0=
 github.com/pepeunlimited/files v0.0.0-20200112214012-37c6b7caed95 h1:K7TUtCK/Ib0jXyR6FryfeXbSRGeo7sxo/Zh2xsT6j8M=
 github.com/pepeunlimited/files v0.0.0-20200112214012-37c6b7caed95/go.mod h1:L/4wC/PnaquaEMGNo87KMaezws4TDDLzm3Hhf0VuGB0=
+github.com/pepeunlimited/files v0.0.0-20200113092916-1be7cbc24f76 h1:pIzQQlQkH7FZbQDjbzydGg5MIlPjnepSOi6O686A3wA=
+github.com/pepeunlimited/files v0.0.0-20200113092916-1be7cbc24f76/go.mod h1:L/4wC/PnaquaEMGNo87KMaezws4TDDLzm3Hhf0VuGB0=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191210170159-5cadda36c9a8 h1:T8U7hpS02+SOPDmUEzablGoevxHKKAcJ9mKDGxrzcx4=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191210170159-5cadda36c9a8/go.mod h1:40wd+99+zSd3O9hZFhhwzJXYhWpTTmfAofTTiXX6DCg=
 github.com/pepeunlimited/microservice-kit v0.0.0-20191212102325-e83f82f36d67 h1:botFtZhSBFTO/KmUkNjDu1YnQSy9xUCO3RtVLhSAr8I=

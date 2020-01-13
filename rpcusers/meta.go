@@ -1,4 +1,4 @@
-package rpc
+package rpcusers
 
 import (
 	"github.com/pepeunlimited/microservice-kit/rpcz"

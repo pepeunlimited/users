@@ -2,7 +2,7 @@ package main
 
 import (
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
-	rpc3 "github.com/pepeunlimited/files/rpc"
+	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/headers"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/middleware"
@@ -23,7 +23,7 @@ func main() {
 
 	client := mysql.NewEntClient()
 	authorizationAddress := misc.GetEnv(rpc2.RpcAuthorizationHost, "http://api.dev.pepeunlimited.com")
-	spacesAddress 		 := misc.GetEnv(rpc3.RpcFilesHost, "http://api.dev.pepeunlimited.com")
+	spacesAddress 		 := misc.GetEnv(rpcspaces.RpcSpacesHost, "http://api.dev.pepeunlimited.com")
 
 	stmpUsername := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
 	stmpPassword := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
@@ -35,7 +35,7 @@ func main() {
 		stmpUsername,
 		stmpPassword,
 		smtpProvider,
-		rpc3.NewSpacesServiceProtobufClient(spacesAddress, http.DefaultClient)),
+		rpcspaces.NewSpacesServiceProtobufClient(spacesAddress, http.DefaultClient)),
 		nil)
 
 	mux := http.NewServeMux()

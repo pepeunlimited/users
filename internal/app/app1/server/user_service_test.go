@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
-	rpc3 "github.com/pepeunlimited/files/rpc"
+	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/mysql"
@@ -22,7 +22,7 @@ var provider mail.Provider 	= mail.Mock
 
 func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	resp0, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -33,9 +33,9 @@ func TestUserServer_CreateUser(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	server.authService.(*rpc2.Mock).Username = "simo"
-	server.authService.(*rpc2.Mock).Email 	 = "simo@gmail.com"
-	server.authService.(*rpc2.Mock).UserId 	 = resp0.Id
+	server.authorization.(*rpc2.Mock).Username = "simo"
+	server.authorization.(*rpc2.Mock).Email 	 = "simo@gmail.com"
+	server.authorization.(*rpc2.Mock).UserId 	 = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 	user, err := server.GetUser(ctx, &rpcusers.GetUserParams{})
 	if err != nil {
@@ -58,7 +58,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 func TestUserServer_SetProfilePictureFail(t *testing.T) {
 	ctx := context.TODO()
 
-	spacesMock := rpc3.NewSpacesMock(nil)
+	spacesMock := rpcspaces.NewSpacesMock(nil)
 	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, spacesMock)
 	server.users.DeleteAll(ctx)
 	resp0,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -66,12 +66,12 @@ func TestUserServer_SetProfilePictureFail(t *testing.T) {
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
 	})
-	spacesMock.(*rpc3.SpacesMock).File = &rpc3.File{
+	spacesMock.(*rpcspaces.SpacesMock).File = &rpcspaces.File{
 		UserId: 1111111,
 	}
-	server.authService.(*rpc2.Mock).Username = "simo"
-	server.authService.(*rpc2.Mock).Email 	 = "simo@gmail.com"
-	server.authService.(*rpc2.Mock).UserId 	 = resp0.Id
+	server.authorization.(*rpc2.Mock).Username = "simo"
+	server.authorization.(*rpc2.Mock).Email 	 = "simo@gmail.com"
+	server.authorization.(*rpc2.Mock).UserId 	 = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 	_, err := server.SetProfilePicture(ctx, &rpcusers.SetProfilePictureParams{
 		ProfilePictureId: 3,
@@ -87,7 +87,7 @@ func TestUserServer_SetProfilePictureFail(t *testing.T) {
 func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 	ctx := context.TODO()
 
-	spacesMock := rpc3.NewSpacesMock(nil)
+	spacesMock := rpcspaces.NewSpacesMock(nil)
 	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, spacesMock)
 	server.users.DeleteAll(ctx)
 	resp0,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -95,12 +95,12 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
 	})
-	spacesMock.(*rpc3.SpacesMock).File = &rpc3.File{
+	spacesMock.(*rpcspaces.SpacesMock).File = &rpcspaces.File{
 		UserId: resp0.Id,
 	}
-	server.authService.(*rpc2.Mock).Username = "simo"
-	server.authService.(*rpc2.Mock).Email 	 = "simo@gmail.com"
-	server.authService.(*rpc2.Mock).UserId 	 = resp0.Id
+	server.authorization.(*rpc2.Mock).Username = "simo"
+	server.authorization.(*rpc2.Mock).Email 	 = "simo@gmail.com"
+	server.authorization.(*rpc2.Mock).UserId 	 = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 
 	_, err := server.SetProfilePicture(ctx, &rpcusers.SetProfilePictureParams{
@@ -129,7 +129,7 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 
 func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -156,7 +156,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 
 func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock([]error{fmt.Errorf("custom-error")}), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock([]error{fmt.Errorf("custom-error")}), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	ctx = rpcz.AddAuthorization("1")
 	_, err := server.GetUser(ctx, &rpcusers.GetUserParams{})
@@ -170,7 +170,7 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 
 func TestUserServer_SignInOk(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -183,10 +183,10 @@ func TestUserServer_SignInOk(t *testing.T) {
 		Email:    email,
 	})
 
-	server.authService.(*rpc2.Mock).Username 	= username
-	server.authService.(*rpc2.Mock).Email 		= email
-	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
-	server.authService.(*rpc2.Mock).UserId		= user0.Id
+	server.authorization.(*rpc2.Mock).Username 	= username
+	server.authorization.(*rpc2.Mock).Email 		= email
+	server.authorization.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authorization.(*rpc2.Mock).UserId		= user0.Id
 
 	user, err := server.VerifySignIn(ctx, &rpcusers.VerifySignInParams{
 		Username: username,
@@ -203,7 +203,7 @@ func TestUserServer_SignInOk(t *testing.T) {
 
 func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpcusers.VerifySignInParams{
 		Username: "simo",
@@ -221,7 +221,7 @@ func TestUserServer_SignInFail(t *testing.T) {
 
 func TestUserServer_SignInFailCred(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.VerifySignIn(ctx, &rpcusers.VerifySignInParams{
 		Username: "simo",
@@ -239,7 +239,7 @@ func TestUserServer_SignInFailCred(t *testing.T) {
 
 func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	user,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -269,7 +269,7 @@ func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 
 func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	user,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -301,7 +301,7 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 
 func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.MockFail, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	_, err := server.ForgotPassword(ctx, &rpcusers.ForgotPasswordParams{
@@ -320,7 +320,7 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 
 func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	user,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -340,7 +340,7 @@ func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 
 func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, mail.Mock, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -358,7 +358,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 
 func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	user,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -408,7 +408,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 
 func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	user,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
@@ -456,7 +456,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 
 func TestUserServer_UpdatePassword(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -468,10 +468,10 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 		Password: password,
 		Email:    email,
 	})
-	server.authService.(*rpc2.Mock).Username 	= username
-	server.authService.(*rpc2.Mock).Email 		= email
-	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
-	server.authService.(*rpc2.Mock).UserId		= user0.Id
+	server.authorization.(*rpc2.Mock).Username 	= username
+	server.authorization.(*rpc2.Mock).Email 		= email
+	server.authorization.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authorization.(*rpc2.Mock).UserId		= user0.Id
 	ctx = rpcz.AddAuthorization("token")
 	_, err := server.UpdatePassword(ctx, &rpcusers.UpdatePasswordParams{
 		CurrentPassword: password,
@@ -485,7 +485,7 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 
 func TestUserServer_UpdatePasswordFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpc3.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpc2.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -497,10 +497,10 @@ func TestUserServer_UpdatePasswordFail(t *testing.T) {
 		Password: password,
 		Email:    email,
 	})
-	server.authService.(*rpc2.Mock).Username 	= username
-	server.authService.(*rpc2.Mock).Email 		= email
-	server.authService.(*rpc2.Mock).Roles 		= []string{"User"}
-	server.authService.(*rpc2.Mock).UserId		= user0.Id
+	server.authorization.(*rpc2.Mock).Username 	= username
+	server.authorization.(*rpc2.Mock).Email 		= email
+	server.authorization.(*rpc2.Mock).Roles 		= []string{"User"}
+	server.authorization.(*rpc2.Mock).UserId		= user0.Id
 	ctx = rpcz.AddAuthorization("token")
 	_, err := server.UpdatePassword(ctx, &rpcusers.UpdatePasswordParams{
 		CurrentPassword: "wronpw",

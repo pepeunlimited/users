@@ -49,8 +49,8 @@ func (c *CredentialsMock) VerifySignIn(context.Context, *VerifySignInParams) (*V
 	return nil, c.Errors.Pop()
 }
 
-func NewCredentialsMock(errors []error) CredentialsService {
-	return &CredentialsMock{Errors:  errorz.NewErrorStack(errors)}
+func NewCredentialsMock(errors []error, isAdmin bool) CredentialsService {
+	return &CredentialsMock{Errors: errorz.NewErrorStack(errors), IsAdmin:isAdmin}
 }
 
 func (u *CredentialsMock) user() *rpcusers.User {

@@ -5,12 +5,13 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	rpc2 "github.com/pepeunlimited/authorization-twirp/rpc"
-	rpc3 "github.com/pepeunlimited/files/rpc"
+	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
-	"github.com/pepeunlimited/users/internal/app/app1/repository"
+	"github.com/pepeunlimited/users/internal/app/app1/ticketrepo"
+	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
 	"github.com/pepeunlimited/users/rpcusers"
 	"github.com/twitchtv/twirp"
@@ -21,15 +22,15 @@ import (
 )
 
 type UserServer struct {
-	tickets 			repository.TicketRepository
-	users 				repository.UserRepository
-	crypto  			cryptoz.Crypto
-	validator 			validator.UserServerValidator
-	authService 		rpc2.AuthorizationService
-	smtpUsername 		string
-	smtpPassword 		string
-	smtpProvider 		mail.Provider
-	spacesService       rpc3.SpacesService
+	tickets       ticketrepo.TicketRepository
+	users         userrepo.UserRepository
+	crypto        cryptoz.Crypto
+	validator     validator.UserServerValidator
+	authorization rpc2.AuthorizationService
+	smtpUsername  string
+	smtpPassword  string
+	smtpProvider  mail.Provider
+	spaces 		  rpcspaces.SpacesService
 }
 
 func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers.SetProfilePictureParams) (*rpcusers.ProfilePicture, error) {
@@ -42,13 +43,13 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	user, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	user, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}
 
 	// validate access to the file
-	file, err := server.spacesService.GetFile(ctx, &rpc3.GetFileParams{
+	file, err := server.spaces.GetFile(ctx, &rpcspaces.GetFileParams{
 		FileId: &wrappers.Int64Value{
 			Value: params.ProfilePictureId,
 		},
@@ -75,7 +76,7 @@ func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcus
 		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	user, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	user, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (server UserServer) UpdatePassword(ctx context.Context, params *rpcusers.Up
 		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	verified, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	verified, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}
@@ -235,9 +236,9 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 	user, role, err := server.users.CreateUser(ctx, params.Username, params.Email, params.Password)
 	if err  != nil {
 		switch err {
-		case repository.ErrUsernameExist:
+		case userrepo.ErrUsernameExist:
 			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.UsernameExist)
-		case repository.ErrEmailExist:
+		case userrepo.ErrEmailExist:
 			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.EmailExist)
 		}
 		return nil, twirp.NewError(twirp.Aborted, err.Error())
@@ -252,11 +253,11 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 
 func (server UserServer) isUserError(err error) error {
 	switch err {
-	case repository.ErrUserNotExist:
+	case userrepo.ErrUserNotExist:
 		return twirp.NotFoundError("user not exist").WithMeta(rpcz.Reason, rpcusers.UserNotFound)
-	case repository.ErrUserLocked:
+	case userrepo.ErrUserLocked:
 		return twirp.NewError(twirp.PermissionDenied ,"user is locked").WithMeta(rpcz.Reason, rpcusers.UserIsLocked)
-	case repository.ErrUserBanned:
+	case userrepo.ErrUserBanned:
 		return twirp.NewError(twirp.PermissionDenied ,"user is banned").WithMeta(rpcz.Reason, rpcusers.UserIsBanned)
 	}
 	log.Print("user-service: unknown isUserError: "+err.Error())
@@ -273,9 +274,9 @@ func (server UserServer) isCryptoError(err error) error {
 
 func (server UserServer) isTicketError(err error) error {
 	switch err {
-	case repository.ErrTicketNotExist:
+	case ticketrepo.ErrTicketNotExist:
 		return twirp.NewError(twirp.NotFound, "ticket not found").WithMeta(rpcz.Reason, rpcusers.TicketNotFound)
-	case repository.ErrTicketExpired:
+	case ticketrepo.ErrTicketExpired:
 		return twirp.NewError(twirp.InvalidArgument, "token expired").WithMeta(rpcz.Reason, rpcusers.TicketExpired)
 	}
 	log.Print("user-service: unknown isTicketError: "+err.Error())
@@ -289,7 +290,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserPa
 		return nil, twirp.RequiredArgumentError("authorization")
 	}
 	// verify the token from the authorization service: blacklist and expired..
-	resp, err := server.authService.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
+	resp, err := server.authorization.VerifyAccessToken(ctx, &rpc2.VerifyAccessTokenParams{AccessToken:token})
 	if err != nil {
 		return nil, err
 	}
@@ -312,16 +313,16 @@ func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserPa
 	}, nil
 }
 
-func NewUserServer(client *ent.Client, authService rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider, spacesService rpc3.SpacesService) UserServer {
+func NewUserServer(client *ent.Client, authorization rpc2.AuthorizationService, smtpUsername string, smtpPassword string, provider mail.Provider, spaces rpcspaces.SpacesService) UserServer {
 	return UserServer{
-		users: 			repository.NewUserRepository(client),
-		tickets: 		repository.NewTicketRepository(client),
-		crypto:			cryptoz.NewCrypto(),
-		validator: 		validator.NewUserServerValidator(),
-		authService: 	authService,
-		smtpPassword:	smtpPassword,
-		smtpUsername:	smtpUsername,
-		smtpProvider:	provider,
-		spacesService:  spacesService,
+		users:         userrepo.NewUserRepository(client),
+		tickets:       ticketrepo.NewTicketRepository(client),
+		crypto:        cryptoz.NewCrypto(),
+		validator:     validator.NewUserServerValidator(),
+		authorization: authorization,
+		smtpPassword:  smtpPassword,
+		smtpUsername:  smtpUsername,
+		smtpProvider:  provider,
+		spaces: 	   spaces,
 	}
 }

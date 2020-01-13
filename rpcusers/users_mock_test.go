@@ -2,7 +2,8 @@ package rpcusers
 
 import (
 	"context"
-	"github.com/pepeunlimited/users/internal/app/app1/repository"
+	"github.com/pepeunlimited/users/internal/app/app1/rolerepo"
+	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"log"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestUserServiceMock_GetUser(t *testing.T) {
 }
 
 func TestUserServiceMock_GetUserError(t *testing.T) {
-	mock := NewUserServiceMock([]error{repository.ErrDuplicateRole, repository.ErrUserNotExist}, true)
+	mock := NewUserServiceMock([]error{rolerepo.ErrDuplicateRole, userrepo.ErrUserNotExist}, true)
 	_, err := mock.GetUser(context.TODO(), &GetUserParams{})
 	if err == nil {
 		t.FailNow()

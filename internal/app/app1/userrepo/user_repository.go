@@ -1,4 +1,4 @@
-package repository
+package userrepo
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/user"
+	"github.com/pepeunlimited/users/internal/app/app1/rolerepo"
 	"time"
 )
 
@@ -233,7 +234,7 @@ func (repo userMySQL) CreateUser(ctx context.Context, username string, email str
 	if err != nil {
 		return nil, nil, err
 	}
-	role, err := tx.Role.Create().SetUsersID(user.ID).SetRole(string(User)).Save(ctx)// add default role
+	role, err := tx.Role.Create().SetUsersID(user.ID).SetRole(string(rolerepo.User)).Save(ctx) // add default role
 	if err != nil {
 		tx.Rollback()
 		return nil, nil, err

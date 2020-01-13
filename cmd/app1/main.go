@@ -7,7 +7,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/middleware"
 	"github.com/pepeunlimited/microservice-kit/misc"
-	"github.com/pepeunlimited/users/internal/app/app1/repository"
+	"github.com/pepeunlimited/users/internal/app/app1/mysql"
 	"github.com/pepeunlimited/users/internal/app/app1/server"
 	"github.com/pepeunlimited/users/rpcusers"
 	"log"
@@ -21,7 +21,7 @@ const (
 func main() {
 	log.Printf("Starting the UsersServer... version=[%v]", Version)
 
-	client := repository.NewEntClient()
+	client := mysql.NewEntClient()
 	authorizationAddress := misc.GetEnv(rpc2.RpcAuthorizationHost, "http://api.dev.pepeunlimited.com")
 	spacesAddress 		 := misc.GetEnv(rpc3.RpcFilesHost, "http://api.dev.pepeunlimited.com")
 

@@ -1,4 +1,4 @@
-package repository
+package ticketrepo
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/ent/ticket"
+	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"time"
 )
 
@@ -57,7 +58,7 @@ func (repo ticketMySQL) GetTicketUserByToken(ctx context.Context, token string) 
 	user, err := ticket.QueryUsers().Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, nil, ErrUserNotExist
+			return nil, nil, userrepo.ErrUserNotExist
 		}
 		return nil, nil, err
 	}

@@ -1,8 +1,10 @@
-package repository
+package ticketrepo
 
 import (
 	"context"
 	"github.com/pepeunlimited/microservice-kit/validator"
+	"github.com/pepeunlimited/users/internal/app/app1/mysql"
+	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"testing"
 	"time"
 )
@@ -10,9 +12,9 @@ import (
 func TestTicketMySQL_CreateTicket(t *testing.T) {
 
 	ctx := context.TODO()
-	client := NewEntClient()
+	client := mysql.NewEntClient()
 
-	users := NewUserRepository(client)
+	users := userrepo.NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 
 	users.DeleteAll(ctx)
@@ -46,9 +48,9 @@ func TestTicketMySQL_CreateTicket(t *testing.T) {
 
 func TestTicketMySQL_GetTicketUserByTokenExpired(t *testing.T) {
 	ctx := context.TODO()
-	client := NewEntClient()
+	client := mysql.NewEntClient()
 
-	users := NewUserRepository(client)
+	users := userrepo.NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 
 	users.DeleteAll(ctx)
@@ -84,8 +86,8 @@ func TestTicketMySQL_GetTicketUserByTokenExpired(t *testing.T) {
 
 func TestTicketMySQL_UseTicket(t *testing.T) {
 	ctx := context.TODO()
-	client := NewEntClient()
-	users := NewUserRepository(client)
+	client := mysql.NewEntClient()
+	users := userrepo.NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 	users.DeleteAll(ctx)
 	user,_,err := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "p4sw0rd")
@@ -113,8 +115,8 @@ func TestTicketMySQL_UseTicket(t *testing.T) {
 
 func TestTicketMySQL_GetTicketUserByToken(t *testing.T) {
 	ctx := context.TODO()
-	client := NewEntClient()
-	users := NewUserRepository(client)
+	client := mysql.NewEntClient()
+	users := userrepo.NewUserRepository(client)
 	tickets := NewTicketRepository(client)
 	users.DeleteAll(ctx)
 	_, _, err := tickets.GetTicketUserByToken(ctx, "a")

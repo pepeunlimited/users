@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/pepeunlimited/authorization-twirp/rpcauthorization"
+	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -21,7 +21,7 @@ var provider mail.Provider 	= mail.Mock
 
 func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpcauthorization.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpcauth.NewAuthenticationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	resp0, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -32,9 +32,9 @@ func TestUserServer_CreateUser(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	server.authorization.(*rpcauthorization.Mock).Username = "simo"
-	server.authorization.(*rpcauthorization.Mock).Email    = "simo@gmail.com"
-	server.authorization.(*rpcauthorization.Mock).UserId   = resp0.Id
+	server.authentication.(*rpcauth.AuthenticationMock).Username = "simo"
+	server.authentication.(*rpcauth.AuthenticationMock).Email    = "simo@gmail.com"
+	server.authentication.(*rpcauth.AuthenticationMock).UserId   = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 	user, err := server.GetUser(ctx, &empty.Empty{})
 	if err != nil {
@@ -58,7 +58,7 @@ func TestUserServer_SetProfilePictureFail(t *testing.T) {
 	ctx := context.TODO()
 
 	spacesMock := rpcspaces.NewSpacesMock(nil)
-	server := NewUserServer(mysql.NewEntClient(), rpcauthorization.NewAuthorizationMock(nil), username, password, provider, spacesMock)
+	server := NewUserServer(mysql.NewEntClient(), rpcauth.NewAuthenticationMock(nil), username, password, provider, spacesMock)
 	server.users.DeleteAll(ctx)
 	resp0,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -68,9 +68,9 @@ func TestUserServer_SetProfilePictureFail(t *testing.T) {
 	spacesMock.(*rpcspaces.SpacesMock).File = &rpcspaces.File{
 		UserId: 1111111,
 	}
-	server.authorization.(*rpcauthorization.Mock).Username = "simo"
-	server.authorization.(*rpcauthorization.Mock).Email 	 = "simo@gmail.com"
-	server.authorization.(*rpcauthorization.Mock).UserId 	 = resp0.Id
+	server.authentication.(*rpcauth.AuthenticationMock).Username = "simo"
+	server.authentication.(*rpcauth.AuthenticationMock).Email 	 = "simo@gmail.com"
+	server.authentication.(*rpcauth.AuthenticationMock).UserId 	 = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 	_, err := server.SetProfilePicture(ctx, &rpcusers.SetProfilePictureParams{
 		ProfilePictureId: 3,
@@ -87,7 +87,7 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 	ctx := context.TODO()
 
 	spacesMock := rpcspaces.NewSpacesMock(nil)
-	server := NewUserServer(mysql.NewEntClient(), rpcauthorization.NewAuthorizationMock(nil), username, password, provider, spacesMock)
+	server := NewUserServer(mysql.NewEntClient(), rpcauth.NewAuthenticationMock(nil), username, password, provider, spacesMock)
 	server.users.DeleteAll(ctx)
 	resp0,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -97,9 +97,9 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 	spacesMock.(*rpcspaces.SpacesMock).File = &rpcspaces.File{
 		UserId: resp0.Id,
 	}
-	server.authorization.(*rpcauthorization.Mock).Username = "simo"
-	server.authorization.(*rpcauthorization.Mock).Email 	 = "simo@gmail.com"
-	server.authorization.(*rpcauthorization.Mock).UserId 	 = resp0.Id
+	server.authentication.(*rpcauth.AuthenticationMock).Username = "simo"
+	server.authentication.(*rpcauth.AuthenticationMock).Email 	 = "simo@gmail.com"
+	server.authentication.(*rpcauth.AuthenticationMock).UserId 	 = resp0.Id
 	ctx = rpcz.AddAuthorization("1")
 
 	_, err := server.SetProfilePicture(ctx, &rpcusers.SetProfilePictureParams{
@@ -128,7 +128,7 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 
 func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
-	server := NewUserServer(mysql.NewEntClient(), rpcauthorization.NewAuthorizationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpcauth.NewAuthenticationMock(nil), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	_, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
 		Username: "simo",
@@ -155,7 +155,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 
 func TestUserServer_GetUserNotFound(t *testing.T) {
 	ctx := rpcz.AddUserId(3)
-	server := NewUserServer(mysql.NewEntClient(), rpcauthorization.NewAuthorizationMock([]error{fmt.Errorf("custom-error")}), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	server := NewUserServer(mysql.NewEntClient(), rpcauth.NewAuthenticationMock([]error{fmt.Errorf("custom-error")}), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	ctx = rpcz.AddAuthorization("1")
 	_, err := server.GetUser(ctx, &empty.Empty{})

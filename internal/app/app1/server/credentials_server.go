@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/authorization-twirp/rpcauthorization"
+	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -25,7 +25,7 @@ type CredentialsServer struct {
 	users         userrepo.UserRepository
 	crypto        cryptoz.Crypto
 	validator     validator.UserServerValidator
-	authorization rpcauthorization.AuthorizationService
+	authentication rpcauth.AuthenticationService
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
@@ -57,7 +57,7 @@ func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccre
 }
 
 func (server CredentialsServer) UpdatePassword(ctx context.Context, params *rpccredentials.UpdatePasswordParams) (*empty.Empty, error) {
-	verified, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
+	verified, err := rpcauth.IsSignedIn(ctx, server.authentication)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func (server CredentialsServer) ResetPassword(ctx context.Context, params *rpccr
 }
 
 func NewCredentialsServer(client *ent.Client,
-	authorization rpcauthorization.AuthorizationService,
+	authentication rpcauth.AuthenticationService,
 	smtpUsername string,
 	smtpPassword string,
 	provider mail.Provider) CredentialsServer {
@@ -168,7 +168,7 @@ func NewCredentialsServer(client *ent.Client,
 		tickets:       ticketrepo.NewTicketRepository(client),
 		crypto:        cryptoz.NewCrypto(),
 		validator:     validator.NewUserServerValidator(),
-		authorization: authorization,
+		authentication: authentication,
 		smtpPassword:  smtpPassword,
 		smtpUsername:  smtpUsername,
 		smtpProvider:  provider,

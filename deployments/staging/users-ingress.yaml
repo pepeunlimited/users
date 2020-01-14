@@ -14,3 +14,7 @@ spec:
               serviceName: users
               servicePort: 80
             path: /twirp/pepeunlimited.users.UserService/*
+          - backend:
+              serviceName: users
+              servicePort: 80
+            path: /twirp/pepeunlimited.users.CredentialsService/*

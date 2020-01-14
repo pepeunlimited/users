@@ -26,7 +26,7 @@ spec:
               value: root
             - name: MYSQL_USER
               value: root
-            - name: RPC_AUTHORIZATION_HOST
+            - name: RPC_AUTHENTICATION_HOST
               value: http://authorization-twirp.default.svc.cluster.local
             - name: RPC_SPACES_HOST
               value: http://files.default.svc.cluster.local

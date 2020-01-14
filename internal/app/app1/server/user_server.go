@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/authorization-twirp/rpcauthorization"
+	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
@@ -22,7 +22,7 @@ type UserServer struct {
 	users         userrepo.UserRepository
 	crypto        cryptoz.Crypto
 	validator     validator.UserServerValidator
-	authorization rpcauthorization.AuthorizationService
+	authentication rpcauth.AuthenticationService
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
@@ -33,7 +33,7 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
-	user, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
+	user, err := rpcauth.IsSignedIn(ctx, server.authentication)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 }
 
 func (server UserServer) DeleteProfilePicture(ctx context.Context, params *empty.Empty) (*rpcusers.ProfilePicture, error) {
-	user, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
+	user, err := rpcauth.IsSignedIn(ctx, server.authentication)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 }
 
 func (server UserServer) GetUser(ctx context.Context, empty *empty.Empty) (*rpcusers.User, error) {
-	resp, err := rpcauthorization.IsSignedIn(ctx, server.authorization)
+	resp, err := rpcauth.IsSignedIn(ctx, server.authentication)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (server UserServer) GetUser(ctx context.Context, empty *empty.Empty) (*rpcu
 }
 
 func NewUserServer(client *ent.Client,
-	authorization rpcauthorization.AuthorizationService,
+	authentication rpcauth.AuthenticationService,
 	smtpUsername string,
 	smtpPassword string,
 	provider mail.Provider,
@@ -135,7 +135,7 @@ func NewUserServer(client *ent.Client,
 		tickets:       ticketrepo.NewTicketRepository(client),
 		crypto:        cryptoz.NewCrypto(),
 		validator:     validator.NewUserServerValidator(),
-		authorization: authorization,
+		authentication: authentication,
 		smtpPassword:  smtpPassword,
 		smtpUsername:  smtpUsername,
 		smtpProvider:  provider,

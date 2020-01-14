@@ -66,6 +66,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJ
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/olekukonko/tablewriter v0.0.1 h1:b3iUnf1v+ppJiOfNX4yxxqfWKMQPZR5yoh8urCTFX88=
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
+github.com/pepeunlimited/authentication-twirp v0.0.0-20200114151521-54f013ac4215 h1:r+MMhR+Z5gXUY1EE2lSsilhAHIA4Of3JbXhNPrpU5aU=
+github.com/pepeunlimited/authentication-twirp v0.0.0-20200114151521-54f013ac4215/go.mod h1:rryZeJ44aVocpmSqG/PLquYngvas06iv7M7oUFnI+Ug=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191226222451-143c391ae673 h1:P5Jko/Neu1Z8bdILkDJ2yPvlF1ZNQkukVo/j3AlmyQs=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191226222451-143c391ae673/go.mod h1:hLL/D2ZQcqZFG2uzpRQAdBj6rutIgihSd705532mCnY=
 github.com/pepeunlimited/authorization-twirp v0.0.0-20191228185403-fbaa511eeb9e h1:aK2/w/zXHFlmeA74F+C1p4ht+L2OZZwbHME3eInuaDM=
@@ -146,6 +148,7 @@ github.com/pepeunlimited/microservice-kit v0.0.0-20200101194341-7d7834523c0e/go.
 github.com/pepeunlimited/microservice-kit v0.0.0-20200104135345-a4c82c1180ef h1:TSx5pbfZ3p62PyHxXG0hBPNrUrakqBn46epd59RjjCc=
 github.com/pepeunlimited/microservice-kit v0.0.0-20200104135345-a4c82c1180ef/go.mod h1:ioKXg9wp47PIRCa8isEhMhCtMJT8PDv85G8x0pPadSg=
 github.com/pepeunlimited/users v0.0.0-20191228172936-dbc235d12523/go.mod h1:WusCrTEIh8UpzIwrUTvvprhEplfEFaMgpAQIuuBVnnk=
+github.com/pepeunlimited/users v0.0.0-20200113172413-5fccb15e7674/go.mod h1:DNckc6774K8UD/auEndBI4sp2WdSd0Z+Rx2al7Xi2Zc=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=

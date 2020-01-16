@@ -4,9 +4,7 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/files/rpcspaces"
-	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
@@ -20,9 +18,7 @@ import (
 type UserServer struct {
 	tickets       ticketrepo.TicketRepository
 	users         userrepo.UserRepository
-	crypto        cryptoz.Crypto
 	validator     validator.UserServerValidator
-	authentication rpcauth.AuthenticationService
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
@@ -33,9 +29,9 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
-	user, err := rpcauth.IsSignedIn(ctx, server.authentication)
+	userId, err := rpcz.GetUserId(ctx)
 	if err != nil {
-		return nil, err
+		return nil, twirp.RequiredArgumentError("user_id")
 	}
 	// validate access to the file
 	file, err := server.spaces.GetFile(ctx, &rpcspaces.GetFileParams{
@@ -47,11 +43,11 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 		return nil, err
 	}
 
-	if file.UserId != user.UserId {
+	if file.UserId != userId {
 		return nil, twirp.InvalidArgumentError("profile_picture_id", "can't access other uploader fileID").WithMeta(rpcz.Reason, rpcusers.ProfilePictureAccessDenied);
 	}
 
-	err = server.users.SetProfilePictureID(ctx, int(user.UserId), params.ProfilePictureId)
+	err = server.users.SetProfilePictureID(ctx, int(userId), params.ProfilePictureId)
 	if err != nil {
 		return nil, isUserError(err)
 	}
@@ -60,18 +56,18 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 }
 
 func (server UserServer) DeleteProfilePicture(ctx context.Context, params *empty.Empty) (*rpcusers.ProfilePicture, error) {
-	user, err := rpcauth.IsSignedIn(ctx, server.authentication)
+	userId, err := rpcz.GetUserId(ctx)
 	if err != nil {
-		return nil, err
+		return nil, twirp.RequiredArgumentError("user_id")
 	}
-	fromDB, err := server.users.GetUserById(ctx, int(user.UserId))
+	fromDB, err := server.users.GetUserById(ctx, int(userId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
 	if fromDB.ProfilePictureID == nil {
 		return &rpcusers.ProfilePicture{}, nil
 	}
-	if err := server.users.DeleteProfilePictureID(ctx, int(user.UserId)); err != nil {
+	if err := server.users.DeleteProfilePictureID(ctx, int(userId)); err != nil {
 		return nil, isUserError(err)
 	}
 	profilePictureId := *fromDB.ProfilePictureID
@@ -101,31 +97,30 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 }
 
 func (server UserServer) GetUser(ctx context.Context, empty *empty.Empty) (*rpcusers.User, error) {
-	resp, err := rpcauth.IsSignedIn(ctx, server.authentication)
+	userId, err := rpcz.GetUserId(ctx)
 	if err != nil {
-		return nil, err
+		return nil, twirp.RequiredArgumentError("user_id")
 	}
-	user, err := server.users.GetUserByEmail(ctx, resp.Email)
+	user, roles, err := server.users.GetUserRolesByUserId(ctx, int(userId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
 
-	userId := &wrappers.Int64Value{}
+	ppID := &wrappers.Int64Value{}
 	if user.ProfilePictureID != nil {
-		userId.Value = *user.ProfilePictureID
+		ppID.Value = *user.ProfilePictureID
 	}
 
 	return &rpcusers.User{
-		Id:               resp.UserId,
-		Username:         resp.Username,
-		Email:            resp.Email,
-		Roles:            resp.Roles,
-		ProfilePictureId:  userId,
+		Id:               int64(user.ID),
+		Username:         user.Username,
+		Email:            user.Email,
+		Roles:            rolesToString(roles),
+		ProfilePictureId:  ppID,
 	}, nil
 }
 
 func NewUserServer(client *ent.Client,
-	authentication rpcauth.AuthenticationService,
 	smtpUsername string,
 	smtpPassword string,
 	provider mail.Provider,
@@ -133,9 +128,7 @@ func NewUserServer(client *ent.Client,
 	return UserServer{
 		users:         userrepo.NewUserRepository(client),
 		tickets:       ticketrepo.NewTicketRepository(client),
-		crypto:        cryptoz.NewCrypto(),
 		validator:     validator.NewUserServerValidator(),
-		authentication: authentication,
 		smtpPassword:  smtpPassword,
 		smtpUsername:  smtpUsername,
 		smtpProvider:  provider,

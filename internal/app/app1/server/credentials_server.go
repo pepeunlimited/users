@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
@@ -25,7 +24,6 @@ type CredentialsServer struct {
 	users         userrepo.UserRepository
 	crypto        cryptoz.Crypto
 	validator     validator.UserServerValidator
-	authentication rpcauth.AuthenticationService
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
@@ -57,18 +55,18 @@ func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccre
 }
 
 func (server CredentialsServer) UpdatePassword(ctx context.Context, params *rpccredentials.UpdatePasswordParams) (*empty.Empty, error) {
-	verified, err := rpcauth.IsSignedIn(ctx, server.authentication)
+	userId, err := rpcz.GetUserId(ctx)
 	if err != nil {
-		return nil, err
+		return nil, twirp.RequiredArgumentError("user_id")
 	}
-	user,_, err := server.users.GetUserRolesByUsername(ctx, verified.Username)
+	user,_, err := server.users.GetUserRolesByUserId(ctx, int(userId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
 	if err := server.crypto.Check(user.Password, params.CurrentPassword); err != nil {
 		return nil, isCryptoError(err)
 	}
-	_, err = server.users.UpdatePassword(ctx, int(verified.UserId), params.CurrentPassword, params.NewPassword)
+	_, err = server.users.UpdatePassword(ctx, int(userId), params.CurrentPassword, params.NewPassword)
 	if err != nil {
 		return nil, isUserError(err)
 	}
@@ -159,7 +157,6 @@ func (server CredentialsServer) ResetPassword(ctx context.Context, params *rpccr
 }
 
 func NewCredentialsServer(client *ent.Client,
-	authentication rpcauth.AuthenticationService,
 	smtpUsername string,
 	smtpPassword string,
 	provider mail.Provider) CredentialsServer {
@@ -168,7 +165,6 @@ func NewCredentialsServer(client *ent.Client,
 		tickets:       ticketrepo.NewTicketRepository(client),
 		crypto:        cryptoz.NewCrypto(),
 		validator:     validator.NewUserServerValidator(),
-		authentication: authentication,
 		smtpPassword:  smtpPassword,
 		smtpUsername:  smtpUsername,
 		smtpProvider:  provider,

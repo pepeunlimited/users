@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/pepeunlimited/authentication-twirp/rpcauth"
 	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/headers"
 	"github.com/pepeunlimited/microservice-kit/mail"
@@ -16,32 +15,28 @@ import (
 )
 
 const (
-	Version = "0.1.3.15"
+	Version = "0.1.3.16"
 )
 
 func main() {
 	log.Printf("Starting the UsersServer... version=[%v]", Version)
 
-	client := mysql.NewEntClient()
-	authenticationAddress := misc.GetEnv(rpcauth.RpcAuthenticationHost, "http://api.dev.pepeunlimited.com")
-	spacesAddress 		 := misc.GetEnv(rpcspaces.RpcSpacesHost, "http://api.dev.pepeunlimited.com")
+	client 		  := mysql.NewEntClient()
 
-	stmpUsername := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
-	stmpPassword := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
-	smtpProvider := mail.Provider(misc.GetEnv(mail.SmtpClient,   mail.Mock))
+	spacesAddress := misc.GetEnv(rpcspaces.RpcSpacesHost, "http://api.dev.pepeunlimited.com")
 
+	stmpUsername  := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
+	stmpPassword  := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
+	smtpProvider  := mail.Provider(misc.GetEnv(mail.SmtpClient, mail.Mock))
 
 	css := rpccredentials.NewCredentialsServiceServer(server.NewCredentialsServer(
 		client,
-		rpcauth.NewAuthenticationServiceProtobufClient(authenticationAddress, http.DefaultClient),
 		stmpUsername,
 		stmpPassword,
 		smtpProvider),nil)
 
-
 	uss := rpcusers.NewUserServiceServer(server.NewUserServer(
 		client,
-		rpcauth.NewAuthenticationServiceProtobufClient(authenticationAddress, http.DefaultClient),
 		stmpUsername,
 		stmpPassword,
 		smtpProvider,

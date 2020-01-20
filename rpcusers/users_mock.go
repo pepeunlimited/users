@@ -2,7 +2,6 @@ package rpcusers
 
 import (
 	"context"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pepeunlimited/microservice-kit/errorz"
 )
 
@@ -29,7 +28,7 @@ func (u *UsersMock) GetUser(context.Context, *GetUserParams) (*User, error) {
 	return nil, u.Errors.Pop()
 }
 
-func (u *UsersMock) DeleteProfilePicture(context.Context, *empty.Empty) (*ProfilePicture, error) {
+func (u *UsersMock) DeleteProfilePicture(context.Context, *DeleteProfilePictureParams) (*ProfilePicture, error) {
 	panic("implement me")
 }
 
@@ -55,4 +54,6 @@ type UsersMock struct {
 	IsAdmin 	bool
 	User        *User
 }
+
+
 

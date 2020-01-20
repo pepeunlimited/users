@@ -2,9 +2,6 @@ package server
 
 import (
 	"context"
-	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
@@ -22,55 +19,39 @@ type UserServer struct {
 	smtpUsername  string
 	smtpPassword  string
 	smtpProvider  mail.Provider
-	spaces 		  rpcspaces.SpacesService
 }
 
 func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers.SetProfilePictureParams) (*rpcusers.ProfilePicture, error) {
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
-	userId, err := rpcz.GetUserId(ctx)
-	if err != nil {
-		return nil, twirp.RequiredArgumentError("user_id")
-	}
-	// validate access to the file
-	file, err := server.spaces.GetFile(ctx, &rpcspaces.GetFileParams{
-		FileId: &wrappers.Int64Value{
-			Value: params.ProfilePictureId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if file.UserId != userId {
-		return nil, twirp.InvalidArgumentError("profile_picture_id", "can't access other uploader fileID").WithMeta(rpcz.Reason, rpcusers.ProfilePictureAccessDenied);
-	}
-
-	err = server.users.SetProfilePictureID(ctx, int(userId), params.ProfilePictureId)
+	_, err := server.users.GetUserById(ctx, int(params.UserId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
-
+	err = server.users.SetProfilePictureID(ctx, int(params.UserId), params.ProfilePictureId)
+	if err != nil {
+		return nil, isUserError(err)
+	}
 	return &rpcusers.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
 }
 
-func (server UserServer) DeleteProfilePicture(ctx context.Context, params *empty.Empty) (*rpcusers.ProfilePicture, error) {
-	userId, err := rpcz.GetUserId(ctx)
+func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcusers.DeleteProfilePictureParams) (*rpcusers.ProfilePicture, error) {
+	err := server.validator.DeleteProfilePicture(params)
 	if err != nil {
-		return nil, twirp.RequiredArgumentError("user_id")
+		return nil, err
 	}
-	fromDB, err := server.users.GetUserById(ctx, int(userId))
+	user, err := server.users.GetUserById(ctx, int(params.UserId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
-	if fromDB.ProfilePictureID == nil {
+	if user.ProfilePictureID == nil {
 		return &rpcusers.ProfilePicture{}, nil
 	}
-	if err := server.users.DeleteProfilePictureID(ctx, int(userId)); err != nil {
+	if err := server.users.DeleteProfilePictureID(ctx, int(params.UserId)); err != nil {
 		return nil, isUserError(err)
 	}
-	profilePictureId := *fromDB.ProfilePictureID
+	profilePictureId := *user.ProfilePictureID
 	return &rpcusers.ProfilePicture{ProfilePictureId: profilePictureId}, nil
 }
 
@@ -121,8 +102,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserPa
 func NewUserServer(client *ent.Client,
 	smtpUsername string,
 	smtpPassword string,
-	provider mail.Provider,
-	spaces rpcspaces.SpacesService) UserServer {
+	provider mail.Provider) UserServer {
 	return UserServer{
 		users:         userrepo.NewUserRepository(client),
 		tickets:       ticketrepo.NewTicketRepository(client),
@@ -130,6 +110,5 @@ func NewUserServer(client *ent.Client,
 		smtpPassword:  smtpPassword,
 		smtpUsername:  smtpUsername,
 		smtpProvider:  provider,
-		spaces: 	   spaces,
 	}
 }

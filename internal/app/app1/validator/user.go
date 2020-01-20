@@ -31,6 +31,9 @@ func (UserServerValidator) SetProfilePicture(params *rpcusers.SetProfilePictureP
 	if params.ProfilePictureId == 0 {
 		return twirp.RequiredArgumentError("profile_picture_id")
 	}
+	if params.UserId == 0 {
+		return twirp.RequiredArgumentError("user_id")
+	}
 	return nil
 }
 
@@ -92,6 +95,13 @@ func (v UserServerValidator) UpdatePassword(params *rpccredentials.UpdatePasswor
 	}
 	if validator.IsEmpty(params.CurrentPassword) {
 		return twirp.RequiredArgumentError("current_password")
+	}
+	return nil
+}
+
+func (v UserServerValidator) DeleteProfilePicture(params *rpcusers.DeleteProfilePictureParams) error {
+	if params.UserId == 0 {
+		return twirp.RequiredArgumentError("user_id")
 	}
 	return nil
 }

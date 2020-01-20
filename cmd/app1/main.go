@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/pepeunlimited/files/rpcspaces"
-	"github.com/pepeunlimited/microservice-kit/headers"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/middleware"
 	"github.com/pepeunlimited/microservice-kit/misc"
@@ -23,8 +21,6 @@ func main() {
 
 	client 		  := mysql.NewEntClient()
 
-	spacesAddress := misc.GetEnv(rpcspaces.RpcSpacesHost, "http://api.dev.pepeunlimited.com")
-
 	stmpUsername  := misc.GetEnv(mail.SmtpPassword, "us3rn4m3")
 	stmpPassword  := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
 	smtpProvider  := mail.Provider(misc.GetEnv(mail.SmtpClient, mail.Mock))
@@ -39,15 +35,15 @@ func main() {
 		client,
 		stmpUsername,
 		stmpPassword,
-		smtpProvider,
-		rpcspaces.NewSpacesServiceProtobufClient(spacesAddress, http.DefaultClient)),
+		smtpProvider),
 		nil)
 
 	mux := http.NewServeMux()
-	mux.Handle(uss.PathPrefix(), middleware.Adapt(uss, headers.UserId()))
-	mux.Handle(css.PathPrefix(), middleware.Adapt(css, headers.UserId()))
+	mux.Handle(uss.PathPrefix(), middleware.Adapt(uss))
+	mux.Handle(css.PathPrefix(), middleware.Adapt(css))
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Panic(err)
 	}
+
 }

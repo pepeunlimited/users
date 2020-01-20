@@ -26,8 +26,6 @@ spec:
               value: root
             - name: MYSQL_USER
               value: root
-            - name: RPC_SPACES_HOST
-              value: files
             - name: SMTP_USERNAME
               value: us3rn4m3
             - name: SMTP_PASSWORD

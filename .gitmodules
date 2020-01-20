@@ -1,6 +1,3 @@
-[submodule "rpcusers/protobuf"]
-	path = rpcusers/protobuf
-	url = git@github.com:pepeunlimited/protobuf.git
 [submodule "rpccredentials/protobuf"]
 	path = rpccredentials/protobuf
 	url = git@github.com:pepeunlimited/protobuf.git

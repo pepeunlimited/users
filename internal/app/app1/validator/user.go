@@ -34,7 +34,10 @@ func (UserServerValidator) SetProfilePicture(params *rpcusers.SetProfilePictureP
 	return nil
 }
 
-func (UserServerValidator) GetUser() error {
+func (UserServerValidator) GetUser(params *rpcusers.GetUserParams) error {
+	if params.UserId == 0 {
+		return twirp.RequiredArgumentError("user_id")
+	}
 	return nil
 }
 
@@ -76,6 +79,19 @@ func (UserServerValidator) ResetPassword(params *rpccredentials.ResetPasswordPar
 	}
 	if validator.IsEmpty(params.Password) {
 		return twirp.RequiredArgumentError("password")
+	}
+	return nil
+}
+
+func (v UserServerValidator) UpdatePassword(params *rpccredentials.UpdatePasswordParams) error {
+	if params.UserId == 0 {
+		return twirp.RequiredArgumentError("user_id")
+	}
+	if validator.IsEmpty(params.NewPassword) {
+		return twirp.RequiredArgumentError("new_password")
+	}
+	if validator.IsEmpty(params.CurrentPassword) {
+		return twirp.RequiredArgumentError("current_password")
 	}
 	return nil
 }

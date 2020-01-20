@@ -22,7 +22,7 @@ func (u *UsersMock) CreateUser(context.Context, *CreateUserParams) (*User, error
 	return nil, u.Errors.Pop()
 }
 
-func (u *UsersMock) GetUser(context.Context, *empty.Empty) (*User, error) {
+func (u *UsersMock) GetUser(context.Context, *GetUserParams) (*User, error) {
 	if u.Errors.IsEmpty() {
 		return u.user(), nil
 	}
@@ -55,3 +55,4 @@ type UsersMock struct {
 	IsAdmin 	bool
 	User        *User
 }
+

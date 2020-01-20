@@ -55,18 +55,18 @@ func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccre
 }
 
 func (server CredentialsServer) UpdatePassword(ctx context.Context, params *rpccredentials.UpdatePasswordParams) (*empty.Empty, error) {
-	userId, err := rpcz.GetUserId(ctx)
+	err := server.validator.UpdatePassword(params)
 	if err != nil {
-		return nil, twirp.RequiredArgumentError("user_id")
+		return nil, err
 	}
-	user,_, err := server.users.GetUserRolesByUserId(ctx, int(userId))
+	user,_, err := server.users.GetUserRolesByUserId(ctx, int(params.UserId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
 	if err := server.crypto.Check(user.Password, params.CurrentPassword); err != nil {
 		return nil, isCryptoError(err)
 	}
-	_, err = server.users.UpdatePassword(ctx, int(userId), params.CurrentPassword, params.NewPassword)
+	_, err = server.users.UpdatePassword(ctx, int(params.UserId), params.CurrentPassword, params.NewPassword)
 	if err != nil {
 		return nil, isUserError(err)
 	}

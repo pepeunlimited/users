@@ -30,9 +30,9 @@ func TestUserServer_CreateUser(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	ctx = rpcz.AddUserId(resp0.Id)
-
-	user, err := server.GetUser(ctx, &empty.Empty{})
+	user, err := server.GetUser(ctx, &rpcusers.GetUserParams{
+		UserId: resp0.Id,
+	})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -149,7 +149,9 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 	server := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	ctx = rpcz.AddUserId(12312312)
-	_, err := server.GetUser(ctx, &empty.Empty{})
+	_, err := server.GetUser(ctx, &rpcusers.GetUserParams{
+		UserId: 123123123,
+	})
 	if err == nil {
 		t.FailNow()
 	}

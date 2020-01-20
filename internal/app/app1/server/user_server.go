@@ -96,21 +96,19 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 	}, nil
 }
 
-func (server UserServer) GetUser(ctx context.Context, empty *empty.Empty) (*rpcusers.User, error) {
-	userId, err := rpcz.GetUserId(ctx)
+func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserParams) (*rpcusers.User, error) {
+	err := server.validator.GetUser(params)
 	if err != nil {
-		return nil, twirp.RequiredArgumentError("user_id")
+		return nil, err
 	}
-	user, roles, err := server.users.GetUserRolesByUserId(ctx, int(userId))
+	user, roles, err := server.users.GetUserRolesByUserId(ctx, int(params.UserId))
 	if err != nil {
 		return nil, isUserError(err)
 	}
-
-	ppID := &wrappers.Int64Value{}
+	ppID := int64(0)
 	if user.ProfilePictureID != nil {
-		ppID.Value = *user.ProfilePictureID
+		ppID = *user.ProfilePictureID
 	}
-
 	return &rpcusers.User{
 		Id:               int64(user.ID),
 		Username:         user.Username,

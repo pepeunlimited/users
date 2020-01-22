@@ -11,8 +11,8 @@ import (
 	"github.com/pepeunlimited/users/internal/app/app1/ticketrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
-	"github.com/pepeunlimited/users/rpccredentials"
-	"github.com/pepeunlimited/users/rpcusers"
+	"github.com/pepeunlimited/users/credentialsrpc"
+	"github.com/pepeunlimited/users/usersrpc"
 	"github.com/twitchtv/twirp"
 	"log"
 	"path"
@@ -29,7 +29,7 @@ type CredentialsServer struct {
 	smtpProvider  mail.Provider
 }
 
-func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccredentials.VerifySignInParams) (*rpccredentials.VerifySignInResponse, error) {
+func (server CredentialsServer) VerifySignIn(ctx context.Context, params *credentialsrpc.VerifySignInParams) (*credentialsrpc.VerifySignInResponse, error) {
 	err := server.validator.VerifySignIn(params)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccre
 	if user.ProfilePictureID != nil {
 		userId.Value = *user.ProfilePictureID
 	}
-	return &rpccredentials.VerifySignInResponse{
+	return &credentialsrpc.VerifySignInResponse{
 		Id:               int64(user.ID),
 		Username:         user.Username,
 		Email:            user.Email,
@@ -54,7 +54,7 @@ func (server CredentialsServer) VerifySignIn(ctx context.Context, params *rpccre
 	}, nil
 }
 
-func (server CredentialsServer) UpdatePassword(ctx context.Context, params *rpccredentials.UpdatePasswordParams) (*empty.Empty, error) {
+func (server CredentialsServer) UpdatePassword(ctx context.Context, params *credentialsrpc.UpdatePasswordParams) (*empty.Empty, error) {
 	err := server.validator.UpdatePassword(params)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (server CredentialsServer) findUserByUsernameOrEmail(ctx context.Context, u
 	return user, nil
 }
 
-func (server CredentialsServer) ForgotPassword(ctx context.Context, params *rpccredentials.ForgotPasswordParams) (*empty.Empty, error) {
+func (server CredentialsServer) ForgotPassword(ctx context.Context, params *credentialsrpc.ForgotPasswordParams) (*empty.Empty, error) {
 	if err :=  server.validator.ValidForgotPassword(params); err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (server CredentialsServer) ForgotPassword(ctx context.Context, params *rpcc
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, rpcusers.TicketExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, usersrpc.TicketExist)
 		}
 		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
 		return nil, twirp.InternalErrorWith(err)
@@ -129,7 +129,7 @@ func (server CredentialsServer) ForgotPassword(ctx context.Context, params *rpcc
 	return &empty.Empty{}, nil
 }
 
-func (server CredentialsServer) VerifyResetPassword(ctx context.Context, params *rpccredentials.VerifyPasswordParams) (*empty.Empty, error) {
+func (server CredentialsServer) VerifyResetPassword(ctx context.Context, params *credentialsrpc.VerifyPasswordParams) (*empty.Empty, error) {
 	if err := server.validator.VerifyResetPassword(params); err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (server CredentialsServer) VerifyResetPassword(ctx context.Context, params 
 	return &empty.Empty{}, nil
 }
 
-func (server CredentialsServer) ResetPassword(ctx context.Context, params *rpccredentials.ResetPasswordParams) (*empty.Empty, error) {
+func (server CredentialsServer) ResetPassword(ctx context.Context, params *credentialsrpc.ResetPasswordParams) (*empty.Empty, error) {
 	if err := server.validator.ResetPassword(params); err != nil {
 		return nil, err
 	}

@@ -7,8 +7,8 @@ import (
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/mysql"
-	"github.com/pepeunlimited/users/rpccredentials"
-	"github.com/pepeunlimited/users/rpcusers"
+	"github.com/pepeunlimited/users/credentialsrpc"
+	"github.com/pepeunlimited/users/usersrpc"
 	"github.com/twitchtv/twirp"
 	"testing"
 	"time"
@@ -24,13 +24,13 @@ func TestUserServer_SignInOk(t *testing.T) {
 	password := "p4sw0rd"
 
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
-	user0, err := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user0, err := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: password,
 		Email:    email,
 	})
 	ctx = rpcz.AddUserId(user0.Id)
-	user, err := server.VerifySignIn(ctx, &rpccredentials.VerifySignInParams{
+	user, err := server.VerifySignIn(ctx, &credentialsrpc.VerifySignInParams{
 		Username: username,
 		Password: password,
 	})
@@ -47,14 +47,14 @@ func TestUserServer_SignInFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	_, err := server.VerifySignIn(ctx, &rpccredentials.VerifySignInParams{
+	_, err := server.VerifySignIn(ctx, &credentialsrpc.VerifySignInParams{
 		Username: "simo",
 		Password: "p4sw0rd",
 	})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.UserNotFound) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -65,14 +65,14 @@ func TestUserServer_SignInFailCred(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	_, err := server.VerifySignIn(ctx, &rpccredentials.VerifySignInParams{
+	_, err := server.VerifySignIn(ctx, &credentialsrpc.VerifySignInParams{
 		Username: "simo",
 		Password: "p4sw0rd",
 	})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.UserNotFound) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -86,12 +86,12 @@ func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 	username := "simo"
 
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
-	user,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
 		Email:    "simo@gmail.com",
 	})
-	_, err := server.ForgotPassword(ctx, &rpccredentials.ForgotPasswordParams{
+	_, err := server.ForgotPassword(ctx, &credentialsrpc.ForgotPasswordParams{
 		Email: &wrappers.StringValue{
 			Value: user.Email,
 		},
@@ -117,12 +117,12 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
-	user,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
 		Email:    "simo@gmail.com",
 	})
-	_, err := server.ForgotPassword(ctx, &rpccredentials.ForgotPasswordParams{
+	_, err := server.ForgotPassword(ctx, &credentialsrpc.ForgotPasswordParams{
 		Username: &wrappers.StringValue{
 			Value: username,
 		},
@@ -131,7 +131,7 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), mail.MailSendFailed) {
+	if !usersrpc.IsReason(err.(twirp.Error), mail.MailSendFailed) {
 		t.FailNow()
 	}
 	_, tickets, err := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
@@ -151,7 +151,7 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 	server.users.DeleteAll(ctx)
 	username := "simo"
 
-	_, err := server.ForgotPassword(ctx, &rpccredentials.ForgotPasswordParams{
+	_, err := server.ForgotPassword(ctx, &credentialsrpc.ForgotPasswordParams{
 		Username: &wrappers.StringValue{
 			Value: username,
 		},
@@ -160,7 +160,7 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.UserNotFound) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
 		t.FailNow()
 	}
 }
@@ -173,18 +173,18 @@ func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
 
 	server.users.DeleteAll(ctx)
-	user,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "simo",
 		Email:    "simo@gmail.com",
 	})
 	ticket,_ := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Second), int(user.Id))
 	time.Sleep(2 * time.Second)
-	_, err := server.VerifyResetPassword(ctx, &rpccredentials.VerifyPasswordParams{TicketToken: ticket.Token})
+	_, err := server.VerifyResetPassword(ctx, &credentialsrpc.VerifyPasswordParams{TicketToken: ticket.Token})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.TicketExpired) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.TicketExpired) {
 		t.FailNow()
 	}
 }
@@ -194,16 +194,16 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
-	userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "simo",
 		Email:    "simo@gmail.com",
 	})
-	_, err := server.VerifyResetPassword(ctx, &rpccredentials.VerifyPasswordParams{TicketToken: "asd"})
+	_, err := server.VerifyResetPassword(ctx, &credentialsrpc.VerifyPasswordParams{TicketToken: "asd"})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.TicketNotFound) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.TicketNotFound) {
 		t.FailNow()
 	}
 }
@@ -216,12 +216,12 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 
 	server.users.DeleteAll(ctx)
 	username := "simo"
-	user,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
 		Email:    "simo@gmail.com",
 	})
-	server.ForgotPassword(ctx, &rpccredentials.ForgotPasswordParams{
+	server.ForgotPassword(ctx, &credentialsrpc.ForgotPasswordParams{
 		Username: &wrappers.StringValue{
 			Value: username,
 		},
@@ -232,14 +232,14 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 		t.FailNow()
 	}
 	token := tickets[0].Token
-	_, err := server.VerifyResetPassword(ctx, &rpccredentials.VerifyPasswordParams{
+	_, err := server.VerifyResetPassword(ctx, &credentialsrpc.VerifyPasswordParams{
 		TicketToken: token,
 	})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.ResetPassword(ctx, &rpccredentials.ResetPasswordParams{
+	_, err = server.ResetPassword(ctx, &credentialsrpc.ResetPasswordParams{
 		TicketToken:    token,
 		Password: "newpw",
 	})
@@ -247,7 +247,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.VerifySignIn(ctx, &rpccredentials.VerifySignInParams{
+	_, err = server.VerifySignIn(ctx, &credentialsrpc.VerifySignInParams{
 		Username: username,
 		Password: "newpw",
 	})
@@ -267,12 +267,12 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
 	server.users.DeleteAll(ctx)
 	username := "simo"
-	user,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
 		Email:    "simo@gmail.com",
 	})
-	server.ForgotPassword(ctx, &rpccredentials.ForgotPasswordParams{
+	server.ForgotPassword(ctx, &credentialsrpc.ForgotPasswordParams{
 		Email: &wrappers.StringValue{Value: user.Email},
 		Language: "fi",
 	})
@@ -281,14 +281,14 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 		t.FailNow()
 	}
 	token := tickets[0].Token
-	_, err := server.VerifyResetPassword(ctx, &rpccredentials.VerifyPasswordParams{
+	_, err := server.VerifyResetPassword(ctx, &credentialsrpc.VerifyPasswordParams{
 		TicketToken: token,
 	})
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.ResetPassword(ctx, &rpccredentials.ResetPasswordParams{
+	_, err = server.ResetPassword(ctx, &credentialsrpc.ResetPasswordParams{
 		TicketToken:    token,
 		Password: "newpw",
 	})
@@ -296,7 +296,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.VerifySignIn(ctx, &rpccredentials.VerifySignInParams{
+	_, err = server.VerifySignIn(ctx, &credentialsrpc.VerifySignInParams{
 		Username: username,
 		Password: "newpw",
 	})
@@ -321,13 +321,13 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 	username := email
 	password := "p4sw0rd"
 
-	user0,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user0,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: password,
 		Email:    email,
 	})
 	ctx = rpcz.AddUserId(user0.Id)
-	_, err := server.UpdatePassword(ctx, &rpccredentials.UpdatePasswordParams{
+	_, err := server.UpdatePassword(ctx, &credentialsrpc.UpdatePasswordParams{
 		CurrentPassword: password,
 		NewPassword:     "newpw",
 	})
@@ -347,20 +347,20 @@ func TestUserServer_UpdatePasswordFail(t *testing.T) {
 	username := email
 	password := "p4sw0rd"
 
-	user0,_ := userServer.CreateUser(ctx, &rpcusers.CreateUserParams{
+	user0,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: password,
 		Email:    email,
 	})
 	ctx = rpcz.AddUserId(user0.Id)
-	_, err := server.UpdatePassword(ctx, &rpccredentials.UpdatePasswordParams{
+	_, err := server.UpdatePassword(ctx, &credentialsrpc.UpdatePasswordParams{
 		CurrentPassword: "wronpw",
 		NewPassword:     "newpw",
 	})
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.InvalidCredentials) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.InvalidCredentials) {
 		t.FailNow()
 	}
 }

@@ -45,7 +45,6 @@ $ curl -H "Content-Type: application/json" \
 -d '{"current_password": "currpw", "new_password":"newpw"}'
 ```
 
-
 ```
 for ((i=1;i<=100;i++)); do curl https://t-bucket-666.fra1.cdn.digitaloceanspaces.com/simo.txt; done
 ```

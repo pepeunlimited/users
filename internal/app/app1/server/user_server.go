@@ -8,7 +8,7 @@ import (
 	"github.com/pepeunlimited/users/internal/app/app1/ticketrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
-	"github.com/pepeunlimited/users/rpcusers"
+	"github.com/pepeunlimited/users/usersrpc"
 	"github.com/twitchtv/twirp"
 )
 
@@ -21,7 +21,7 @@ type UserServer struct {
 	smtpProvider  mail.Provider
 }
 
-func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers.SetProfilePictureParams) (*rpcusers.ProfilePicture, error) {
+func (server UserServer) SetProfilePicture(ctx context.Context, params *usersrpc.SetProfilePictureParams) (*usersrpc.ProfilePicture, error) {
 	if err := server.validator.SetProfilePicture(params); err != nil {
 		return nil, err
 	}
@@ -33,10 +33,10 @@ func (server UserServer) SetProfilePicture(ctx context.Context, params *rpcusers
 	if err != nil {
 		return nil, isUserError(err)
 	}
-	return &rpcusers.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
+	return &usersrpc.ProfilePicture{ProfilePictureId: params.ProfilePictureId}, nil
 }
 
-func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcusers.DeleteProfilePictureParams) (*rpcusers.ProfilePicture, error) {
+func (server UserServer) DeleteProfilePicture(ctx context.Context, params *usersrpc.DeleteProfilePictureParams) (*usersrpc.ProfilePicture, error) {
 	err := server.validator.DeleteProfilePicture(params)
 	if err != nil {
 		return nil, err
@@ -46,16 +46,16 @@ func (server UserServer) DeleteProfilePicture(ctx context.Context, params *rpcus
 		return nil, isUserError(err)
 	}
 	if user.ProfilePictureID == nil {
-		return &rpcusers.ProfilePicture{}, nil
+		return &usersrpc.ProfilePicture{}, nil
 	}
 	if err := server.users.DeleteProfilePictureID(ctx, int(params.UserId)); err != nil {
 		return nil, isUserError(err)
 	}
 	profilePictureId := *user.ProfilePictureID
-	return &rpcusers.ProfilePicture{ProfilePictureId: profilePictureId}, nil
+	return &usersrpc.ProfilePicture{ProfilePictureId: profilePictureId}, nil
 }
 
-func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.CreateUserParams) (*rpcusers.User, error) {
+func (server UserServer) CreateUser(ctx context.Context, params *usersrpc.CreateUserParams) (*usersrpc.User, error) {
 	if err := server.validator.CreateUser(params); err != nil {
 		return nil, err
 	}
@@ -63,13 +63,13 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 	if err  != nil {
 		switch err {
 		case userrepo.ErrUsernameExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.UsernameExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, usersrpc.UsernameExist)
 		case userrepo.ErrEmailExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, rpcusers.EmailExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, usersrpc.EmailExist)
 		}
 		return nil, twirp.NewError(twirp.Aborted, err.Error())
 	}
-	return &rpcusers.User{
+	return &usersrpc.User{
 		Id:                   int64(user.ID),
 		Username:             user.Username,
 		Email:                user.Email,
@@ -77,7 +77,7 @@ func (server UserServer) CreateUser(ctx context.Context, params *rpcusers.Create
 	}, nil
 }
 
-func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserParams) (*rpcusers.User, error) {
+func (server UserServer) GetUser(ctx context.Context, params *usersrpc.GetUserParams) (*usersrpc.User, error) {
 	err := server.validator.GetUser(params)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (server UserServer) GetUser(ctx context.Context, params *rpcusers.GetUserPa
 	if user.ProfilePictureID != nil {
 		ppID = *user.ProfilePictureID
 	}
-	return &rpcusers.User{
+	return &usersrpc.User{
 		Id:               int64(user.ID),
 		Username:         user.Username,
 		Email:            user.Email,

@@ -5,7 +5,7 @@ import (
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/mysql"
-	"github.com/pepeunlimited/users/rpcusers"
+	"github.com/pepeunlimited/users/usersrpc"
 	"github.com/twitchtv/twirp"
 	"log"
 	"testing"
@@ -19,7 +19,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	resp0, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
+	resp0, err := server.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
@@ -28,7 +28,7 @@ func TestUserServer_CreateUser(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	user, err := server.GetUser(ctx, &rpcusers.GetUserParams{
+	user, err := server.GetUser(ctx, &usersrpc.GetUserParams{
 		UserId: resp0.Id,
 	})
 	if err != nil {
@@ -51,13 +51,13 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	resp0,_ := server.CreateUser(ctx, &rpcusers.CreateUserParams{
+	resp0,_ := server.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
 	})
 
-	_, err := server.SetProfilePicture(ctx, &rpcusers.SetProfilePictureParams{
+	_, err := server.SetProfilePicture(ctx, &usersrpc.SetProfilePictureParams{
 		ProfilePictureId: 3,
 		UserId: resp0.Id,
 	})
@@ -75,7 +75,7 @@ func TestUserServer_SetDeleteProfilePicture(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.DeleteProfilePicture(ctx, &rpcusers.DeleteProfilePictureParams{
+	_, err = server.DeleteProfilePicture(ctx, &usersrpc.DeleteProfilePictureParams{
 		UserId: resp0.Id,
 	})
 	if err != nil {
@@ -88,7 +88,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	_, err := server.CreateUser(ctx, &rpcusers.CreateUserParams{
+	_, err := server.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo@gmail.com",
@@ -97,7 +97,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	_, err = server.CreateUser(ctx, &rpcusers.CreateUserParams{
+	_, err = server.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "siimoo",
 		Email:    "simo2@gmail.com",
@@ -105,7 +105,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.UsernameExist) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UsernameExist) {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -116,14 +116,14 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 	server := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
 	ctx = rpcz.AddUserId(12312312)
-	_, err := server.GetUser(ctx, &rpcusers.GetUserParams{
+	_, err := server.GetUser(ctx, &usersrpc.GetUserParams{
 		UserId: 123123123,
 	})
 	if err == nil {
 		t.FailNow()
 	}
 
-	if !rpcusers.IsReason(err.(twirp.Error), rpcusers.UserNotFound) {
+	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
 		t.FailNow()
 	}
 }

@@ -1,4 +1,4 @@
-package rpcusers
+package usersrpc
 
 import (
 	"context"

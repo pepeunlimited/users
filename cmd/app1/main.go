@@ -6,14 +6,14 @@ import (
 	"github.com/pepeunlimited/microservice-kit/misc"
 	"github.com/pepeunlimited/users/internal/app/app1/mysql"
 	"github.com/pepeunlimited/users/internal/app/app1/server"
-	"github.com/pepeunlimited/users/rpccredentials"
-	"github.com/pepeunlimited/users/rpcusers"
+	"github.com/pepeunlimited/users/credentialsrpc"
+	"github.com/pepeunlimited/users/usersrpc"
 	"log"
 	"net/http"
 )
 
 const (
-	Version = "0.1.3.18"
+	Version = "0.1.3.19"
 )
 
 func main() {
@@ -25,13 +25,13 @@ func main() {
 	stmpPassword  := misc.GetEnv(mail.SmtpPassword, "p4sw0rd")
 	smtpProvider  := mail.Provider(misc.GetEnv(mail.SmtpClient, mail.Mock))
 
-	css := rpccredentials.NewCredentialsServiceServer(server.NewCredentialsServer(
+	css := credentialsrpc.NewCredentialsServiceServer(server.NewCredentialsServer(
 		client,
 		stmpUsername,
 		stmpPassword,
 		smtpProvider),nil)
 
-	uss := rpcusers.NewUserServiceServer(server.NewUserServer(
+	uss := usersrpc.NewUserServiceServer(server.NewUserServer(
 		client,
 		stmpUsername,
 		stmpPassword,

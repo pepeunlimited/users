@@ -8,7 +8,7 @@ This code was generated with github.com/twitchtv/twirp/protoc-gen-twirp v5.10.0.
 It is generated from these files:
 	credentials.proto
 */
-package rpccredentials
+package credentialsrpc
 
 import bytes "bytes"
 import strings "strings"

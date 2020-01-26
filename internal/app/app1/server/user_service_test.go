@@ -105,7 +105,7 @@ func TestUserServer_CreateUserFail(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UsernameExist) {
+	if err.(twirp.Error).Msg() != usersrpc.UsernameExist {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -122,8 +122,7 @@ func TestUserServer_GetUserNotFound(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
+	if err.(twirp.Error).Msg() != usersrpc.UserNotFound {
 		t.FailNow()
 	}
 }

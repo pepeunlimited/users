@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/pepeunlimited/files/rpcspaces"
 	"github.com/pepeunlimited/microservice-kit/mail"
 	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/mysql"
@@ -23,7 +22,7 @@ func TestUserServer_SignInOk(t *testing.T) {
 	username := email
 	password := "p4sw0rd"
 
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	user0, err := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: password,
@@ -54,7 +53,7 @@ func TestUserServer_SignInFail(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
+	if err.(twirp.Error).Msg() != usersrpc.UserNotFound {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -72,7 +71,7 @@ func TestUserServer_SignInFailCred(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
+	if err.(twirp.Error).Msg() != usersrpc.UserNotFound {
 		t.Log(err.(twirp.Error).Error())
 		t.FailNow()
 	}
@@ -85,7 +84,7 @@ func TestUserServer_ForgotPasswordSuccess(t *testing.T) {
 	server.users.DeleteAll(ctx)
 	username := "simo"
 
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
@@ -116,7 +115,7 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, mail.MockFail)
 	server.users.DeleteAll(ctx)
 	username := "simo"
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: username,
 		Password: "p4sw04d",
@@ -131,7 +130,7 @@ func TestUserServer_ForgotPasswordFailure1(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), mail.MailSendFailed) {
+	if err.(twirp.Error).Msg() != mail.MailSendFailed {
 		t.FailNow()
 	}
 	_, tickets, err := server.users.GetUserTicketsByUserId(ctx, int(user.Id))
@@ -160,7 +159,7 @@ func TestUserServer_ForgotPasswordFailure2(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.UserNotFound) {
+	if err.(twirp.Error).Msg() != usersrpc.UserNotFound {
 		t.FailNow()
 	}
 }
@@ -170,7 +169,7 @@ func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
 
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 
 	server.users.DeleteAll(ctx)
 	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
@@ -184,7 +183,7 @@ func TestUserServer_VerifyResetPasswordExpired(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.TicketExpired) {
+	if err.(twirp.Error).Msg() != usersrpc.TicketExpired {
 		t.FailNow()
 	}
 }
@@ -193,7 +192,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
 		Username: "simo",
 		Password: "simo",
@@ -203,7 +202,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.TicketNotFound) {
+	if err.(twirp.Error).Msg() != usersrpc.TicketNotFound {
 		t.FailNow()
 	}
 }
@@ -211,7 +210,7 @@ func TestUserServer_VerifyResetPasswordNotFound(t *testing.T) {
 func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 
 
 	server.users.DeleteAll(ctx)
@@ -264,7 +263,7 @@ func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess(t *testing.T) {
 func TestUserServer_VerifyResetPasswordAndResetPasswordSuccess2(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
 	username := "simo"
 	user,_ := userServer.CreateUser(ctx, &usersrpc.CreateUserParams{
@@ -314,7 +313,7 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 	ctx := context.TODO()
 
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -330,6 +329,7 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 	_, err := server.UpdatePassword(ctx, &credentialsrpc.UpdatePasswordParams{
 		CurrentPassword: password,
 		NewPassword:     "newpw",
+		UserId:user0.Id,
 	})
 	if err != nil {
 		t.Error(err)
@@ -340,7 +340,7 @@ func TestUserServer_UpdatePassword(t *testing.T) {
 func TestUserServer_UpdatePasswordFail(t *testing.T) {
 	ctx := context.TODO()
 	server := NewCredentialsServer(mysql.NewEntClient(), username, password, provider)
-	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider, rpcspaces.NewSpacesMock(nil))
+	userServer := NewUserServer(mysql.NewEntClient(), username, password, provider)
 	server.users.DeleteAll(ctx)
 
 	email := "simo@gmail.com"
@@ -356,11 +356,12 @@ func TestUserServer_UpdatePasswordFail(t *testing.T) {
 	_, err := server.UpdatePassword(ctx, &credentialsrpc.UpdatePasswordParams{
 		CurrentPassword: "wronpw",
 		NewPassword:     "newpw",
+		UserId:          user0.Id,
 	})
 	if err == nil {
 		t.FailNow()
 	}
-	if !usersrpc.IsReason(err.(twirp.Error), usersrpc.InvalidCredentials) {
+	if err.(twirp.Error).Msg() != usersrpc.InvalidCredentials {
 		t.FailNow()
 	}
 }

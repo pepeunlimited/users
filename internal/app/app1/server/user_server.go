@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"github.com/pepeunlimited/microservice-kit/mail"
-	"github.com/pepeunlimited/microservice-kit/rpcz"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/ticketrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
@@ -63,9 +62,9 @@ func (server UserServer) CreateUser(ctx context.Context, params *usersrpc.Create
 	if err  != nil {
 		switch err {
 		case userrepo.ErrUsernameExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, usersrpc.UsernameExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, usersrpc.UsernameExist)
 		case userrepo.ErrEmailExist:
-			return nil, twirp.NewError(twirp.AlreadyExists, err.Error()).WithMeta(rpcz.Reason, usersrpc.EmailExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, usersrpc.EmailExist)
 		}
 		return nil, twirp.NewError(twirp.Aborted, err.Error())
 	}

@@ -1,11 +1,5 @@
 package usersrpc
 
-import (
-	"github.com/pepeunlimited/microservice-kit/rpcz"
-	"github.com/pepeunlimited/microservice-kit/validator"
-	"github.com/twitchtv/twirp"
-)
-
 const (
 	UserNotFound        	  = "user_not_found"
 	UserIsBanned        	  = "user_is_banned"
@@ -16,13 +10,4 @@ const (
 	TicketExist    			  = "ticket_exist"
 	TicketNotFound 			  = "ticket_not_found"
 	TicketExpired       	  = "ticket_expired"
-	ProfilePictureAccessDenied = "profile_picture_access_denied"
 )
-
-func IsReason(error twirp.Error, key string) bool {
-	reason := error.Meta(rpcz.Reason)
-	if validator.IsEmpty(reason) {
-		return false
-	}
-	return reason == key
-}

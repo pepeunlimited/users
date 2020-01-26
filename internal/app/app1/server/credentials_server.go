@@ -6,12 +6,11 @@ import (
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/microservice-kit/mail"
-	"github.com/pepeunlimited/microservice-kit/rpcz"
+	"github.com/pepeunlimited/users/credentialsrpc"
 	"github.com/pepeunlimited/users/internal/app/app1/ent"
 	"github.com/pepeunlimited/users/internal/app/app1/ticketrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/userrepo"
 	"github.com/pepeunlimited/users/internal/app/app1/validator"
-	"github.com/pepeunlimited/users/credentialsrpc"
 	"github.com/pepeunlimited/users/usersrpc"
 	"github.com/twitchtv/twirp"
 	"log"
@@ -101,7 +100,7 @@ func (server CredentialsServer) ForgotPassword(ctx context.Context, params *cred
 	ticket, err := server.tickets.CreateTicket(ctx, time.Now().UTC().Add(1*time.Hour), user.ID)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, twirp.NewError(twirp.AlreadyExists, "ticket already exist").WithMeta(rpcz.Reason, usersrpc.TicketExist)
+			return nil, twirp.NewError(twirp.AlreadyExists, usersrpc.TicketExist)
 		}
 		log.Print("users-service: unknown error during create ticket on forgot password: "+err.Error())
 		return nil, twirp.InternalErrorWith(err)
@@ -124,7 +123,7 @@ func (server CredentialsServer) ForgotPassword(ctx context.Context, params *cred
 	if err != nil {
 		log.Print("users-service: unknown error during mail send on forgot password: "+err.Error())
 		server.tickets.UseTicket(ctx, ticket.Token)
-		return nil, twirp.NewError(twirp.Aborted, "failed to send mail for user").WithMeta(rpcz.Reason, mail.MailSendFailed)
+		return nil, twirp.NewError(twirp.Aborted, mail.MailSendFailed)
 	}
 	return &empty.Empty{}, nil
 }

@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
-	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
+	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
 )
 
 // TicketDelete is the builder for deleting a Ticket entity.
@@ -39,7 +39,7 @@ func (td *TicketDelete) ExecX(ctx context.Context) int {
 }
 
 func (td *TicketDelete) sqlExec(ctx context.Context) (int, error) {
-	spec := &sqlgraph.DeleteSpec{
+	_spec := &sqlgraph.DeleteSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table: ticket.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -49,13 +49,13 @@ func (td *TicketDelete) sqlExec(ctx context.Context) (int, error) {
 		},
 	}
 	if ps := td.predicates; len(ps) > 0 {
-		spec.Predicate = func(selector *sql.Selector) {
+		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	return sqlgraph.DeleteNodes(ctx, td.driver, spec)
+	return sqlgraph.DeleteNodes(ctx, td.driver, _spec)
 }
 
 // TicketDeleteOne is the builder for deleting a single Ticket entity.
@@ -70,7 +70,7 @@ func (tdo *TicketDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &ErrNotFound{ticket.Label}
+		return &NotFoundError{ticket.Label}
 	default:
 		return nil
 	}

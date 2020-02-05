@@ -5,11 +5,13 @@ package ent
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/pepeunlimited/users/internal/pkg/ent/migrate"
+
 	"github.com/pepeunlimited/users/internal/pkg/ent/role"
 	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
 	"github.com/pepeunlimited/users/internal/pkg/ent/user"
-	"log"
 
 	"github.com/facebookincubator/ent/dialect"
 	"github.com/facebookincubator/ent/dialect/sql"

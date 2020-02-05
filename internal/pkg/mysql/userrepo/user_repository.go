@@ -6,7 +6,6 @@ import (
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/users/internal/pkg/ent"
 	"github.com/pepeunlimited/users/internal/pkg/ent/user"
-	"github.com/pepeunlimited/users/internal/pkg/mysql/rolerepo"
 	"time"
 )
 
@@ -234,7 +233,7 @@ func (repo userMySQL) CreateUser(ctx context.Context, username string, email str
 	if err != nil {
 		return nil, nil, err
 	}
-	role, err := tx.Role.Create().SetUsersID(user.ID).SetRole(string(rolerepo.User)).Save(ctx) // add default role
+	role, err := tx.Role.Create().SetUsersID(user.ID).SetRole("user").Save(ctx) // add default role
 	if err != nil {
 		tx.Rollback()
 		return nil, nil, err

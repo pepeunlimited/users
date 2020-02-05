@@ -6,7 +6,6 @@ import (
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/users/internal/pkg/ent"
 	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
-	"github.com/pepeunlimited/users/internal/pkg/mysql/userrepo"
 	"time"
 )
 
@@ -14,6 +13,7 @@ import (
 var (
 	ErrTicketExpired 	= errors.New("tickets: ticket is expired")
 	ErrTicketNotExist 	= errors.New("tickets: ticket not exist")
+	ErrUserNotExist 	= errors.New("users: user not exist")
 )
 
 // Access the tickets table
@@ -58,7 +58,7 @@ func (repo ticketMySQL) GetTicketUserByToken(ctx context.Context, token string) 
 	user, err := ticket.QueryUsers().Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, nil, userrepo.ErrUserNotExist
+			return nil, nil, ErrUserNotExist
 		}
 		return nil, nil, err
 	}

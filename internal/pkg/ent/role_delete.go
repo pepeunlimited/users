@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
 )
 
 // RoleDelete is the builder for deleting a Role entity.
@@ -39,7 +39,7 @@ func (rd *RoleDelete) ExecX(ctx context.Context) int {
 }
 
 func (rd *RoleDelete) sqlExec(ctx context.Context) (int, error) {
-	spec := &sqlgraph.DeleteSpec{
+	_spec := &sqlgraph.DeleteSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table: role.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -49,13 +49,13 @@ func (rd *RoleDelete) sqlExec(ctx context.Context) (int, error) {
 		},
 	}
 	if ps := rd.predicates; len(ps) > 0 {
-		spec.Predicate = func(selector *sql.Selector) {
+		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	return sqlgraph.DeleteNodes(ctx, rd.driver, spec)
+	return sqlgraph.DeleteNodes(ctx, rd.driver, _spec)
 }
 
 // RoleDeleteOne is the builder for deleting a single Role entity.
@@ -70,7 +70,7 @@ func (rdo *RoleDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &ErrNotFound{role.Label}
+		return &NotFoundError{role.Label}
 	default:
 		return nil
 	}

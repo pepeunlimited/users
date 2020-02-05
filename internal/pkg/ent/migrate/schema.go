@@ -15,7 +15,7 @@ var (
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "role", Type: field.TypeString, Size: 200, Default: role.DefaultRole},
-		{Name: "users_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_roles", Type: field.TypeInt, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
@@ -38,7 +38,7 @@ var (
 		{Name: "token", Type: field.TypeString, Unique: true, Size: 72},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "expires_at", Type: field.TypeTime},
-		{Name: "users_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_tickets", Type: field.TypeInt, Nullable: true},
 	}
 	// TicketsTable holds the schema information for the "tickets" table.
 	TicketsTable = &schema.Table{

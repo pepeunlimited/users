@@ -3,11 +3,11 @@
 package user
 
 import (
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
 )
 
 // ID filters vertices based on their identifier.

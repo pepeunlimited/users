@@ -36,17 +36,17 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "ticket" package.
 	TicketsInverseTable = "tickets"
 	// TicketsColumn is the table column denoting the tickets relation/edge.
-	TicketsColumn = "users_id"
+	TicketsColumn = "user_tickets"
 	// RolesTable is the table the holds the roles relation/edge.
 	RolesTable = "roles"
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "roles"
 	// RolesColumn is the table column denoting the roles relation/edge.
-	RolesColumn = "users_id"
+	RolesColumn = "user_roles"
 )
 
-// Columns holds all SQL columns are user fields.
+// Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
 	FieldUsername,

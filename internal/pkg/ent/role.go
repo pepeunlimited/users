@@ -4,10 +4,11 @@ package ent
 
 import (
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
 	"strings"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // Role is the model entity for the Role schema.
@@ -17,20 +18,54 @@ type Role struct {
 	ID int `json:"id,omitempty"`
 	// Role holds the value of the "role" field.
 	Role string `json:"role,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RoleQuery when eager-loading is set.
+	Edges      RoleEdges `json:"edges"`
+	user_roles *int
+}
+
+// RoleEdges holds the relations/edges for other nodes in the graph.
+type RoleEdges struct {
+	// Users holds the value of the users edge.
+	Users *User
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RoleEdges) UsersOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.Users == nil {
+			// The edge users was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Role) scanValues() []interface{} {
 	return []interface{}{
-		&sql.NullInt64{},
-		&sql.NullString{},
+		&sql.NullInt64{},  // id
+		&sql.NullString{}, // role
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*Role) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // user_roles
 	}
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Role fields.
 func (r *Role) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(role.Columns); m != n {
+	if m, n := len(values), len(role.Columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	value, ok := values[0].(*sql.NullInt64)
@@ -43,6 +78,15 @@ func (r *Role) assignValues(values ...interface{}) error {
 		return fmt.Errorf("unexpected type %T for field role", values[0])
 	} else if value.Valid {
 		r.Role = value.String
+	}
+	values = values[1:]
+	if len(values) == len(role.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field user_roles", value)
+		} else if value.Valid {
+			r.user_roles = new(int)
+			*r.user_roles = int(value.Int64)
+		}
 	}
 	return nil
 }

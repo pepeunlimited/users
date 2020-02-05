@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
-	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
+	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // TicketQuery is the builder for querying Ticket entities.
@@ -24,6 +24,9 @@ type TicketQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Ticket
+	// eager-loading edges.
+	withUsers *UserQuery
+	withFKs   bool
 	// intermediate query.
 	sql *sql.Selector
 }
@@ -64,14 +67,14 @@ func (tq *TicketQuery) QueryUsers() *UserQuery {
 	return query
 }
 
-// First returns the first Ticket entity in the query. Returns *ErrNotFound when no ticket was found.
+// First returns the first Ticket entity in the query. Returns *NotFoundError when no ticket was found.
 func (tq *TicketQuery) First(ctx context.Context) (*Ticket, error) {
 	ts, err := tq.Limit(1).All(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if len(ts) == 0 {
-		return nil, &ErrNotFound{ticket.Label}
+		return nil, &NotFoundError{ticket.Label}
 	}
 	return ts[0], nil
 }
@@ -85,14 +88,14 @@ func (tq *TicketQuery) FirstX(ctx context.Context) *Ticket {
 	return t
 }
 
-// FirstID returns the first Ticket id in the query. Returns *ErrNotFound when no id was found.
+// FirstID returns the first Ticket id in the query. Returns *NotFoundError when no id was found.
 func (tq *TicketQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = tq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &ErrNotFound{ticket.Label}
+		err = &NotFoundError{ticket.Label}
 		return
 	}
 	return ids[0], nil
@@ -117,9 +120,9 @@ func (tq *TicketQuery) Only(ctx context.Context) (*Ticket, error) {
 	case 1:
 		return ts[0], nil
 	case 0:
-		return nil, &ErrNotFound{ticket.Label}
+		return nil, &NotFoundError{ticket.Label}
 	default:
-		return nil, &ErrNotSingular{ticket.Label}
+		return nil, &NotSingularError{ticket.Label}
 	}
 }
 
@@ -142,9 +145,9 @@ func (tq *TicketQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &ErrNotFound{ticket.Label}
+		err = &NotFoundError{ticket.Label}
 	default:
-		err = &ErrNotSingular{ticket.Label}
+		err = &NotSingularError{ticket.Label}
 	}
 	return
 }
@@ -233,6 +236,17 @@ func (tq *TicketQuery) Clone() *TicketQuery {
 	}
 }
 
+//  WithUsers tells the query-builder to eager-loads the nodes that are connected to
+// the "users" edge. The optional arguments used to configure the query builder of the edge.
+func (tq *TicketQuery) WithUsers(opts ...func(*UserQuery)) *TicketQuery {
+	query := &UserQuery{config: tq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withUsers = query
+	return tq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -276,30 +290,74 @@ func (tq *TicketQuery) Select(field string, fields ...string) *TicketSelect {
 
 func (tq *TicketQuery) sqlAll(ctx context.Context) ([]*Ticket, error) {
 	var (
-		nodes []*Ticket
-		spec  = tq.querySpec()
+		nodes       = []*Ticket{}
+		withFKs     = tq.withFKs
+		_spec       = tq.querySpec()
+		loadedTypes = [1]bool{
+			tq.withUsers != nil,
+		}
 	)
-	spec.ScanValues = func() []interface{} {
+	if tq.withUsers != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, ticket.ForeignKeys...)
+	}
+	_spec.ScanValues = func() []interface{} {
 		node := &Ticket{config: tq.config}
 		nodes = append(nodes, node)
-		return node.scanValues()
+		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
+		return values
 	}
-	spec.Assign = func(values ...interface{}) error {
+	_spec.Assign = func(values ...interface{}) error {
 		if len(nodes) == 0 {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(values...)
 	}
-	if err := sqlgraph.QueryNodes(ctx, tq.driver, spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, tq.driver, _spec); err != nil {
 		return nil, err
 	}
+	if len(nodes) == 0 {
+		return nodes, nil
+	}
+
+	if query := tq.withUsers; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Ticket)
+		for i := range nodes {
+			if fk := nodes[i].user_tickets; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(user.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_tickets" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Users = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 
 func (tq *TicketQuery) sqlCount(ctx context.Context) (int, error) {
-	spec := tq.querySpec()
-	return sqlgraph.CountNodes(ctx, tq.driver, spec)
+	_spec := tq.querySpec()
+	return sqlgraph.CountNodes(ctx, tq.driver, _spec)
 }
 
 func (tq *TicketQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -311,7 +369,7 @@ func (tq *TicketQuery) sqlExist(ctx context.Context) (bool, error) {
 }
 
 func (tq *TicketQuery) querySpec() *sqlgraph.QuerySpec {
-	spec := &sqlgraph.QuerySpec{
+	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   ticket.Table,
 			Columns: ticket.Columns,
@@ -324,26 +382,26 @@ func (tq *TicketQuery) querySpec() *sqlgraph.QuerySpec {
 		Unique: true,
 	}
 	if ps := tq.predicates; len(ps) > 0 {
-		spec.Predicate = func(selector *sql.Selector) {
+		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
 	if limit := tq.limit; limit != nil {
-		spec.Limit = *limit
+		_spec.Limit = *limit
 	}
 	if offset := tq.offset; offset != nil {
-		spec.Offset = *offset
+		_spec.Offset = *offset
 	}
 	if ps := tq.order; len(ps) > 0 {
-		spec.Order = func(selector *sql.Selector) {
+		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	return spec
+	return _spec
 }
 
 func (tq *TicketQuery) sqlQuery() *sql.Selector {

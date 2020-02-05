@@ -22,13 +22,18 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UsersInverseTable = "users"
 	// UsersColumn is the table column denoting the users relation/edge.
-	UsersColumn = "users_id"
+	UsersColumn = "user_roles"
 )
 
-// Columns holds all SQL columns are role fields.
+// Columns holds all SQL columns for role fields.
 var Columns = []string{
 	FieldID,
 	FieldRole,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the Role type.
+var ForeignKeys = []string{
+	"user_roles",
 }
 
 var (

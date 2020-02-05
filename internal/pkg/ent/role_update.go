@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // RoleUpdate is the builder for updating Role entities.
@@ -108,7 +108,7 @@ func (ru *RoleUpdate) ExecX(ctx context.Context) {
 }
 
 func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	spec := &sqlgraph.UpdateSpec{
+	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -119,14 +119,14 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		},
 	}
 	if ps := ru.predicates; len(ps) > 0 {
-		spec.Predicate = func(selector *sql.Selector) {
+		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
 	if value := ru.role; value != nil {
-		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: role.FieldRole,
@@ -146,7 +146,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				},
 			},
 		}
-		spec.Edges.Clear = append(spec.Edges.Clear, edge)
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ru.users; len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -165,9 +165,9 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges.Add = append(spec.Edges.Add, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, spec); err != nil {
+	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}
@@ -263,7 +263,7 @@ func (ruo *RoleUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (r *Role, err error) {
-	spec := &sqlgraph.UpdateSpec{
+	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -275,7 +275,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (r *Role, err error) {
 		},
 	}
 	if value := ruo.role; value != nil {
-		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: role.FieldRole,
@@ -295,7 +295,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (r *Role, err error) {
 				},
 			},
 		}
-		spec.Edges.Clear = append(spec.Edges.Clear, edge)
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := ruo.users; len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -314,12 +314,12 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (r *Role, err error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges.Add = append(spec.Edges.Add, edge)
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	r = &Role{config: ruo.config}
-	spec.Assign = r.assignValues
-	spec.ScanValues = r.scanValues()
-	if err = sqlgraph.UpdateNode(ctx, ruo.driver, spec); err != nil {
+	_spec.Assign = r.assignValues
+	_spec.ScanValues = r.scanValues()
+	if err = sqlgraph.UpdateNode(ctx, ruo.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}

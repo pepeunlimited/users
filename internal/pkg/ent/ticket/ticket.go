@@ -26,15 +26,20 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UsersInverseTable = "users"
 	// UsersColumn is the table column denoting the users relation/edge.
-	UsersColumn = "users_id"
+	UsersColumn = "user_tickets"
 )
 
-// Columns holds all SQL columns are ticket fields.
+// Columns holds all SQL columns for ticket fields.
 var Columns = []string{
 	FieldID,
 	FieldToken,
 	FieldCreatedAt,
 	FieldExpiresAt,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the Ticket type.
+var ForeignKeys = []string{
+	"user_tickets",
 }
 
 var (

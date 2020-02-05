@@ -16,19 +16,19 @@ CREATE TABLE users (
 );
 
 CREATE TABLE tickets (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    token CHAR(72) UNIQUE NOT NULL,
-    created_at DATETIME(3) NOT NULL,
-    expires_at DATETIME(3) NOT NULL,
-    users_id BIGINT NULL,
-    FOREIGN KEY (users_id) REFERENCES users (id),
+    id            BIGINT      NOT NULL AUTO_INCREMENT,
+    token         CHAR(72)    UNIQUE NOT NULL,
+    created_at    DATETIME(3) NOT NULL,
+    expires_at    DATETIME(3) NOT NULL,
+    user_tickets  BIGINT      NULL,
+    FOREIGN KEY (user_tickets) REFERENCES users (id),
     PRIMARY KEY (id)
 );
 
 CREATE TABLE roles (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    role VARCHAR(200) NOT NULL DEFAULT 'user', -- user, admin, reviewer
-    users_id BIGINT NULL,
-    FOREIGN KEY (users_id) REFERENCES users (id),
+    id            BIGINT       NOT NULL AUTO_INCREMENT,
+    role          VARCHAR(200) NOT NULL DEFAULT 'user', -- user, admin, reviewer
+    user_roles    BIGINT NULL,
+    FOREIGN KEY (user_roles) REFERENCES users (id),
     PRIMARY KEY (id)
 );

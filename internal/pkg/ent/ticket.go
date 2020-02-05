@@ -4,11 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
 	"strings"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // Ticket is the model entity for the Ticket schema.
@@ -22,22 +23,56 @@ type Ticket struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// ExpiresAt holds the value of the "expires_at" field.
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TicketQuery when eager-loading is set.
+	Edges        TicketEdges `json:"edges"`
+	user_tickets *int
+}
+
+// TicketEdges holds the relations/edges for other nodes in the graph.
+type TicketEdges struct {
+	// Users holds the value of the users edge.
+	Users *User
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TicketEdges) UsersOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.Users == nil {
+			// The edge users was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Ticket) scanValues() []interface{} {
 	return []interface{}{
-		&sql.NullInt64{},
-		&sql.NullString{},
-		&sql.NullTime{},
-		&sql.NullTime{},
+		&sql.NullInt64{},  // id
+		&sql.NullString{}, // token
+		&sql.NullTime{},   // created_at
+		&sql.NullTime{},   // expires_at
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*Ticket) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // user_tickets
 	}
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Ticket fields.
 func (t *Ticket) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(ticket.Columns); m != n {
+	if m, n := len(values), len(ticket.Columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	value, ok := values[0].(*sql.NullInt64)
@@ -60,6 +95,15 @@ func (t *Ticket) assignValues(values ...interface{}) error {
 		return fmt.Errorf("unexpected type %T for field expires_at", values[2])
 	} else if value.Valid {
 		t.ExpiresAt = value.Time
+	}
+	values = values[3:]
+	if len(values) == len(ticket.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field user_tickets", value)
+		} else if value.Valid {
+			t.user_tickets = new(int)
+			*t.user_tickets = int(value.Int64)
+		}
 	}
 	return nil
 }

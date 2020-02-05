@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // TicketCreate is the builder for creating a Ticket entity.
@@ -94,8 +94,8 @@ func (tc *TicketCreate) SaveX(ctx context.Context) *Ticket {
 
 func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 	var (
-		t    = &Ticket{config: tc.config}
-		spec = &sqlgraph.CreateSpec{
+		t     = &Ticket{config: tc.config}
+		_spec = &sqlgraph.CreateSpec{
 			Table: ticket.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
@@ -104,7 +104,7 @@ func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 		}
 	)
 	if value := tc.token; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: ticket.FieldToken,
@@ -112,7 +112,7 @@ func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 		t.Token = *value
 	}
 	if value := tc.created_at; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  *value,
 			Column: ticket.FieldCreatedAt,
@@ -120,7 +120,7 @@ func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 		t.CreatedAt = *value
 	}
 	if value := tc.expires_at; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  *value,
 			Column: ticket.FieldExpiresAt,
@@ -144,15 +144,15 @@ func (tc *TicketCreate) sqlSave(ctx context.Context) (*Ticket, error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges = append(spec.Edges, edge)
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if err := sqlgraph.CreateNode(ctx, tc.driver, spec); err != nil {
+	if err := sqlgraph.CreateNode(ctx, tc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}
 		return nil, err
 	}
-	id := spec.ID.Value.(int64)
+	id := _spec.ID.Value.(int64)
 	t.ID = int(id)
 	return t, nil
 }

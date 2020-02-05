@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/predicate"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // RoleQuery is the builder for querying Role entities.
@@ -24,6 +24,9 @@ type RoleQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Role
+	// eager-loading edges.
+	withUsers *UserQuery
+	withFKs   bool
 	// intermediate query.
 	sql *sql.Selector
 }
@@ -64,14 +67,14 @@ func (rq *RoleQuery) QueryUsers() *UserQuery {
 	return query
 }
 
-// First returns the first Role entity in the query. Returns *ErrNotFound when no role was found.
+// First returns the first Role entity in the query. Returns *NotFoundError when no role was found.
 func (rq *RoleQuery) First(ctx context.Context) (*Role, error) {
 	rs, err := rq.Limit(1).All(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if len(rs) == 0 {
-		return nil, &ErrNotFound{role.Label}
+		return nil, &NotFoundError{role.Label}
 	}
 	return rs[0], nil
 }
@@ -85,14 +88,14 @@ func (rq *RoleQuery) FirstX(ctx context.Context) *Role {
 	return r
 }
 
-// FirstID returns the first Role id in the query. Returns *ErrNotFound when no id was found.
+// FirstID returns the first Role id in the query. Returns *NotFoundError when no id was found.
 func (rq *RoleQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &ErrNotFound{role.Label}
+		err = &NotFoundError{role.Label}
 		return
 	}
 	return ids[0], nil
@@ -117,9 +120,9 @@ func (rq *RoleQuery) Only(ctx context.Context) (*Role, error) {
 	case 1:
 		return rs[0], nil
 	case 0:
-		return nil, &ErrNotFound{role.Label}
+		return nil, &NotFoundError{role.Label}
 	default:
-		return nil, &ErrNotSingular{role.Label}
+		return nil, &NotSingularError{role.Label}
 	}
 }
 
@@ -142,9 +145,9 @@ func (rq *RoleQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &ErrNotFound{role.Label}
+		err = &NotFoundError{role.Label}
 	default:
-		err = &ErrNotSingular{role.Label}
+		err = &NotSingularError{role.Label}
 	}
 	return
 }
@@ -233,6 +236,17 @@ func (rq *RoleQuery) Clone() *RoleQuery {
 	}
 }
 
+//  WithUsers tells the query-builder to eager-loads the nodes that are connected to
+// the "users" edge. The optional arguments used to configure the query builder of the edge.
+func (rq *RoleQuery) WithUsers(opts ...func(*UserQuery)) *RoleQuery {
+	query := &UserQuery{config: rq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withUsers = query
+	return rq
+}
+
 // GroupBy used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -276,30 +290,74 @@ func (rq *RoleQuery) Select(field string, fields ...string) *RoleSelect {
 
 func (rq *RoleQuery) sqlAll(ctx context.Context) ([]*Role, error) {
 	var (
-		nodes []*Role
-		spec  = rq.querySpec()
+		nodes       = []*Role{}
+		withFKs     = rq.withFKs
+		_spec       = rq.querySpec()
+		loadedTypes = [1]bool{
+			rq.withUsers != nil,
+		}
 	)
-	spec.ScanValues = func() []interface{} {
+	if rq.withUsers != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, role.ForeignKeys...)
+	}
+	_spec.ScanValues = func() []interface{} {
 		node := &Role{config: rq.config}
 		nodes = append(nodes, node)
-		return node.scanValues()
+		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
+		return values
 	}
-	spec.Assign = func(values ...interface{}) error {
+	_spec.Assign = func(values ...interface{}) error {
 		if len(nodes) == 0 {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(values...)
 	}
-	if err := sqlgraph.QueryNodes(ctx, rq.driver, spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, rq.driver, _spec); err != nil {
 		return nil, err
 	}
+	if len(nodes) == 0 {
+		return nodes, nil
+	}
+
+	if query := rq.withUsers; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Role)
+		for i := range nodes {
+			if fk := nodes[i].user_roles; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
+		}
+		query.Where(user.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_roles" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Users = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 
 func (rq *RoleQuery) sqlCount(ctx context.Context) (int, error) {
-	spec := rq.querySpec()
-	return sqlgraph.CountNodes(ctx, rq.driver, spec)
+	_spec := rq.querySpec()
+	return sqlgraph.CountNodes(ctx, rq.driver, _spec)
 }
 
 func (rq *RoleQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -311,7 +369,7 @@ func (rq *RoleQuery) sqlExist(ctx context.Context) (bool, error) {
 }
 
 func (rq *RoleQuery) querySpec() *sqlgraph.QuerySpec {
-	spec := &sqlgraph.QuerySpec{
+	_spec := &sqlgraph.QuerySpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
@@ -324,26 +382,26 @@ func (rq *RoleQuery) querySpec() *sqlgraph.QuerySpec {
 		Unique: true,
 	}
 	if ps := rq.predicates; len(ps) > 0 {
-		spec.Predicate = func(selector *sql.Selector) {
+		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
 	if limit := rq.limit; limit != nil {
-		spec.Limit = *limit
+		_spec.Limit = *limit
 	}
 	if offset := rq.offset; offset != nil {
-		spec.Offset = *offset
+		_spec.Offset = *offset
 	}
 	if ps := rq.order; len(ps) > 0 {
-		spec.Order = func(selector *sql.Selector) {
+		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	return spec
+	return _spec
 }
 
 func (rq *RoleQuery) sqlQuery() *sql.Selector {

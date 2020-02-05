@@ -4,11 +4,11 @@ package ent
 
 import (
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 	"strings"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // User is the model entity for the User schema.
@@ -32,27 +32,59 @@ type User struct {
 	LastModified time.Time `json:"last_modified,omitempty"`
 	// ProfilePictureID holds the value of the "profile_picture_id" field.
 	ProfilePictureID *int64 `json:"profile_picture_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Tickets holds the value of the tickets edge.
+	Tickets []*Ticket
+	// Roles holds the value of the roles edge.
+	Roles []*Role
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// TicketsOrErr returns the Tickets value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) TicketsOrErr() ([]*Ticket, error) {
+	if e.loadedTypes[0] {
+		return e.Tickets, nil
+	}
+	return nil, &NotLoadedError{edge: "tickets"}
+}
+
+// RolesOrErr returns the Roles value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) RolesOrErr() ([]*Role, error) {
+	if e.loadedTypes[1] {
+		return e.Roles, nil
+	}
+	return nil, &NotLoadedError{edge: "roles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues() []interface{} {
 	return []interface{}{
-		&sql.NullInt64{},
-		&sql.NullString{},
-		&sql.NullString{},
-		&sql.NullString{},
-		&sql.NullBool{},
-		&sql.NullBool{},
-		&sql.NullBool{},
-		&sql.NullTime{},
-		&sql.NullInt64{},
+		&sql.NullInt64{},  // id
+		&sql.NullString{}, // username
+		&sql.NullString{}, // email
+		&sql.NullString{}, // password
+		&sql.NullBool{},   // is_deleted
+		&sql.NullBool{},   // is_banned
+		&sql.NullBool{},   // is_locked
+		&sql.NullTime{},   // last_modified
+		&sql.NullInt64{},  // profile_picture_id
 	}
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the User fields.
 func (u *User) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(user.Columns); m != n {
+	if m, n := len(values), len(user.Columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	value, ok := values[0].(*sql.NullInt64)

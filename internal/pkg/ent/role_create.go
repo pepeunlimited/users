@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // RoleCreate is the builder for creating a Role entity.
@@ -82,8 +82,8 @@ func (rc *RoleCreate) SaveX(ctx context.Context) *Role {
 
 func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
 	var (
-		r    = &Role{config: rc.config}
-		spec = &sqlgraph.CreateSpec{
+		r     = &Role{config: rc.config}
+		_spec = &sqlgraph.CreateSpec{
 			Table: role.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
@@ -92,7 +92,7 @@ func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
 		}
 	)
 	if value := rc.role; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: role.FieldRole,
@@ -116,15 +116,15 @@ func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges = append(spec.Edges, edge)
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if err := sqlgraph.CreateNode(ctx, rc.driver, spec); err != nil {
+	if err := sqlgraph.CreateNode(ctx, rc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}
 		return nil, err
 	}
-	id := spec.ID.Value.(int64)
+	id := _spec.ID.Value.(int64)
 	r.ID = int(id)
 	return r, nil
 }

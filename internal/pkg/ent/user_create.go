@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pepeunlimited/users/internal/pkg/ent/role"
-	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
-	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
 	"github.com/facebookincubator/ent/schema/field"
+	"github.com/pepeunlimited/users/internal/pkg/ent/role"
+	"github.com/pepeunlimited/users/internal/pkg/ent/ticket"
+	"github.com/pepeunlimited/users/internal/pkg/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -199,8 +199,8 @@ func (uc *UserCreate) SaveX(ctx context.Context) *User {
 
 func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	var (
-		u    = &User{config: uc.config}
-		spec = &sqlgraph.CreateSpec{
+		u     = &User{config: uc.config}
+		_spec = &sqlgraph.CreateSpec{
 			Table: user.Table,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
@@ -209,7 +209,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		}
 	)
 	if value := uc.username; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: user.FieldUsername,
@@ -217,7 +217,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.Username = *value
 	}
 	if value := uc.email; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: user.FieldEmail,
@@ -225,7 +225,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.Email = *value
 	}
 	if value := uc.password; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  *value,
 			Column: user.FieldPassword,
@@ -233,7 +233,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.Password = *value
 	}
 	if value := uc.is_deleted; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  *value,
 			Column: user.FieldIsDeleted,
@@ -241,7 +241,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.IsDeleted = *value
 	}
 	if value := uc.is_banned; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  *value,
 			Column: user.FieldIsBanned,
@@ -249,7 +249,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.IsBanned = *value
 	}
 	if value := uc.is_locked; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  *value,
 			Column: user.FieldIsLocked,
@@ -257,7 +257,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.IsLocked = *value
 	}
 	if value := uc.last_modified; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  *value,
 			Column: user.FieldLastModified,
@@ -265,7 +265,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		u.LastModified = *value
 	}
 	if value := uc.profile_picture_id; value != nil {
-		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt64,
 			Value:  *value,
 			Column: user.FieldProfilePictureID,
@@ -289,7 +289,7 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges = append(spec.Edges, edge)
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := uc.roles; len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -308,15 +308,15 @@ func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 		for k, _ := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		spec.Edges = append(spec.Edges, edge)
+		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if err := sqlgraph.CreateNode(ctx, uc.driver, spec); err != nil {
+	if err := sqlgraph.CreateNode(ctx, uc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
 		}
 		return nil, err
 	}
-	id := spec.ID.Value.(int64)
+	id := _spec.ID.Value.(int64)
 	u.ID = int(id)
 	return u, nil
 }

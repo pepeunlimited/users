@@ -9,7 +9,6 @@ import (
 	"strconv"
 )
 
-
 func NewEntClient() *Client {
 	username 	:= misc.GetEnv(sqlz.MysqlUser, "root")
 	password 	:= misc.GetEnv(sqlz.MysqlRootPassword, "root")

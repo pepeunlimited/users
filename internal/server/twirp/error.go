@@ -36,6 +36,8 @@ func isTicketError(err error) error {
 		return twirp.NewError(twirp.NotFound, usersrpc.TicketNotFound)
 	case ticketrepo.ErrTicketExpired:
 		return twirp.NewError(twirp.InvalidArgument, usersrpc.TicketExpired)
+	case ticketrepo.ErrUserNotExist:
+		return twirp.NotFoundError(usersrpc.UserNotFound)
 	}
 	log.Print("user-service: unknown isTicketError: "+err.Error())
 	return twirp.InternalErrorWith(err)

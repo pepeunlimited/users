@@ -1,18 +1,18 @@
-package rolerepo
+package role
 
 import (
 	"context"
 	"github.com/pepeunlimited/users/internal/pkg/ent"
-	"github.com/pepeunlimited/users/internal/pkg/mysql/userrepo"
+	"github.com/pepeunlimited/users/internal/pkg/mysql/user"
 	"testing"
 )
 
 func TestRolesMySQL_AddRole(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := userrepo.NewUserRepository(client)
+	users := user.New(client)
 	users.DeleteAll(ctx)
-	roles := NewRolesRepository(client)
+	roles := New(client)
 	user,_, err := users.CreateUser(ctx, "simo", "simo@gmail.com", "p4sw0rd")
 	if err != nil {
 		t.Error(err)

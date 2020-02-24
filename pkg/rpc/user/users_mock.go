@@ -1,4 +1,4 @@
-package usersrpc
+package user
 
 import (
 	"context"

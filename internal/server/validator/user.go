@@ -2,8 +2,8 @@ package validator
 
 import (
 	"github.com/pepeunlimited/microservice-kit/validator"
-	"github.com/pepeunlimited/users/pkg/credentialsrpc"
-	"github.com/pepeunlimited/users/pkg/usersrpc"
+	"github.com/pepeunlimited/users/pkg/rpc/credentials"
+	"github.com/pepeunlimited/users/pkg/rpc/user"
 	"github.com/twitchtv/twirp"
 )
 
@@ -14,7 +14,7 @@ func NewUserServerValidator() UserServerValidator {
 	return UserServerValidator{}
 }
 
-func (UserServerValidator) CreateUser(params *usersrpc.CreateUserParams) error {
+func (UserServerValidator) CreateUser(params *user.CreateUserParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}
@@ -27,7 +27,7 @@ func (UserServerValidator) CreateUser(params *usersrpc.CreateUserParams) error {
 	return nil
 }
 
-func (UserServerValidator) SetProfilePicture(params *usersrpc.SetProfilePictureParams) error {
+func (UserServerValidator) SetProfilePicture(params *user.SetProfilePictureParams) error {
 	if params.ProfilePictureId == 0 {
 		return twirp.RequiredArgumentError("profile_picture_id")
 	}
@@ -37,14 +37,14 @@ func (UserServerValidator) SetProfilePicture(params *usersrpc.SetProfilePictureP
 	return nil
 }
 
-func (UserServerValidator) GetUser(params *usersrpc.GetUserParams) error {
+func (UserServerValidator) GetUser(params *user.GetUserParams) error {
 	if params.UserId == 0 {
 		return twirp.RequiredArgumentError("user_id")
 	}
 	return nil
 }
 
-func (UserServerValidator) VerifySignIn(params *credentialsrpc.VerifySignInParams) error {
+func (UserServerValidator) VerifySignIn(params *credentials.VerifySignInParams) error {
 	if validator.IsEmpty(params.Username) {
 		return twirp.RequiredArgumentError("username")
 	}
@@ -54,7 +54,7 @@ func (UserServerValidator) VerifySignIn(params *credentialsrpc.VerifySignInParam
 	return nil
 }
 
-func (UserServerValidator) ValidForgotPassword(params *credentialsrpc.ForgotPasswordParams) error {
+func (UserServerValidator) ValidForgotPassword(params *credentials.ForgotPasswordParams) error {
 	if params.Username == nil && params.Email == nil {
 		return twirp.RequiredArgumentError("username_or_email")
 	}
@@ -69,14 +69,14 @@ func (UserServerValidator) ValidForgotPassword(params *credentialsrpc.ForgotPass
 	return nil
 }
 
-func (UserServerValidator) VerifyResetPassword(params *credentialsrpc.VerifyPasswordParams) error {
+func (UserServerValidator) VerifyResetPassword(params *credentials.VerifyPasswordParams) error {
 	if validator.IsEmpty(params.TicketToken) {
 		return twirp.RequiredArgumentError("ticket_token")
 	}
 	return nil
 }
 
-func (UserServerValidator) ResetPassword(params *credentialsrpc.ResetPasswordParams) error {
+func (UserServerValidator) ResetPassword(params *credentials.ResetPasswordParams) error {
 	if validator.IsEmpty(params.TicketToken) {
 		return twirp.RequiredArgumentError("ticket_token")
 	}
@@ -86,7 +86,7 @@ func (UserServerValidator) ResetPassword(params *credentialsrpc.ResetPasswordPar
 	return nil
 }
 
-func (v UserServerValidator) UpdatePassword(params *credentialsrpc.UpdatePasswordParams) error {
+func (v UserServerValidator) UpdatePassword(params *credentials.UpdatePasswordParams) error {
 	if params.UserId == 0 {
 		return twirp.RequiredArgumentError("user_id")
 	}
@@ -99,7 +99,7 @@ func (v UserServerValidator) UpdatePassword(params *credentialsrpc.UpdatePasswor
 	return nil
 }
 
-func (v UserServerValidator) DeleteProfilePicture(params *usersrpc.DeleteProfilePictureParams) error {
+func (v UserServerValidator) DeleteProfilePicture(params *user.DeleteProfilePictureParams) error {
 	if params.UserId == 0 {
 		return twirp.RequiredArgumentError("user_id")
 	}

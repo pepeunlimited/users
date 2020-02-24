@@ -1,16 +1,16 @@
-package credentialsrpc
+package credentials
 
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pepeunlimited/microservice-kit/errorz"
-	"github.com/pepeunlimited/users/pkg/usersrpc"
+	"github.com/pepeunlimited/users/pkg/rpc/user"
 )
 
 type CredentialsMock struct {
 	Errors 		errorz.Stack
 	IsAdmin 	bool
-	User        *usersrpc.User
+	User        *user.User
 }
 
 func (c *CredentialsMock) UpdatePassword(context.Context, *UpdatePasswordParams) (*empty.Empty, error) {
@@ -53,12 +53,12 @@ func NewCredentialsMock(errors []error, isAdmin bool) CredentialsService {
 	return &CredentialsMock{Errors: errorz.NewErrorStack(errors), IsAdmin:isAdmin}
 }
 
-func (u *CredentialsMock) user() *usersrpc.User {
+func (u *CredentialsMock) user() *user.User {
 	roles := []string{"User"}
 	if u.IsAdmin {
 		roles = append(roles, "Admin")
 	}
-	return &usersrpc.User{
+	return &user.User{
 		Id:                   1,
 		Username:             "kakkaliisa",
 		Email:                "kakkaliisa@gmail.com",

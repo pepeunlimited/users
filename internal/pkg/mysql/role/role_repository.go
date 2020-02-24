@@ -1,4 +1,4 @@
-package rolerepo
+package role
 
 import (
 	"context"
@@ -55,6 +55,6 @@ func (r rolesMySQL) DeleteRole(ctx context.Context, userId int, srole Role) erro
 	return err
 }
 
-func NewRolesRepository(client *ent.Client) RoleRepository {
+func New(client *ent.Client) RoleRepository {
 	return &rolesMySQL{client:client}
 }

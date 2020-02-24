@@ -1,4 +1,4 @@
-package ticketrepo
+package ticket
 
 import (
 	"context"
@@ -14,6 +14,7 @@ var (
 	ErrTicketExpired 	= errors.New("tickets: ticket is expired")
 	ErrTicketNotExist 	= errors.New("tickets: ticket not exist")
 	ErrUserNotExist 	= errors.New("users: user not exist")
+	ErrErrTicketExist 	= errors.New("tickets: ticket exist")
 )
 
 // Access the tickets table
@@ -79,8 +80,10 @@ func (repo ticketMySQL) CreateTicket(ctx context.Context, expiresAt time.Time, u
 		SetToken(token).
 		SetUsersID(userId).
 		Save(ctx)
-
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, ErrErrTicketExist
+		}
 		return nil, err
 	}
 
@@ -91,7 +94,7 @@ func (repo ticketMySQL) DeleteTickets(ctx context.Context) {
 	repo.client.Ticket.Delete().ExecX(ctx)
 }
 
-func NewTicketRepository(client *ent.Client) TicketRepository {
+func New(client *ent.Client) TicketRepository {
 	return ticketMySQL{client:client, crypto:cryptoz.NewCrypto()}
 }
 

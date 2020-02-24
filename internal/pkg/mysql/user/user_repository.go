@@ -1,4 +1,4 @@
-package userrepo
+package user
 
 import (
 	"context"
@@ -283,6 +283,6 @@ func (repo userMySQL) DeleteUsers(ctx context.Context) {
 	repo.client.User.Delete().ExecX(ctx)
 }
 
-func NewUserRepository(client *ent.Client) UserRepository {
+func New(client *ent.Client) UserRepository {
 	return userMySQL{client:client, crypto: cryptoz.NewCrypto()}
 }

@@ -1,11 +1,11 @@
-package userrepo
+package user
 
 import (
 	"context"
 	"github.com/pepeunlimited/microservice-kit/cryptoz"
 	"github.com/pepeunlimited/users/internal/pkg/ent"
-	"github.com/pepeunlimited/users/internal/pkg/mysql/rolerepo"
-	"github.com/pepeunlimited/users/internal/pkg/mysql/ticketrepo"
+	"github.com/pepeunlimited/users/internal/pkg/mysql/role"
+	"github.com/pepeunlimited/users/internal/pkg/mysql/ticket"
 	"testing"
 	"time"
 )
@@ -13,7 +13,7 @@ import (
 func TestUserMySQL_ResetPassword(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	repo := NewUserRepository(client)
+	repo := New(client)
 	repo.DeleteAll(ctx)
 	username := "ssiimoo"
 	email := "simo.alakotila@gmail.com"
@@ -38,7 +38,7 @@ func TestUserMySQL_ResetPassword(t *testing.T) {
 func TestUserMySQL_CreateUser(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	repo := NewUserRepository(client)
+	repo := New(client)
 	repo.DeleteAll(ctx)
 	username := "ssiimoo"
 	email := "simo.alakotila@gmail.com"
@@ -57,7 +57,7 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 	if userById.ID != user.ID {
 		t.FailNow()
 	}
-	if rolerepo.Role(role.Role) != rolerepo.User {
+	if role.Role(role.Role) != role.User {
 		t.FailNow()
 	}
 }
@@ -65,7 +65,7 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 func TestUserMySQL_GetUserByIdNotFound(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	repo := NewUserRepository(client)
+	repo := New(client)
 	repo.DeleteAll(ctx)
 	user, err := repo.GetUserById(ctx, 100)
 	if err == nil {
@@ -80,7 +80,7 @@ func TestUserMySQL_GetUserByIdNotFound(t *testing.T) {
 func TestUserMySQL_GetUsers(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	repo := NewUserRepository(client)
+	repo := New(client)
 
 	repo.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo")
 	repo.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo")
@@ -99,8 +99,8 @@ func TestUserMySQL_GetUsers(t *testing.T) {
 func TestUserMySQL_GetUserTicketsByUserId(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
-	ticketsrepo := ticketrepo.NewTicketRepository(client)
+	users := New(client)
+	ticketsrepo := ticket.New(client)
 	users.DeleteAll(ctx)
 	ssiimoo,_, _ := users.CreateUser(ctx, "ssiimoo", "simo.alakotila@gmail.com", "ssiimoo")
 	piiia,_, _ := users.CreateUser(ctx, "piiia", "piiiaaa@gmail.com", "ssiimoo")
@@ -128,7 +128,7 @@ func TestUserMySQL_GetUserTicketsByUserId(t *testing.T) {
 func TestUserMySQL_UpdateUser(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	user,_,_ := users.CreateUser(ctx, "ssimoo", "simo.alakotila@gmail.com", "p4sw0rd")
 	selected,_ := users.GetUserById(ctx, user.ID)
@@ -146,7 +146,7 @@ func TestUserMySQL_UpdateUser(t *testing.T) {
 func TestUserMySQL_UpdatePasswordOk(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	password := "p4sw0rd"
 	newpw := "new_"+password
@@ -170,7 +170,7 @@ func TestUserMySQL_UpdatePasswordOk(t *testing.T) {
 func TestUserMySQL_UpdatePasswordFail(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	password := "p4sw0rd"
 	newpw := "new_"+password
@@ -199,7 +199,7 @@ func TestUserMySQL_UpdatePasswordFail(t *testing.T) {
 func TestUserMySQL_BanUserUnLock(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	user,_,_ := users.CreateUser(ctx, "simo", "simo.alakotila@gmail.com", "simo")
 	err := users.BanUser(ctx, user.ID)
@@ -230,7 +230,7 @@ func TestUserMySQL_BanUserUnLock(t *testing.T) {
 func TestUserMySQL_CreateUserEmailAndUsernameExist(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	users.CreateUser(ctx, "simo1", "simo.alakotila@gmail.com", "simo")
 	users.CreateUser(ctx, "simo", "simo1.alakotila@gmail.com", "simo")
@@ -253,9 +253,9 @@ func TestUserMySQL_CreateUserEmailAndUsernameExist(t *testing.T) {
 func TestUserMySQL_GetUserRolesByUsername(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
-	repo := rolerepo.NewRolesRepository(client)
+	repo := role.New(client)
 	user, _,_ := users.CreateUser(ctx, "simo", "simo.alakotila@gmail.com", "p4sw0rd")
 	user, roles, err := users.GetUserRolesByUserId(ctx, user.ID)
 	if err != nil {
@@ -265,7 +265,7 @@ func TestUserMySQL_GetUserRolesByUsername(t *testing.T) {
 	if len(roles) != 1 {
 		t.FailNow()
 	}
-	err = repo.AddRole(ctx, user.ID, rolerepo.Admin)
+	err = repo.AddRole(ctx, user.ID, role.Admin)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -283,9 +283,9 @@ func TestUserMySQL_GetUserRolesByUsername(t *testing.T) {
 func TestUserMySQL_GetUserRolesByUserId(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
-	repo := rolerepo.NewRolesRepository(client)
+	repo := role.New(client)
 	username := "simo"
 	user, _,_ := users.CreateUser(ctx, username, "simo.alakotila@gmail.com", "p4sw0rd")
 	user, roles, err := users.GetUserRolesByUsername(ctx, username)
@@ -296,7 +296,7 @@ func TestUserMySQL_GetUserRolesByUserId(t *testing.T) {
 	if len(roles) != 1 {
 		t.FailNow()
 	}
-	err = repo.AddRole(ctx, user.ID, rolerepo.Admin)
+	err = repo.AddRole(ctx, user.ID, role.Admin)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -314,7 +314,7 @@ func TestUserMySQL_GetUserRolesByUserId(t *testing.T) {
 func TestUserMySQL_SetProfilePictureIDAndDelete(t *testing.T) {
 	ctx := context.TODO()
 	client := ent.NewEntClient()
-	users := NewUserRepository(client)
+	users := New(client)
 	users.DeleteAll(ctx)
 	username := "simo0"
 	users.DeleteAll(ctx)

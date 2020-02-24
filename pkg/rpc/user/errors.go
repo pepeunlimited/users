@@ -1,4 +1,4 @@
-package credentialsrpc
+package user
 
 const (
 	UserNotFound        	  = "user_not_found"
@@ -10,5 +10,4 @@ const (
 	TicketExist    			  = "ticket_exist"
 	TicketNotFound 			  = "ticket_not_found"
 	TicketExpired       	  = "ticket_expired"
-	ProfilePictureAccessDenied = "profile_picture_access_denied"
 )

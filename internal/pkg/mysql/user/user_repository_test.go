@@ -44,7 +44,7 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 	email := "simo.alakotila@gmail.com"
 	password := "p4sw0rd"
 
-	user, role, err := repo.CreateUser(ctx, username, email, password)
+	user, fromDBRole, err := repo.CreateUser(ctx, username, email, password)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -57,7 +57,7 @@ func TestUserMySQL_CreateUser(t *testing.T) {
 	if userById.ID != user.ID {
 		t.FailNow()
 	}
-	if role.Role(role.Role) != role.User {
+	if role.Role(fromDBRole.Role) != role.User {
 		t.FailNow()
 	}
 }
